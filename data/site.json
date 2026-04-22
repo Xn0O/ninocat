@@ -3,12 +3,40 @@
   "brandIcon": "./assets/Home_Site/ninocatlogo.png",
   "brand": {
     "icon": "./assets/Home_Site/ninocatlogo.png",
-    "textSize": "2.0rem",
-    "logoSize": "36px",
+    "textSize": "1.08rem",
+    "logoSize": "22px",
     "gap": "8px"
   },
-  "eyebrow": "（*＾-＾*）",
-  "subtitle": "↑长按互动",
+  "navItems": [
+    {
+      "key": "blog",
+      "label": "Blog",
+      "href": "./blog.html"
+    },
+    {
+      "key": "game",
+      "label": "Game",
+      "href": "./game.html"
+    },
+    {
+      "key": "art",
+      "label": "Art",
+      "href": "./art.html"
+    },
+    {
+      "key": "about",
+      "label": "About",
+      "href": "./about.html"
+    }
+  ],
+  "navGlassQuick": {
+    "color": "#ffffff",
+    "opacity": 0.1,
+    "blur": "16px",
+    "saturate": "100%"
+  },
+  "eyebrow": "im ninocat",
+  "subtitle": "点击/长按NINO猫可以互动~",
   "defaultTheme": "dark",
   "themes": {
     "light": {
@@ -31,10 +59,10 @@
   "headerImages": {
     "default": "./assets/hero-home.svg",
     "home": "./assets/hero-home.svg",
-    "blog": "./assets/hero-blog.svg",
-    "game": "./assets/hero-game.svg",
-    "art": "./assets/hero-art.svg",
-    "about": "./assets/hero-about.svg"
+    "blog": "./assets/Home_Site/B_0.jpg",
+    "game": "./assets/Home_Site/B_1.jpg",
+    "art": "./assets/Home_Site/B_2_1.jpg",
+    "about": "./assets/Home_Site/B_3.jpg"
   },
   "homeStrips": [
     {
@@ -82,6 +110,7 @@
     "bgB": "./assets/Home_Toy/BG_0.jpg",
     "frameMs": 90,
     "roleScale": 2.0,
+    "titleGap": "48px",
     "roleXPercent": 0,
     "roleYPercent": 28,
     "shakeMs": 240

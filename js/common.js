@@ -18,6 +18,28 @@
     return fallback;
   }
 
+  function normalizeCssNumberOrPercent(value, fallback) {
+    if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+      return String(value);
+    }
+    if (typeof value !== "string") return fallback;
+    const text = value.trim();
+    if (!text) return fallback;
+    if (/^\d+(\.\d+)?%?$/.test(text)) return text;
+    return fallback;
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function rgbaFromColor(color, alpha, fallback) {
+    const rgb = parseColorToRgb(color);
+    if (!rgb) return fallback;
+    const a = clamp(Number(alpha), 0, 1);
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${a.toFixed(3)})`;
+  }
+
   function applyBrandConfig(config) {
     const root = document.documentElement.style;
     const brand = config?.brand && typeof config.brand === "object" ? config.brand : {};
@@ -42,6 +64,141 @@
     root.setProperty("--brand-gap", brandGap);
   }
 
+  function normalizeNavItems(config) {
+    const fallback = [
+      { key: "blog", label: "博客", href: "./blog.html" },
+      { key: "game", label: "游戏", href: "./game.html" },
+      { key: "art", label: "美术", href: "./art.html" },
+      { key: "about", label: "关于", href: "./about.html" },
+    ];
+
+    const flatItems = Array.isArray(config?.navItems) ? config.navItems : [];
+    const nestedItems = Array.isArray(config?.nav?.items) ? config.nav.items : [];
+    const source = flatItems.length ? flatItems : nestedItems;
+    if (!source.length) return fallback;
+
+    const normalized = source
+      .map((item) => {
+        const key = typeof item?.key === "string" ? item.key.trim() : "";
+        const label = typeof item?.label === "string" ? item.label.trim() : "";
+        const href = typeof item?.href === "string" ? item.href.trim() : "";
+        if (!label || !href) return null;
+        return {
+          key,
+          label,
+          href,
+        };
+      })
+      .filter(Boolean);
+
+    return normalized.length ? normalized : fallback;
+  }
+
+  function applyNavConfig(config) {
+    const navRoot = document.querySelector(".top-nav nav");
+    if (!navRoot) return;
+
+    const items = normalizeNavItems(config);
+    navRoot.replaceChildren();
+
+    items.forEach((item) => {
+      const anchor = document.createElement("a");
+      anchor.href = item.href;
+      anchor.textContent = item.label;
+      if (item.key) {
+        anchor.dataset.nav = item.key;
+      }
+      navRoot.appendChild(anchor);
+    });
+  }
+
+  function applyNavGlassConfig(config) {
+    const root = document.documentElement.style;
+    const nestedNav = config?.nav && typeof config.nav === "object" ? config.nav : {};
+    const nestedGlass = nestedNav?.glass && typeof nestedNav.glass === "object" ? nestedNav.glass : {};
+    const flatGlass = config?.navGlass && typeof config.navGlass === "object" ? config.navGlass : {};
+    const glass = Object.keys(flatGlass).length ? flatGlass : nestedGlass;
+    const quick = config?.navGlassQuick && typeof config.navGlassQuick === "object" ? config.navGlassQuick : {};
+
+    const setColorVar = (name, value) => {
+      if (typeof value !== "string") return;
+      const text = value.trim();
+      if (!text) return;
+      root.setProperty(name, text);
+    };
+
+    // Quick mode: user adjusts only 4 knobs in site.json, detailed values are auto-derived.
+    if (Object.keys(quick).length) {
+      const quickColor = typeof quick.color === "string" ? quick.color.trim() : "#8400ff";
+      const rawOpacity = Number(quick.opacity);
+      const opacity = Number.isFinite(rawOpacity) ? clamp(rawOpacity, 0, 1) : 0.78;
+
+      setColorVar("--nav-glass-base", rgbaFromColor(quickColor, opacity, "rgba(132, 0, 255, 0.78)"));
+      setColorVar(
+        "--nav-glass-tint",
+        rgbaFromColor(quickColor, clamp(opacity * 0.42, 0.08, 0.45), "rgba(242, 185, 255, 0.36)")
+      );
+      setColorVar(
+        "--nav-glass-glow",
+        rgbaFromColor(quickColor, clamp(opacity * 0.9, 0.22, 0.9), "rgba(104, 0, 255, 0.7)")
+      );
+      setColorVar("--nav-glass-border", `rgba(255, 255, 255, ${clamp(opacity * 0.58, 0.18, 0.5).toFixed(3)})`);
+      setColorVar("--nav-ink", "#ffffff");
+      setColorVar("--nav-muted-ink", `rgba(255, 255, 255, ${clamp(opacity * 0.9, 0.7, 0.95).toFixed(3)})`);
+      setColorVar("--nav-pill-bg", `rgba(255, 255, 255, ${clamp(opacity * 0.2, 0.08, 0.2).toFixed(3)})`);
+      setColorVar("--nav-pill-active-bg", "#ffffff");
+      setColorVar("--nav-pill-active-ink", rgbaFromColor(quickColor, 1, "#5900b8"));
+      root.setProperty("--nav-blur", normalizeCssSize(quick.blur, "16px"));
+      root.setProperty("--nav-saturate", normalizeCssNumberOrPercent(quick.saturate, "180%"));
+    }
+
+    setColorVar("--nav-glass-base", glass.base ?? config?.navGlassBase);
+    setColorVar("--nav-glass-tint", glass.tint ?? config?.navGlassTint);
+    setColorVar("--nav-glass-glow", glass.glow ?? config?.navGlassGlow);
+    setColorVar("--nav-glass-border", glass.border ?? config?.navGlassBorder);
+    setColorVar("--nav-ink", glass.ink ?? config?.navInk);
+    setColorVar("--nav-muted-ink", glass.mutedInk ?? config?.navMutedInk);
+    setColorVar("--nav-pill-bg", glass.pill ?? glass.pillBg ?? config?.navPillBg);
+    setColorVar("--nav-pill-active-bg", glass.pillActive ?? config?.navPillActiveBg);
+    setColorVar("--nav-pill-active-ink", glass.pillActiveInk ?? config?.navPillActiveInk);
+
+    root.setProperty("--nav-blur", normalizeCssSize(glass.blur ?? config?.navBlur, "16px"));
+    root.setProperty(
+      "--nav-saturate",
+      normalizeCssNumberOrPercent(glass.saturate ?? config?.navSaturate, "180%")
+    );
+  }
+
+  function setupBackToTop() {
+    if (document.getElementById("back-to-top-btn")) return;
+
+    const btn = document.createElement("button");
+    btn.id = "back-to-top-btn";
+    btn.className = "back-to-top";
+    btn.type = "button";
+    btn.textContent = "";
+    btn.setAttribute("aria-label", "返回页面顶部");
+    document.body.appendChild(btn);
+
+    const updateVisibility = () => {
+      if (window.scrollY > 260) {
+        btn.classList.add("visible");
+      } else {
+        btn.classList.remove("visible");
+      }
+    };
+
+    btn.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    });
+
+    updateVisibility();
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+  }
+
   async function loadSiteConfig() {
     if (!siteConfigPromise) {
       siteConfigPromise = fetch(SITE_CONFIG_PATH, { cache: "no-store" })
@@ -49,7 +206,7 @@
           if (!res.ok) {
             throw new Error(`加载站点配置失败: ${res.status}`);
           }
-          return res.json();
+          return res.text().then((text) => JSON.parse(text.replace(/^\uFEFF/, "")));
         })
         .catch(() => ({
           title: "nino",
@@ -59,6 +216,31 @@
             textSize: "1.08rem",
             logoSize: "22px",
             gap: "8px",
+          },
+          navItems: [
+            { key: "blog", label: "博客", href: "./blog.html" },
+            { key: "game", label: "游戏", href: "./game.html" },
+            { key: "art", label: "美术", href: "./art.html" },
+            { key: "about", label: "关于", href: "./about.html" },
+          ],
+          navGlass: {
+            base: "rgba(132, 0, 255, 0.78)",
+            tint: "rgba(242, 185, 255, 0.36)",
+            glow: "rgba(104, 0, 255, 0.7)",
+            border: "rgba(255, 255, 255, 0.45)",
+            ink: "#ffffff",
+            mutedInk: "rgba(255, 255, 255, 0.9)",
+            pill: "rgba(255, 255, 255, 0.14)",
+            pillActive: "#ffffff",
+            pillActiveInk: "#5900b8",
+            blur: "16px",
+            saturate: "180%",
+          },
+          navGlassQuick: {
+            color: "#8400ff",
+            opacity: 0.78,
+            blur: "16px",
+            saturate: "180%",
           },
           eyebrow: "涂鸦 / 实验",
           subtitle: "博客 / 游戏 / 美术 / 关于",
@@ -87,6 +269,9 @@
         }))
         .then((config) => {
           applyBrandConfig(config);
+          applyNavGlassConfig(config);
+          applyNavConfig(config);
+          setupBackToTop();
           return config;
         });
     }
@@ -209,8 +394,9 @@
 
     const syncLabel = () => {
       const current = getTheme();
-      btn.textContent = current === "dark" ? "切换浅色" : "切换深色";
+      btn.textContent = "";
       btn.setAttribute("aria-label", current === "dark" ? "切换到浅色主题" : "切换到深色主题");
+      btn.title = current === "dark" ? "切换到浅色主题" : "切换到深色主题";
     };
 
     btn.addEventListener("click", () => {
@@ -449,6 +635,9 @@
     initTheme,
     setupThemeToggle,
     applyHeaderImage,
+    applyNavGlassConfig,
+    applyNavConfig,
+    setupBackToTop,
     applySiteText,
     markActiveNav,
     parseFrontMatter,

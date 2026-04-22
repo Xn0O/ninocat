@@ -147,6 +147,7 @@ function setupScrollParallax(pairs) {
 function setupHomeTitleRole(config) {
   const role = document.getElementById("home-title-role");
   if (!role) return;
+  const titleLine = role.closest(".home-title-line");
 
   const toy = config?.homeToy || {};
   const stand = toy.stand || "./assets/toy-stand.svg";
@@ -154,9 +155,52 @@ function setupHomeTitleRole(config) {
   const raise = toy.raise || transition;
   const frameMs = Math.max(80, Number(toy.frameMs) || 180);
   const shakeMs = Math.max(80, Number(toy.shakeMs) || 220);
+  const roleScale = Number(toy.roleScale);
+  const resolvedRoleScale = Number.isFinite(roleScale) && roleScale > 0 ? roleScale : 1;
+  const roleXPercent = Number(toy.roleXPercent);
+  const roleYPercent = Number(toy.roleYPercent);
+  const resolvedRoleX = Number.isFinite(roleXPercent) ? roleXPercent : 0;
+  const resolvedRoleY = Number.isFinite(roleYPercent) ? roleYPercent : 0;
+  const rawTitleGap = toy.titleGap ?? toy.roleTitleGap;
+
+  const resolveTitleGap = (value) => {
+    if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+      return `${value}px`;
+    }
+    if (typeof value !== "string") return "";
+    const text = value.trim();
+    if (!text) return "";
+    if (/^\d+(\.\d+)?(px|rem|em|vw|vh|%)$/i.test(text)) return text;
+    if (/^(clamp|calc|min|max)\(.+\)$/i.test(text)) return text;
+    return "";
+  };
+  const resolvedTitleGap = resolveTitleGap(rawTitleGap);
 
   role.src = stand;
   role.style.setProperty("--toy-shake-ms", `${shakeMs}ms`);
+  role.style.setProperty("--home-role-scale", String(resolvedRoleScale));
+  role.style.setProperty("--home-role-offset-x", `${resolvedRoleX}%`);
+  role.style.setProperty("--home-role-offset-y", `${resolvedRoleY}%`);
+  if (titleLine && resolvedTitleGap) {
+    titleLine.style.setProperty("--home-title-gap", resolvedTitleGap);
+  }
+
+  const syncTitleSafeGap = () => {
+    if (!titleLine) return;
+    if (resolvedRoleY <= 0) {
+      titleLine.style.setProperty("--home-title-safe-gap", "0px");
+      return;
+    }
+    const roleHeight = role.getBoundingClientRect().height || role.offsetHeight || 0;
+    const yShift = (roleHeight * resolvedRoleY) / 100;
+    const safeGap = Math.min(240, Math.max(0, yShift));
+    titleLine.style.setProperty("--home-title-safe-gap", `${safeGap.toFixed(1)}px`);
+  };
+
+  syncTitleSafeGap();
+  role.addEventListener("load", syncTitleSafeGap);
+  window.addEventListener("resize", syncTitleSafeGap);
+
   role.draggable = false;
   role.setAttribute("draggable", "false");
 
