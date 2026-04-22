@@ -1,0 +1,12 @@
+{
+  "posts": [
+    {
+      "slug": "build-blog-game-art-site",
+      "file": "./content/blog/build-blog-game-art-site.md"
+    },
+    {
+      "slug": "unity-webgl-embed-notes",
+      "file": "./content/blog/unity-webgl-embed-notes.md"
+    }
+  ]
+}

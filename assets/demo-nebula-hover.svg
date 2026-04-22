@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="n1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e132d" />
+      <stop offset="100%" stop-color="#233370" />
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#n1)" />
+  <g stroke="#9fb3ff" stroke-width="5" fill="none" opacity="0.8">
+    <path d="M110 530 L360 420 L560 470 L790 350 L1050 410" />
+    <path d="M170 590 L390 500 L620 540 L840 450 L1110 520" />
+  </g>
+  <circle cx="290" cy="290" r="74" fill="#6f90ff" />
+  <circle cx="560" cy="230" r="32" fill="#9eb6ff" />
+  <circle cx="850" cy="180" r="24" fill="#9eb6ff" />
+  <text x="110" y="140" fill="#eef3ff" font-size="78" font-family="Arial, sans-serif" font-weight="700">NEBULA DASH</text>
+  <text x="115" y="198" fill="#b9c9ff" font-size="30" font-family="Arial, sans-serif">Hover Preview / In-Game Scene</text>
+</svg>

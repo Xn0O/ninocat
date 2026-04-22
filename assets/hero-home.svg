@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560">
+  <rect width="1600" height="560" fill="#ffffff" />
+  <g fill="none" stroke="#000000" stroke-width="8">
+    <path d="M80 110 C250 40, 420 40, 590 110" />
+    <path d="M620 110 C790 40, 960 40, 1130 110" />
+    <path d="M1160 110 C1330 40, 1500 40, 1560 110" />
+    <path d="M100 250 C280 340, 460 340, 640 250" />
+    <path d="M700 250 C880 340, 1060 340, 1240 250" />
+    <path d="M1280 250 C1390 200, 1490 200, 1560 250" />
+    <path d="M120 430 C320 380, 520 380, 720 430" />
+    <path d="M760 430 C960 380, 1160 380, 1360 430" />
+  </g>
+  <text x="80" y="520" fill="#000000" font-size="56" font-family="Arial, sans-serif" font-weight="700">DOODLE HOME HEADER</text>
+</svg>

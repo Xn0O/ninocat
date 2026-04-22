@@ -1,0 +1,83 @@
+﻿{
+  "title": "Nino",
+  "eyebrow": "（*＾-＾*）",
+  "subtitle": "↑长按互动",
+  "defaultTheme": "dark",
+  "themes": {
+    "light": {
+      "bg": "#f7f7f7",
+      "surface": "#ffffff",
+      "surfaceAlt": "#e8e8e8",
+      "text": "#0f0f0f",
+      "muted": "#303030",
+      "accent": "#101010"
+    },
+    "dark": {
+      "bg": "#090909",
+      "surface": "#141414",
+      "surfaceAlt": "#262626",
+      "text": "#f2f2f2",
+      "muted": "#bcbcbc",
+      "accent": "#f2f2f2"
+    }
+  },
+  "headerImages": {
+    "default": "./assets/hero-home.svg",
+    "home": "./assets/hero-home.svg",
+    "blog": "./assets/hero-blog.svg",
+    "game": "./assets/hero-game.svg",
+    "art": "./assets/hero-art.svg",
+    "about": "./assets/hero-about.svg"
+  },
+  "homeStrips": [
+    {
+      "key": "blog",
+      "href": "./blog.html",
+      "title": "Blog",
+      "desc": "梦游产物",
+      "fit": "cover",
+      "image": "./assets/Home_Site/B_0.jpg",
+      "speed": 0.8
+    },
+    {
+      "key": "game",
+      "href": "./game.html",
+      "title": "Game",
+      "desc": "钝意开发中",
+      "fit": "cover",
+      "image": "./assets/Home_Site/B_1.jpg",
+      "speed": 0.7
+    },
+    {
+      "key": "art",
+      "href": "./art.html",
+      "title": "Art",
+      "desc": "存放处",
+      "fit": "cover",
+      "image": "./assets/Home_Site/B_2.jpg",
+      "speed": 0.5
+    },
+    {
+      "key": "about",
+      "href": "./about.html",
+      "title": "About",
+      "desc": "关于",
+      "fit": "cover",
+      "image": "./assets/Home_Site/B_3.jpg",
+      "speed": 0.3
+    }
+  ],
+  "homeToy": {
+    "stand": "./assets/Home_Toy/M_0.png",
+    "transition": "./assets/Home_Toy/M_1.png",
+    "raise": "./assets/Home_Toy/M_2.png",
+    "bgA": "./assets/Home_Toy/BG_0.jpg",
+    "bgB": "./assets/Home_Toy/BG_0.jpg",
+    "frameMs": 90,
+    "roleScale": 2.0,
+    "roleXPercent": 0,
+    "roleYPercent": 28,
+    "shakeMs": 240
+  }
+}
+

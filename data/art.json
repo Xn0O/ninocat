@@ -1,0 +1,18 @@
+﻿{
+  "arts": [
+    {
+      "title": "紫色回廊",
+      "description": "概念场景练习，强调冷暖碰撞与透视层次。",
+      "year": "2026",
+      "image": "./assets/art-violet-corridor.svg",
+      "tags": "概念|场景"
+    },
+    {
+      "title": "漂移角色设定",
+      "description": "角色设定草图，包含三视图与表情变化。",
+      "year": "2026",
+      "image": "./assets/art-drift-sheet.svg",
+      "tags": "角色|设计"
+    }
+  ]
+}

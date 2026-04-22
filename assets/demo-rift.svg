@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="b" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#fcfbff" />
+      <stop offset="58%" stop-color="#ede7ff" />
+      <stop offset="100%" stop-color="#d7cbff" />
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#b)" />
+  <g stroke="#4e37d6" stroke-width="10" fill="none" opacity="0.7">
+    <path d="M150 560 L360 380 L560 520 L760 280 L970 450 L1130 220" />
+    <path d="M170 640 L380 460 L570 620 L760 420 L970 590 L1140 350" />
+  </g>
+  <circle cx="360" cy="380" r="18" fill="#4e37d6" />
+  <circle cx="760" cy="280" r="18" fill="#4e37d6" />
+  <circle cx="970" cy="450" r="18" fill="#4e37d6" />
+  <text x="140" y="170" fill="#2b1f6c" font-size="86" font-family="Arial, sans-serif" font-weight="700">RIFT LINES</text>
+  <text x="145" y="230" fill="#5f49ff" font-size="34" font-family="Arial, sans-serif">Puzzle Prototype</text>
+</svg>
