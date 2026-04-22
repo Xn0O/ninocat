@@ -148,6 +148,19 @@ function setupHomeTitleRole(config) {
   const role = document.getElementById("home-title-role");
   if (!role) return;
   const titleLine = role.closest(".home-title-line");
+  const roleHit =
+    role.parentElement && role.parentElement.classList.contains("home-title-role-hit")
+      ? role.parentElement
+      : (() => {
+          const hit = document.createElement("span");
+          hit.className = "home-title-role-hit";
+          hit.setAttribute("role", "button");
+          hit.setAttribute("aria-label", role.alt || "主页小人互动");
+          hit.tabIndex = 0;
+          role.parentNode?.insertBefore(hit, role);
+          hit.appendChild(role);
+          return hit;
+        })();
 
   const toy = config?.homeToy || {};
   const stand = toy.stand || "./assets/toy-stand.svg";
@@ -238,9 +251,9 @@ function setupHomeTitleRole(config) {
     clearTimers();
     setState("transition");
 
-    if (event.pointerId !== undefined && role.setPointerCapture) {
+    if (event.pointerId !== undefined && roleHit.setPointerCapture) {
       try {
-        role.setPointerCapture(event.pointerId);
+        roleHit.setPointerCapture(event.pointerId);
         capturedPointerId = event.pointerId;
       } catch (_) {
         capturedPointerId = null;
@@ -266,9 +279,9 @@ function setupHomeTitleRole(config) {
       }
     }, frameMs);
 
-    if (capturedPointerId !== null && role.releasePointerCapture) {
+    if (capturedPointerId !== null && roleHit.releasePointerCapture) {
       try {
-        role.releasePointerCapture(capturedPointerId);
+        roleHit.releasePointerCapture(capturedPointerId);
       } catch (_) {
         // Ignore release errors when pointer capture is already lost.
       }
@@ -276,13 +289,16 @@ function setupHomeTitleRole(config) {
     capturedPointerId = null;
   };
 
-  role.addEventListener("pointerdown", startHold);
-  role.addEventListener("pointerup", endHold);
-  role.addEventListener("pointercancel", endHold);
-  role.addEventListener("lostpointercapture", endHold);
+  roleHit.addEventListener("pointerdown", startHold);
+  roleHit.addEventListener("pointerup", endHold);
+  roleHit.addEventListener("pointercancel", endHold);
+  roleHit.addEventListener("lostpointercapture", endHold);
   window.addEventListener("pointerup", endHold);
-  role.addEventListener("dragstart", (event) => event.preventDefault());
-  role.addEventListener("contextmenu", (event) => event.preventDefault());
+  roleHit.addEventListener("dragstart", (event) => event.preventDefault());
+  roleHit.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  });
 }
 
 async function init() {
