@@ -10,22 +10,22 @@
   "navItems": [
     {
       "key": "blog",
-      "label": "Blog",
+      "label": "博客",
       "href": "./blog.html"
     },
     {
       "key": "game",
-      "label": "Game",
+      "label": "游戏",
       "href": "./game.html"
     },
     {
       "key": "art",
-      "label": "Art",
+      "label": "美术",
       "href": "./art.html"
     },
     {
       "key": "about",
-      "label": "About",
+      "label": "关于",
       "href": "./about.html"
     }
   ],
@@ -35,8 +35,8 @@
     "blur": "16px",
     "saturate": "100%"
   },
-  "eyebrow": "im ninocat",
-  "subtitle": "点击/长按NINO猫可以互动~",
+  "eyebrow": "ninocat",
+  "subtitle": "点击/长按NINO猫互动",
   "defaultTheme": "dark",
   "themes": {
     "light": {
@@ -64,11 +64,33 @@
     "art": "./assets/Home_Site/B_2_1.jpg",
     "about": "./assets/Home_Site/B_3.jpg"
   },
+  "pageHeroTexts": {
+    "blog": {
+      "eyebrow": "blog",
+      "title": "博客文章",
+      "description": "梦游产物"
+    },
+    "game": {
+      "eyebrow": "game",
+      "title": "游戏卡片",
+      "description": "钝意开发中"
+    },
+    "art": {
+      "eyebrow": "art",
+      "title": "美术",
+      "description": "存放处"
+    },
+    "about": {
+      "eyebrow": "ninocat",
+      "title": "关于",
+      "description": "我是nino"
+    }
+  },
   "homeStrips": [
     {
       "key": "blog",
       "href": "./blog.html",
-      "title": "Blog",
+      "title": "博客",
       "desc": "梦游产物",
       "fit": "cover",
       "image": "./assets/Home_Site/B_0.jpg",
@@ -77,7 +99,7 @@
     {
       "key": "game",
       "href": "./game.html",
-      "title": "Game",
+      "title": "游戏",
       "desc": "钝意开发中",
       "fit": "cover",
       "image": "./assets/Home_Site/B_1.jpg",
@@ -86,7 +108,7 @@
     {
       "key": "art",
       "href": "./art.html",
-      "title": "Art",
+      "title": "美术",
       "desc": "存放处",
       "fit": "cover",
       "image": "./assets/Home_Site/B_2.jpg",
@@ -95,7 +117,7 @@
     {
       "key": "about",
       "href": "./about.html",
-      "title": "About",
+      "title": "关于",
       "desc": "关于",
       "fit": "cover",
       "image": "./assets/Home_Site/B_3.jpg",
@@ -109,7 +131,7 @@
     "bgA": "./assets/Home_Toy/BG_0.jpg",
     "bgB": "./assets/Home_Toy/BG_0.jpg",
     "frameMs": 90,
-    "roleScale": 2.0,
+    "roleScale": 1.5,
     "titleGap": "48px",
     "roleXPercent": 0,
     "roleYPercent": 28,

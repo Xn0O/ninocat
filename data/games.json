@@ -10,22 +10,22 @@
       "coverHover": "./assets/GamePic/Aio_1.png",
       "embedUrl": "./games/aio_Web/index.html",
       "launchMode": "auto",
-      "tags": "引擎|网页图形|本地",
+      "tags": "Unity|本地",
       "order": 1
     },
     
     {
       "id": "remote-unity-example",
-      "title": "远程网页示例",
+      "title": "外部网页",
       "description": "外部地址示例；若内嵌被拦截会自动提示新标签打开。",
       "status": "外部",
-      "category": "动作",
-      "cover": "./assets/game-cover-aio.svg",
-      "coverHover": "./assets/demo-nebula-hover.svg",
+      "category": "test",
+      "cover": "./assets/Blog/P0/P0.jpg",
+      "coverHover": "./assets/Blog/P0/P1.jpg",
       "embedUrl": "https://example.com/unityweb/index.html",
       "openUrl": "https://example.com/unityweb/index.html",
       "launchMode": "auto",
-      "tags": "远程|外部|网页",
+      "tags": "远程|外部",
       "order": 99
     }
   ]

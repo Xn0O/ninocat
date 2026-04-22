@@ -66,10 +66,10 @@
 
   function normalizeNavItems(config) {
     const fallback = [
-      { key: "blog", label: "博客", href: "./blog.html" },
-      { key: "game", label: "游戏", href: "./game.html" },
-      { key: "art", label: "美术", href: "./art.html" },
-      { key: "about", label: "关于", href: "./about.html" },
+      { key: "blog", label: "Blog", href: "./blog.html" },
+      { key: "game", label: "Game", href: "./game.html" },
+      { key: "art", label: "Art", href: "./art.html" },
+      { key: "about", label: "About", href: "./about.html" },
     ];
 
     const flatItems = Array.isArray(config?.navItems) ? config.navItems : [];
@@ -129,27 +129,27 @@
 
     // Quick mode: user adjusts only 4 knobs in site.json, detailed values are auto-derived.
     if (Object.keys(quick).length) {
-      const quickColor = typeof quick.color === "string" ? quick.color.trim() : "#8400ff";
+      const quickColor = typeof quick.color === "string" ? quick.color.trim() : "#ffffff";
       const rawOpacity = Number(quick.opacity);
-      const opacity = Number.isFinite(rawOpacity) ? clamp(rawOpacity, 0, 1) : 0.78;
+      const opacity = Number.isFinite(rawOpacity) ? clamp(rawOpacity, 0, 1) : 0.1;
 
-      setColorVar("--nav-glass-base", rgbaFromColor(quickColor, opacity, "rgba(132, 0, 255, 0.78)"));
+      setColorVar("--nav-glass-base", rgbaFromColor(quickColor, opacity, "rgba(255, 255, 255, 0.1)"));
       setColorVar(
         "--nav-glass-tint",
-        rgbaFromColor(quickColor, clamp(opacity * 0.42, 0.08, 0.45), "rgba(242, 185, 255, 0.36)")
+        rgbaFromColor(quickColor, clamp(opacity * 0.42, 0.08, 0.45), "rgba(255, 255, 255, 0.08)")
       );
       setColorVar(
         "--nav-glass-glow",
-        rgbaFromColor(quickColor, clamp(opacity * 0.9, 0.22, 0.9), "rgba(104, 0, 255, 0.7)")
+        rgbaFromColor(quickColor, clamp(opacity * 0.9, 0.22, 0.9), "rgba(255, 255, 255, 0.22)")
       );
       setColorVar("--nav-glass-border", `rgba(255, 255, 255, ${clamp(opacity * 0.58, 0.18, 0.5).toFixed(3)})`);
       setColorVar("--nav-ink", "#ffffff");
       setColorVar("--nav-muted-ink", `rgba(255, 255, 255, ${clamp(opacity * 0.9, 0.7, 0.95).toFixed(3)})`);
       setColorVar("--nav-pill-bg", `rgba(255, 255, 255, ${clamp(opacity * 0.2, 0.08, 0.2).toFixed(3)})`);
       setColorVar("--nav-pill-active-bg", "#ffffff");
-      setColorVar("--nav-pill-active-ink", rgbaFromColor(quickColor, 1, "#5900b8"));
+      setColorVar("--nav-pill-active-ink", rgbaFromColor(quickColor, 1, "#ffffff"));
       root.setProperty("--nav-blur", normalizeCssSize(quick.blur, "16px"));
-      root.setProperty("--nav-saturate", normalizeCssNumberOrPercent(quick.saturate, "180%"));
+      root.setProperty("--nav-saturate", normalizeCssNumberOrPercent(quick.saturate, "100%"));
     }
 
     setColorVar("--nav-glass-base", glass.base ?? config?.navGlassBase);
@@ -218,10 +218,10 @@
             gap: "8px",
           },
           navItems: [
-            { key: "blog", label: "博客", href: "./blog.html" },
-            { key: "game", label: "游戏", href: "./game.html" },
-            { key: "art", label: "美术", href: "./art.html" },
-            { key: "about", label: "关于", href: "./about.html" },
+            { key: "blog", label: "Blog", href: "./blog.html" },
+            { key: "game", label: "Game", href: "./game.html" },
+            { key: "art", label: "Art", href: "./art.html" },
+            { key: "about", label: "About", href: "./about.html" },
           ],
           navGlass: {
             base: "rgba(132, 0, 255, 0.78)",
@@ -237,13 +237,13 @@
             saturate: "180%",
           },
           navGlassQuick: {
-            color: "#8400ff",
-            opacity: 0.78,
+            color: "#ffffff",
+            opacity: 0.1,
             blur: "16px",
-            saturate: "180%",
+            saturate: "100%",
           },
-          eyebrow: "涂鸦 / 实验",
-          subtitle: "博客 / 游戏 / 美术 / 关于",
+          eyebrow: "eyebrow",
+          subtitle: "subtitle",
           defaultTheme: "dark",
           themes: {
             light: {
@@ -272,6 +272,7 @@
           applyNavGlassConfig(config);
           applyNavConfig(config);
           setupBackToTop();
+          applyPageHeroText(config);
           return config;
         });
     }
@@ -457,6 +458,31 @@
     heroImage.style.setProperty("--hero-ratio", sanitizeRatio(merged.ratio));
   }
 
+  function applyPageHeroText(config) {
+    const page = document.body?.dataset?.page;
+    if (!page) return;
+
+    const flatTexts = config?.pageHeroTexts && typeof config.pageHeroTexts === "object" ? config.pageHeroTexts : {};
+    const nestedTexts =
+      config?.pages?.heroTexts && typeof config.pages.heroTexts === "object" ? config.pages.heroTexts : {};
+    const texts = Object.keys(flatTexts).length ? flatTexts : nestedTexts;
+    const pageText = texts?.[page];
+    if (!pageText || typeof pageText !== "object") return;
+
+    const setHeroText = (slot, value) => {
+      if (typeof value !== "string") return;
+      const text = value.trim();
+      if (!text) return;
+      document.querySelectorAll(`[data-page-hero="${slot}"]`).forEach((el) => {
+        el.textContent = text;
+      });
+    };
+
+    setHeroText("eyebrow", pageText.eyebrow);
+    setHeroText("title", pageText.title);
+    setHeroText("description", pageText.description ?? pageText.desc);
+  }
+
   function applySiteText(config) {
     if (config.title) {
       document.querySelectorAll("[data-site='title']").forEach((el) => {
@@ -635,6 +661,7 @@
     initTheme,
     setupThemeToggle,
     applyHeaderImage,
+    applyPageHeroText,
     applyNavGlassConfig,
     applyNavConfig,
     setupBackToTop,
