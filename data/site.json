@@ -1,5 +1,12 @@
 ﻿{
   "title": "Nino",
+  "brandIcon": "./assets/Home_Site/ninocatlogo.png",
+  "brand": {
+    "icon": "./assets/Home_Site/ninocatlogo.png",
+    "textSize": "2.0rem",
+    "logoSize": "36px",
+    "gap": "8px"
+  },
   "eyebrow": "（*＾-＾*）",
   "subtitle": "↑长按互动",
   "defaultTheme": "dark",

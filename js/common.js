@@ -4,6 +4,44 @@
 
   let siteConfigPromise = null;
 
+  function normalizeCssSize(value, fallback) {
+    if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+      return `${value}px`;
+    }
+
+    if (typeof value !== "string") return fallback;
+    const text = value.trim();
+    if (!text) return fallback;
+
+    if (/^\d+(\.\d+)?(px|rem|em|vw|vh|%)$/i.test(text)) return text;
+    if (/^(clamp|calc|min|max)\(.+\)$/i.test(text)) return text;
+    return fallback;
+  }
+
+  function applyBrandConfig(config) {
+    const root = document.documentElement.style;
+    const brand = config?.brand && typeof config.brand === "object" ? config.brand : {};
+
+    const fromFlat = typeof config?.brandIcon === "string" ? config.brandIcon.trim() : "";
+    const fromNested = typeof brand.icon === "string" ? brand.icon.trim() : "";
+    const iconPath = fromFlat || fromNested;
+    if (iconPath) {
+      const safePath = iconPath.replaceAll('"', '\\"');
+      root.setProperty("--brand-icon-url", `url("${safePath}")`);
+    }
+
+    const textSize = normalizeCssSize(brand.textSize ?? config?.brandTextSize, "1.08rem");
+    const logoSize = normalizeCssSize(
+      brand.logoSize ?? brand.iconSize ?? config?.brandLogoSize ?? config?.brandIconSize,
+      "22px"
+    );
+    const brandGap = normalizeCssSize(brand.gap ?? config?.brandGap, "8px");
+
+    root.setProperty("--brand-text-size", textSize);
+    root.setProperty("--brand-icon-size", logoSize);
+    root.setProperty("--brand-gap", brandGap);
+  }
+
   async function loadSiteConfig() {
     if (!siteConfigPromise) {
       siteConfigPromise = fetch(SITE_CONFIG_PATH, { cache: "no-store" })
@@ -15,6 +53,13 @@
         })
         .catch(() => ({
           title: "nino",
+          brandIcon: "./assets/Home_Toy/M_0.png",
+          brand: {
+            icon: "./assets/Home_Toy/M_0.png",
+            textSize: "1.08rem",
+            logoSize: "22px",
+            gap: "8px",
+          },
           eyebrow: "涂鸦 / 实验",
           subtitle: "博客 / 游戏 / 美术 / 关于",
           defaultTheme: "dark",
@@ -39,7 +84,11 @@
           headerImages: {
             default: "./assets/hero-home.svg",
           },
-        }));
+        }))
+        .then((config) => {
+          applyBrandConfig(config);
+          return config;
+        });
     }
     return siteConfigPromise;
   }
@@ -406,6 +455,7 @@
     markdownToHtml,
     tagsFromText,
     createEmptyTip,
+    applyBrandConfig,
     setTheme,
     getTheme,
   };
