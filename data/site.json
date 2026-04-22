@@ -3,8 +3,8 @@
   "brandIcon": "./assets/Home_Site/ninocatlogo.png",
   "brand": {
     "icon": "./assets/Home_Site/ninocatlogo.png",
-    "textSize": "1.08rem",
-    "logoSize": "22px",
+    "textSize": "3.0rem",
+    "logoSize": "48px",
     "gap": "8px"
   },
   "navItems": [
