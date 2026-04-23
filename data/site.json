@@ -158,7 +158,7 @@
     "bgB": "./assets/Home_Toy/BG_0.jpg",
     "frameMs": 90,
     "roleScale": 1.5,
-    "titleGap": "48px",
+    "titleGap": "0px",
     "roleXPercent": 0,
     "roleYPercent": 28,
     "shakeMs": 240

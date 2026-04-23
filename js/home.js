@@ -109,6 +109,7 @@ function renderStrips(strips) {
 
 function setupScrollParallax(pairs) {
   if (!pairs.length) return;
+  const STRIP_BG_SCALE = 1.2;
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const motionFactor = prefersReducedMotion ? 0.75 : 1;
@@ -125,7 +126,7 @@ function setupScrollParallax(pairs) {
       // Card-based parallax: intentionally stronger so motion is clearly visible.
       const maxShift = Math.min(180, rect.height * 0.85) * motionFactor;
       const moveY = centered * speed * maxShift;
-      bg.style.transform = `translate3d(0, ${moveY}px, 0) scale(1.12)`;
+      bg.style.transform = `translate3d(0, ${moveY}px, 0) scale(${STRIP_BG_SCALE})`;
     });
   };
 
