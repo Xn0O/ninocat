@@ -175,20 +175,6 @@
   function setupBackToTop() {
     if (document.getElementById("back-to-top-btn")) return;
 
-    const getToolsHref = () => {
-      const path = String(window.location.pathname || "").toLowerCase();
-      if (path.includes("/tools/")) return "./blog-editor.html";
-      return "./tools/blog-editor.html";
-    };
-
-    const toolsBtn = document.createElement("a");
-    toolsBtn.id = "tools-entry-btn";
-    toolsBtn.className = "back-to-top back-to-top-tools";
-    toolsBtn.href = getToolsHref();
-    toolsBtn.setAttribute("aria-label", "打开博客编辑器");
-    toolsBtn.title = "打开博客编辑器";
-    document.body.appendChild(toolsBtn);
-
     const btn = document.createElement("button");
     btn.id = "back-to-top-btn";
     btn.className = "back-to-top";
@@ -197,13 +183,30 @@
     btn.setAttribute("aria-label", "返回页面顶部");
     document.body.appendChild(btn);
 
+    const updateBackToTopTop = () => {
+      const isMobile = window.matchMedia("(max-width: 900px)").matches;
+      const fallbackTop = isMobile ? 88 : 96;
+      const nav = document.querySelector(".top-nav");
+      const root = document.documentElement?.style;
+      if (!root) return;
+
+      if (!nav) {
+        root.setProperty("--back-to-top-top", `calc(${fallbackTop}px + env(safe-area-inset-top, 0px))`);
+        return;
+      }
+
+      const rect = nav.getBoundingClientRect();
+      const navBottom = Math.max(0, rect.bottom);
+      const gap = isMobile ? 10 : 12;
+      const top = Math.ceil(navBottom + gap);
+      root.setProperty("--back-to-top-top", `calc(${top}px + env(safe-area-inset-top, 0px))`);
+    };
+
     const updateVisibility = () => {
       if (window.scrollY > 260) {
         btn.classList.add("visible");
-        toolsBtn.classList.add("visible");
       } else {
         btn.classList.remove("visible");
-        toolsBtn.classList.remove("visible");
       }
     };
 
@@ -214,8 +217,18 @@
       });
     });
 
+    updateBackToTopTop();
     updateVisibility();
+    window.addEventListener("resize", updateBackToTopTop, { passive: true });
     window.addEventListener("scroll", updateVisibility, { passive: true });
+
+    if (typeof window.ResizeObserver === "function") {
+      const nav = document.querySelector(".top-nav");
+      if (nav) {
+        const ro = new window.ResizeObserver(() => updateBackToTopTop());
+        ro.observe(nav);
+      }
+    }
   }
 
   async function loadSiteConfig() {
