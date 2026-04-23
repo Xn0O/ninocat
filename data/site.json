@@ -56,6 +56,16 @@
       "accent": "#f2f2f2"
     }
   },
+  "selection": {
+    "light": {
+      "bg": "rgba(100, 0, 255, 1)",
+      "text": "#ffffff"
+    },
+    "dark": {
+      "bg": "rgba(255, 255, 255, 1)",
+      "text": "#000000"
+    }
+  },
   "headerImages": {
     "default": "./assets/hero-home.svg",
     "home": "./assets/hero-home.svg",

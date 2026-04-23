@@ -22,6 +22,8 @@
   --light-muted: #595959;
   --light-accent: #000000;
   --light-accent-ink: #ffffff;
+  --light-selection-bg: rgba(68, 127, 255, 0.28);
+  --light-selection-text: #0f172a;
 
   --dark-bg: #0d0d0d;
   --dark-surface: #1c1c1c;
@@ -31,6 +33,8 @@
   --dark-muted: #b3b3b3;
   --dark-accent: #ffffff;
   --dark-accent-ink: #111111;
+  --dark-selection-bg: rgba(110, 167, 255, 0.38);
+  --dark-selection-text: #f8fbff;
 }
 
 * {
@@ -70,6 +74,8 @@ body[data-theme="light"] {
   --nav-ink: #111111;
   --nav-muted-ink: rgba(0, 0, 0, 0.86);
   --nav-pill-active-ink: #1900ff;
+  --selection-bg: var(--light-selection-bg);
+  --selection-text: var(--light-selection-text);
 }
 
 body[data-theme="dark"] {
@@ -96,12 +102,24 @@ body[data-theme="dark"] {
   --quote-bg: rgba(210, 228, 255, 0.08);
   --quote-mark: rgba(235, 243, 255, 0.13);
   --nav-pill-active-ink: #1900ff;
+  --selection-bg: var(--dark-selection-bg);
+  --selection-text: var(--dark-selection-text);
 }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
 }
 
 a {

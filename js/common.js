@@ -263,6 +263,16 @@
               accent: "#ffffff",
             },
           },
+          selection: {
+            light: {
+              bg: "rgba(68, 127, 255, 0.28)",
+              text: "#0f172a",
+            },
+            dark: {
+              bg: "rgba(110, 167, 255, 0.38)",
+              text: "#f8fbff",
+            },
+          },
           headerImages: {
             default: "./assets/hero-home.svg",
           },
@@ -292,6 +302,22 @@
       values.surfaceAltText || pickReadableTextColor(values.surfaceAlt, values.text)
     );
     root.setProperty(`--${themeName}-accent-ink`, values.accentText || pickReadableTextColor(values.accent, values.bg));
+
+    const selection = values?.selection && typeof values.selection === "object" ? values.selection : {};
+    const defaultSelectionBg = themeName === "light" ? "rgba(68, 127, 255, 0.28)" : "rgba(110, 167, 255, 0.38)";
+    const defaultSelectionText = themeName === "light" ? "#0f172a" : "#f8fbff";
+    const selectionBg =
+      (typeof selection.bg === "string" && selection.bg.trim()) ||
+      (typeof values.selectionBg === "string" && values.selectionBg.trim()) ||
+      defaultSelectionBg;
+    const selectionTextCandidate =
+      (typeof selection.text === "string" && selection.text.trim()) ||
+      (typeof values.selectionText === "string" && values.selectionText.trim()) ||
+      "";
+    const selectionText = selectionTextCandidate || pickReadableTextColor(selectionBg, defaultSelectionText);
+
+    root.setProperty(`--${themeName}-selection-bg`, selectionBg);
+    root.setProperty(`--${themeName}-selection-text`, selectionText);
   }
 
   function parseColorToRgb(value) {
@@ -359,8 +385,31 @@
   function applyThemeConfig(config) {
     const light = config?.themes?.light;
     const dark = config?.themes?.dark;
-    if (light) setThemeVariables("light", light);
-    if (dark) setThemeVariables("dark", dark);
+    const lightGlobalSelection =
+      config?.selection?.light && typeof config.selection.light === "object" ? config.selection.light : null;
+    const darkGlobalSelection =
+      config?.selection?.dark && typeof config.selection.dark === "object" ? config.selection.dark : null;
+
+    if (light) {
+      const lightLocalSelection = light?.selection && typeof light.selection === "object" ? light.selection : null;
+      setThemeVariables("light", {
+        ...light,
+        selection: {
+          ...(lightGlobalSelection || {}),
+          ...(lightLocalSelection || {}),
+        },
+      });
+    }
+    if (dark) {
+      const darkLocalSelection = dark?.selection && typeof dark.selection === "object" ? dark.selection : null;
+      setThemeVariables("dark", {
+        ...dark,
+        selection: {
+          ...(darkGlobalSelection || {}),
+          ...(darkLocalSelection || {}),
+        },
+      });
+    }
   }
 
   function setTheme(theme) {
