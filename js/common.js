@@ -354,6 +354,27 @@
 
     root.setProperty(`--${themeName}-selection-bg`, selectionBg);
     root.setProperty(`--${themeName}-selection-text`, selectionText);
+
+    const stripText = values?.homeStripText && typeof values.homeStripText === "object" ? values.homeStripText : {};
+    const defaultStripText = values?.text || (themeName === "light" ? "#111111" : "#f5f5f5");
+    const stripTitle =
+      (typeof stripText.title === "string" && stripText.title.trim()) ||
+      (typeof values.homeStripTitle === "string" && values.homeStripTitle.trim()) ||
+      defaultStripText;
+    const stripDesc =
+      (typeof stripText.desc === "string" && stripText.desc.trim()) ||
+      (typeof stripText.description === "string" && stripText.description.trim()) ||
+      (typeof values.homeStripDesc === "string" && values.homeStripDesc.trim()) ||
+      defaultStripText;
+    const stripIndex =
+      (typeof stripText.index === "string" && stripText.index.trim()) ||
+      (typeof stripText.no === "string" && stripText.no.trim()) ||
+      (typeof values.homeStripIndex === "string" && values.homeStripIndex.trim()) ||
+      defaultStripText;
+
+    root.setProperty(`--${themeName}-home-strip-title`, stripTitle);
+    root.setProperty(`--${themeName}-home-strip-desc`, stripDesc);
+    root.setProperty(`--${themeName}-home-strip-index`, stripIndex);
   }
 
   function parseColorToRgb(value) {
@@ -425,24 +446,40 @@
       config?.selection?.light && typeof config.selection.light === "object" ? config.selection.light : null;
     const darkGlobalSelection =
       config?.selection?.dark && typeof config.selection.dark === "object" ? config.selection.dark : null;
+    const lightGlobalHomeStripText =
+      config?.homeStripText?.light && typeof config.homeStripText.light === "object" ? config.homeStripText.light : null;
+    const darkGlobalHomeStripText =
+      config?.homeStripText?.dark && typeof config.homeStripText.dark === "object" ? config.homeStripText.dark : null;
 
     if (light) {
       const lightLocalSelection = light?.selection && typeof light.selection === "object" ? light.selection : null;
+      const lightLocalHomeStripText =
+        light?.homeStripText && typeof light.homeStripText === "object" ? light.homeStripText : null;
       setThemeVariables("light", {
         ...light,
         selection: {
           ...(lightGlobalSelection || {}),
           ...(lightLocalSelection || {}),
         },
+        homeStripText: {
+          ...(lightGlobalHomeStripText || {}),
+          ...(lightLocalHomeStripText || {}),
+        },
       });
     }
     if (dark) {
       const darkLocalSelection = dark?.selection && typeof dark.selection === "object" ? dark.selection : null;
+      const darkLocalHomeStripText =
+        dark?.homeStripText && typeof dark.homeStripText === "object" ? dark.homeStripText : null;
       setThemeVariables("dark", {
         ...dark,
         selection: {
           ...(darkGlobalSelection || {}),
           ...(darkLocalSelection || {}),
+        },
+        homeStripText: {
+          ...(darkGlobalHomeStripText || {}),
+          ...(darkLocalHomeStripText || {}),
         },
       });
     }

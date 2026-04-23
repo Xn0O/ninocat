@@ -24,6 +24,9 @@
   --light-accent-ink: #ffffff;
   --light-selection-bg: rgba(68, 127, 255, 0.28);
   --light-selection-text: #0f172a;
+  --light-home-strip-title: #111111;
+  --light-home-strip-desc: #111111;
+  --light-home-strip-index: #111111;
 
   --dark-bg: #0d0d0d;
   --dark-surface: #1c1c1c;
@@ -35,6 +38,9 @@
   --dark-accent-ink: #111111;
   --dark-selection-bg: rgba(110, 167, 255, 0.38);
   --dark-selection-text: #f8fbff;
+  --dark-home-strip-title: #f5f5f5;
+  --dark-home-strip-desc: #f5f5f5;
+  --dark-home-strip-index: #f5f5f5;
 }
 
 * {
@@ -76,6 +82,9 @@ body[data-theme="light"] {
   --nav-pill-active-ink: #1900ff;
   --selection-bg: var(--light-selection-bg);
   --selection-text: var(--light-selection-text);
+  --home-strip-title: var(--light-home-strip-title);
+  --home-strip-desc: var(--light-home-strip-desc);
+  --home-strip-index: var(--light-home-strip-index);
 }
 
 body[data-theme="dark"] {
@@ -104,6 +113,9 @@ body[data-theme="dark"] {
   --nav-pill-active-ink: #1900ff;
   --selection-bg: var(--dark-selection-bg);
   --selection-text: var(--dark-selection-text);
+  --home-strip-title: var(--dark-home-strip-title);
+  --home-strip-desc: var(--dark-home-strip-desc);
+  --home-strip-index: var(--dark-home-strip-index);
 }
 
 body {
@@ -415,17 +427,19 @@ a {
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.12em;
+  color: var(--home-strip-index);
 }
 
 .home-strip h2 {
   margin: 0;
   font-family: "Syne", sans-serif;
   font-size: clamp(1.6rem, 4.6vw, 3rem);
+  color: var(--home-strip-title);
 }
 
 .home-strip p {
   margin: 8px 0 0;
-  color: var(--text);
+  color: var(--home-strip-desc);
 }
 
 .page-hero {

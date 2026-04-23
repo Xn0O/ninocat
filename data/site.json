@@ -66,6 +66,18 @@
       "text": "#000000"
     }
   },
+  "homeStripText": {
+    "light": {
+      "title": "#f5f8ff",
+      "desc": "#e7ecff",
+      "index": "#f5f8ff"
+    },
+    "dark": {
+      "title": "#f5f8ff",
+      "desc": "#e7ecff",
+      "index": "#f5f8ff"
+    }
+  },
   "footer": {
     "line1": "Copyright © 2026 Nino",
     "line2": "All rights reserved."
