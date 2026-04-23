@@ -889,6 +889,21 @@
       .filter(Boolean);
   }
 
+  function isHiddenMeta(value) {
+    const n = Number.parseInt(String(value || "0").trim(), 10);
+    return Number.isFinite(n) && n === 1;
+  }
+
+  function parseMiMeta(value) {
+    const text = String(value || "").trim();
+    if (!text) return null;
+    const parts = text.split("|");
+    const question = String(parts[0] || "").trim();
+    const id = String(parts[1] || "").trim();
+    if (!question || !id) return null;
+    return { question, id, raw: `${question}|${id}` };
+  }
+
   function createEmptyTip(text) {
     const node = document.createElement("div");
     node.className = "empty-tip";
@@ -947,6 +962,8 @@
     markdownToHtml,
     enhanceCodeBlocks,
     tagsFromText,
+    isHiddenMeta,
+    parseMiMeta,
     createEmptyTip,
     applyBrandConfig,
     setTheme,

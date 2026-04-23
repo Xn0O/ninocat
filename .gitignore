@@ -1,3 +1,4 @@
 /private_source/
+/tools/publish.config.local.json
 /tools/secrets/
 *.local.json

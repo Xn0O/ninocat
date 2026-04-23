@@ -567,6 +567,12 @@ a {
   box-shadow: 0 0 0 2px var(--accent);
 }
 
+.item-tags .blog-tag-chip.blog-tag-lock {
+  cursor: default;
+  opacity: 0.9;
+  background: color-mix(in srgb, var(--emphasis-bg), #7cb0ff 35%);
+}
+
 .item-actions {
   display: flex;
   gap: 8px;
@@ -925,6 +931,67 @@ a {
 .modal.open {
   opacity: 1;
   pointer-events: auto;
+}
+
+.mi-unlock-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  background: rgba(0, 0, 0, 0.58);
+  display: grid;
+  place-items: center;
+  padding: 12px;
+}
+
+.mi-unlock-panel {
+  width: min(520px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--surface-alt);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.mi-unlock-panel h2 {
+  margin: 0;
+  font-family: "Syne", sans-serif;
+  font-size: 1.2rem;
+}
+
+.mi-unlock-question {
+  margin: 0;
+  color: var(--muted);
+}
+
+.mi-unlock-form {
+  display: grid;
+  gap: 10px;
+}
+
+.mi-unlock-input {
+  width: 100%;
+  border: 1px solid var(--surface-alt);
+  background: var(--surface);
+  color: var(--text);
+  padding: 9px 10px;
+  font-size: 0.94rem;
+}
+
+.mi-unlock-input:focus {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.mi-unlock-error {
+  margin: 0;
+  color: #ff7b8c;
+  font-size: 0.86rem;
+}
+
+.mi-unlock-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .modal-mask {

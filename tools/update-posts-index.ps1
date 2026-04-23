@@ -1,1 +1,1 @@
-node .\tools\generate-posts-index.js
+node .\tools\publish-private-posts.js

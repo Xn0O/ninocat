@@ -20,6 +20,9 @@
   const fmSummaryInput = document.getElementById("fm-summary");
   const fmTagsInput = document.getElementById("fm-tags");
   const fmCoverInput = document.getElementById("fm-cover");
+  const fmHiddenInput = document.getElementById("fm-hidden");
+  const fmMiIdInput = document.getElementById("fm-mi-id");
+  const fmMiQuestionInput = document.getElementById("fm-mi-question");
   const fmApplyBtn = document.getElementById("fm-apply");
   const fmReadBtn = document.getElementById("fm-read");
   const fmNewBtn = document.getElementById("fm-new");
@@ -118,7 +121,7 @@
       });
       db.close();
     } catch (error) {
-      appendLog(`淇濆瓨鐩綍璁板繂澶辫触锛?{error.message || error}`);
+      appendLog(`保存目录记忆失败：${error.message || error}`);
     }
   }
 
@@ -155,9 +158,54 @@
   }
 
   function normalizePrefix(raw) {
-    const prefix = String(raw || "").trim();
+    let prefix = String(raw || "").trim().replaceAll("\\", "/");
     if (!prefix) return "./assets/Blog";
+
+    if (/^\/?assets\//i.test(prefix)) {
+      prefix = `./${prefix.replace(/^\/+/, "")}`;
+    }
+    if (
+      !/^(https?:|data:|blob:|mailto:|tel:|#|\/|\.\/|\.\.\/|[a-zA-Z]:\/)/.test(prefix)
+    ) {
+      prefix = `./${prefix.replace(/^\.?\//, "")}`;
+    }
+
     return prefix.replace(/\/+$/, "");
+  }
+
+  function normalizeHiddenValue(raw) {
+    const n = Number.parseInt(String(raw || "0").trim(), 10);
+    return Number.isFinite(n) && n === 1 ? "1" : "0";
+  }
+
+  function buildMiField(question, id) {
+    const q = String(question || "").trim();
+    const miId = String(id || "").trim();
+    if (!q && !miId) return "";
+    if (!q || !miId) return "";
+    return `${q}|${miId}`;
+  }
+
+  function parseMiField(raw) {
+    const text = String(raw || "").trim();
+    if (!text) return { question: "", id: "", raw: "" };
+    const parts = text.split("|");
+    return {
+      question: String(parts[0] || "").trim(),
+      id: String(parts[1] || "").trim(),
+      raw: text,
+    };
+  }
+
+  function validateMiInputs() {
+    const q = String(fmMiQuestionInput?.value || "").trim();
+    const id = String(fmMiIdInput?.value || "").trim();
+    if (!q && !id) return true;
+    if (!q || !id) {
+      appendLog("MI 提问和 MI 编号需要同时填写，或同时留空。");
+      return false;
+    }
+    return true;
   }
 
   function syncPrefixWithImageFolderName(folderName) {
@@ -172,7 +220,7 @@
 
     if (lowerCurrent.endsWith("/blog") && lowerName !== "blog") {
       imgPrefixInput.value = `${current}/${name}`;
-      appendLog(`宸茶嚜鍔ㄥ悓姝ュ浘鐗囧墠缂€锛?{imgPrefixInput.value}`);
+      appendLog(`已自动同步图片前缀：${imgPrefixInput.value}`);
     }
   }
 
@@ -184,7 +232,7 @@
     const lowerCurrent = current.toLowerCase();
     if (lowerCurrent === "./assets/blog" || lowerCurrent === "assets/blog") {
       imgPrefixInput.value = `${current}/${postBase}`;
-      appendLog(`宸叉寜鏂囩珷鍚嶅悓姝ュ浘鐗囧墠缂€锛?{imgPrefixInput.value}`);
+      appendLog(`已按文章名同步图片前缀：${imgPrefixInput.value}`);
     }
   }
 
@@ -289,7 +337,7 @@
         if (allowed) {
           imageRootDirHandle = rememberedImageRoot;
           imageDirHandle = rememberedImageRoot;
-          imageFolderState.textContent = `宸叉仮澶嶅浘鐗囩洰褰曪細${rememberedImageRoot.name}`;
+          imageFolderState.textContent = `已恢复图片目录：${rememberedImageRoot.name}`;
         }
       } catch (_error) {
       }
@@ -301,7 +349,7 @@
         const allowed = await requestDirWritePermission(rememberedPost);
         if (allowed) {
           postDirHandle = rememberedPost;
-          postFolderState.textContent = `宸叉仮澶嶆枃绔犵洰褰曪細${rememberedPost.name}`;
+          postFolderState.textContent = `已恢复文章目录：${rememberedPost.name}`;
         }
       } catch (_error) {
       }
@@ -317,12 +365,17 @@
   }
 
   function collectFrontMatterForm() {
+    const hidden = normalizeHiddenValue(fmHiddenInput?.value || "0");
+    const mi = buildMiField(fmMiQuestionInput?.value, fmMiIdInput?.value);
+
     return {
       title: fmTitleInput.value.trim(),
       date: fmDateInput.value.trim(),
       summary: fmSummaryInput.value.trim(),
       tags: fmTagsInput.value.trim(),
       cover: fmCoverInput.value.trim(),
+      hidden,
+      mi,
     };
   }
 
@@ -332,7 +385,11 @@
     lines.push(`date: ${quoteYamlValue(values.date || todayYmd())}`);
     lines.push(`summary: ${quoteYamlValue(values.summary || "旧的文章等以后有空了再迁移进来！")}`);
     lines.push(`tags: ${quoteYamlValue(values.tags || "Blog")}`);
-    lines.push(`cover: ${quoteYamlValue(values.cover || "./assets/Blog/P0/P0.jpg")}`);
+    lines.push(`cover: ${quoteYamlValue(normalizePrefix(values.cover || "./assets/Blog/P0/P0.jpg"))}`);
+    lines.push(`hidden: ${quoteYamlValue(normalizeHiddenValue(values.hidden || "0"))}`);
+    if (values.mi) {
+      lines.push(`MI: ${quoteYamlValue(values.mi)}`);
+    }
     lines.push("---");
     return `${lines.join("\n")}\n`;
   }
@@ -369,6 +426,7 @@
   }
 
   function applyFrontMatterToEditor() {
+    if (!validateMiInputs()) return;
     const values = collectFrontMatterForm();
     const header = buildFrontMatterText(values);
     const parsed = parseFrontMatterFromText(editor.value);
@@ -392,6 +450,10 @@
     fmSummaryInput.value = meta.summary || "";
     fmTagsInput.value = meta.tags || "";
     fmCoverInput.value = meta.cover || "";
+    fmHiddenInput.value = normalizeHiddenValue(meta.hidden || "0");
+    const mi = parseMiField(meta.MI || meta.mi || "");
+    fmMiQuestionInput.value = mi.question;
+    fmMiIdInput.value = mi.id;
     appendLog("已从正文读取 Front Matter。");
   }
 
@@ -477,7 +539,7 @@
 
       const handle = await window.showDirectoryPicker(pickerOptions);
       await setImageFolderHandle(handle, { asRoot: true, remember: true });
-      appendLog(`鍥剧墖鐩綍锛?{handle.name}`);
+      appendLog(`图片目录：${handle.name}`);
       return true;
     } catch (error) {
       if (error && error.name === "AbortError") {
@@ -582,11 +644,15 @@
       fmSummaryInput.value = parsed.meta.summary || "";
       fmTagsInput.value = parsed.meta.tags || fmTagsInput.value || "Blog";
       fmCoverInput.value = parsed.meta.cover || "";
+      fmHiddenInput.value = normalizeHiddenValue(parsed.meta.hidden || "0");
+      const mi = parseMiField(parsed.meta.MI || parsed.meta.mi || "");
+      fmMiQuestionInput.value = mi.question;
+      fmMiIdInput.value = mi.id;
       if (parsed.meta.cover) {
         const coverPath = String(parsed.meta.cover).trim();
         const slash = coverPath.lastIndexOf("/");
         if (slash > 0) {
-          imgPrefixInput.value = coverPath.slice(0, slash);
+          imgPrefixInput.value = normalizePrefix(coverPath.slice(0, slash));
         }
       }
       appendLog("已从导入文件读取 Front Matter。");
@@ -653,6 +719,8 @@
   }
 
   async function exportMarkdownToPostFolder() {
+    if (!validateMiInputs()) return null;
+
     if (!postDirHandle) {
       const ok = await pickPostFolder();
       if (!ok) return null;
@@ -932,7 +1000,7 @@
       );
       if (!clipboardFiles.length) return;
       event.preventDefault();
-      await consumeImages(clipboardFiles, "绮樿创");
+      await consumeImages(clipboardFiles, "粘贴");
     });
   }
 
@@ -944,6 +1012,7 @@
 
   function initDefaults() {
     if (!fmDateInput.value) fmDateInput.value = todayYmd();
+    if (fmHiddenInput && !fmHiddenInput.value) fmHiddenInput.value = "0";
   }
 
   function bindPublishButtons() {
@@ -1008,8 +1077,8 @@
     bindFrontMatterButtons();
     bindPublishButtons();
     bindPreviewEvents();
-    bindDrop(dropZone, "鎷栨嫿");
-    bindDrop(editor, "鎷栨嫿");
+    bindDrop(dropZone, "拖拽");
+    bindDrop(editor, "拖拽");
     bindPaste();
 
     document.addEventListener("dragover", (event) => {
@@ -1021,7 +1090,7 @@
 
     renderPreview();
     appendLog("编辑器已就绪：支持拖图、导出、更新索引与图片预览。");
-    appendLog("建议先选择 ninocat_page/content/blog，再执行导出。");
+    appendLog("建议先选择私密仓库目录 E:/Blog_VB/ninocat_private/content/blog，再执行导出。");
   }
 
   init();

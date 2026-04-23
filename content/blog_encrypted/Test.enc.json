@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "cipher": "AES-256-GCM",
+  "kdf": {
+    "name": "PBKDF2",
+    "hash": "SHA-256",
+    "iterations": 310000,
+    "saltB64": "YlUdJjQjq4s0DlPptd6DsQ=="
+  },
+  "ivB64": "iGETdweTgeEGz1hs",
+  "ciphertextB64": "ji9eyU9nH1YxMLeBMrZpASd/VP2fyj3oec4pCxq9p3h+KcqhLEICfAHuWNYsICDqBferv8Kigpl1UG4RGdEGrnDDXGzmaiRRcVxLa3OxyWejqdJpMgTuNyQ1j8wN1eQaiqQb9jfMxfVQaFGqfm0iokJs7iexyFT5ko0f/DVh8N6iKA3BnhUVI9JHarkTorQDycOlI/BV8O2s4s5E8lGLoB1XitW3aNC1HqGoL3uvPg9hZo1HviSlKwKVcrySoakUVT1gG8hvpIg5I8Uc4yh7TfvOcvicgK1rIpo5UHZm7wYkXctrSd+tTr30YXqVs0qvk9rSCi3H+xOAaD8v0V6JAJBb3agGp7l+MdDOB9PhYUlpMRDwFs2gU6+YiPiTxFdabvaxDUIzEwM7x+ovSP+LCLXICpfPwvs1IogXWayGHYrkCATBx6MnkPuDmq3PflaRA0ps4L59nwMfqUxAv5WaFbw+wpL86JnRg5fxZmpGS8UmRcxL4tAcxFLxhKLSGn0LJkZ6npOoI/FSp/Mbq3cZwLjbsoi9XPVMeF8GEAd8lC6HpuFDJsbqj5w=",
+  "tagB64": "ajZEyZjP+GmO9WwfgDcBew=="
+}

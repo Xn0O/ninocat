@@ -84,8 +84,16 @@
         font-size: 0.9rem;
       }
 
+      .row input {
+        min-width: 0;
+      }
+
       .row.two {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .row.two-col {
+        grid-template-columns: 170px minmax(0, 1fr);
       }
 
       .row.two > div {
@@ -301,6 +309,7 @@
               <input id="name-rule" type="text" value="post" />
               <div class="hint" id="image-folder-state">未选目录：仅插入 Markdown，不写入图片文件。</div>
             </div>
+            <p class="hint">建议图片前缀统一为 `./assets/Blog/文章名`，可先点“创建并切换”自动生成子目录。</p>
             <div class="row">
               <label id="create-image-subdir-label">自动子目录</label>
               <div class="hint" id="create-image-subdir-hint">按文章文件名创建并切换到图片子目录。</div>
@@ -339,6 +348,21 @@
               <input id="fm-cover" type="text" placeholder="./assets/Blog/P0/P0.jpg" />
               <button id="fm-new" class="btn ghost" type="button">新建模板</button>
             </div>
+            <div class="row two">
+              <div>
+                <label for="fm-hidden">hidden</label>
+                <input id="fm-hidden" type="number" min="0" max="1" step="1" value="0" />
+              </div>
+              <div>
+                <label for="fm-mi-id">MI编号</label>
+                <input id="fm-mi-id" type="text" placeholder="001" />
+              </div>
+            </div>
+            <div class="row two-col">
+              <label for="fm-mi-question">MI提问</label>
+              <input id="fm-mi-question" type="text" placeholder="例如：我们的暗号是什么？" />
+            </div>
+            <p class="hint">留空表示非加密文章。格式会自动写成 `MI: 提问|编号`。</p>
           </div>
 
           <div class="grid">
@@ -348,7 +372,7 @@
               <input id="post-file-name" type="text" placeholder="P1" />
               <button id="pick-post-folder" class="btn" type="button">选择文章目录</button>
             </div>
-            <div class="hint" id="post-folder-state">请选择本地 content/blog 目录后再导出。</div>
+            <div class="hint" id="post-folder-state">请选择本地 content/blog 目录后再导出（建议私密仓库目录）。</div>
             <div class="stack">
               <button id="import-md" class="btn ghost" type="button">导入 MD</button>
               <input id="import-md-file" type="file" accept=".md,.markdown,.mdown,text/markdown,text/plain" hidden />
@@ -374,7 +398,7 @@
             <textarea
               id="md-editor"
               spellcheck="false"
-              placeholder="---&#10;title: 第一篇文章&#10;date: 2026-04-21&#10;summary: 旧的文章等以后有空了再迁移进来！&#10;tags: Blog&#10;cover: ./assets/Blog/P0/P0.jpg&#10;---&#10;正文内容"
+              placeholder="---&#10;title: 第一篇文章&#10;date: 2026-04-21&#10;summary: 旧的文章等以后有空了再迁移进来！&#10;tags: Blog&#10;cover: ./assets/Blog/P0/P0.jpg&#10;hidden: 0&#10;MI: 问题|001&#10;---&#10;正文内容"
             ></textarea>
           </div>
 

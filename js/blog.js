@@ -8,6 +8,8 @@
   createEmptyTip,
   parseFrontMatter,
   tagsFromText,
+  isHiddenMeta,
+  parseMiMeta,
 } = window.SiteCommon;
 
 const POSTS_INDEX = "./content/blog/posts.json";
@@ -33,6 +35,12 @@ const state = {
   query: "",
   tag: ALL_TAG,
 };
+
+function withCacheBust(url) {
+  const u = new URL(String(url || ""), window.location.href);
+  u.searchParams.set("_v", String(Date.now()));
+  return u.toString();
+}
 
 function normalizeText(input) {
   return String(input || "").trim().toLowerCase();
@@ -148,6 +156,12 @@ function renderCard(post) {
 
   const tags = document.createElement("div");
   tags.className = "item-tags";
+  if (post.encrypted) {
+    const lockChip = document.createElement("span");
+    lockChip.className = "blog-tag-chip blog-tag-lock";
+    lockChip.textContent = "加密";
+    tags.appendChild(lockChip);
+  }
   post.tags.forEach((tag) => {
     const chip = document.createElement("span");
     chip.className = "blog-tag-chip";
@@ -179,7 +193,7 @@ function renderCard(post) {
 }
 
 async function loadPosts() {
-  const indexRes = await fetch(POSTS_INDEX, { cache: "no-store" });
+  const indexRes = await fetch(withCacheBust(POSTS_INDEX), { cache: "no-store" });
   if (!indexRes.ok) {
     throw new Error("无法加载 posts.json");
   }
@@ -189,27 +203,43 @@ async function loadPosts() {
 
   const loaded = await Promise.all(
     files.map(async (item) => {
-      const res = await fetch(item.file, { cache: "no-store" });
+      const res = await fetch(withCacheBust(item.file), { cache: "no-store" });
       if (!res.ok) {
         throw new Error(`无法加载 Markdown 文件: ${item.file}`);
       }
 
       const raw = await res.text();
       const { meta, body } = parseFrontMatter(raw);
+      if (isHiddenMeta(meta.hidden ?? item.hidden)) {
+        return null;
+      }
+
+      const mi = parseMiMeta(meta.MI || meta.mi || "");
+      const encRef = String(meta.encRef || item.encRef || "").trim();
+      const encrypted = Boolean((item.encrypted || mi) && encRef);
 
       return {
         slug: item.slug,
         title: meta.title || item.slug,
         date: meta.date || "",
-        summary: meta.summary || body.slice(0, 120).replace(/\s+/g, " "),
+        summary:
+          meta.summary ||
+          (encrypted
+            ? "这是一篇加密文章，请在详情页输入密码查看。"
+            : body.slice(0, 120).replace(/\s+/g, " ")),
         tags: tagsFromText(meta.tags),
         cover: meta.cover || DEFAULT_COVER,
+        encrypted,
+        encRef,
+        miQuestion: mi?.question || item.miQuestion || "",
+        miId: mi?.id || item.miId || "",
       };
     })
   );
 
-  loaded.sort((a, b) => String(b.date).localeCompare(String(a.date)));
-  return loaded;
+  const visible = loaded.filter(Boolean);
+  visible.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  return visible;
 }
 
 function renderTagFilters() {
