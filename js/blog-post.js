@@ -4,10 +4,12 @@
   initTheme,
   setupThemeToggle,
   applyHeaderImage,
+  applySiteText,
   markActiveNav,
   createEmptyTip,
   markdownToHtml,
   enhanceCodeBlocks,
+  renderMath,
   parseFrontMatter,
   tagsFromText,
   isHiddenMeta,
@@ -236,6 +238,7 @@ async function renderEncryptedBody(mi, encRef) {
       const markdown = await decryptMarkdownBody(payload, password);
       contentNode.innerHTML = markdownToHtml(markdown);
       enhanceCodeBlocks(contentNode);
+      renderMath(contentNode);
       return;
     } catch (_error) {
       decryptError = "密码错误，或加密数据已损坏，请重试。";
@@ -249,6 +252,7 @@ async function init() {
   initTheme(config);
   setupThemeToggle();
   applyHeaderImage(config);
+  applySiteText(config);
   markActiveNav();
 
   const slug = getSlug();
@@ -296,6 +300,7 @@ async function init() {
     } else {
       contentNode.innerHTML = markdownToHtml(body);
       enhanceCodeBlocks(contentNode);
+      renderMath(contentNode);
     }
 
     document.title = `${meta.title || slug} - 博客`;
@@ -308,3 +313,6 @@ async function init() {
 }
 
 init();
+
+
+

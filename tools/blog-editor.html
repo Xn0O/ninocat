@@ -1,21 +1,27 @@
 ﻿<!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-site-config-path="../data/site.json">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="googlebot" content="noindex, nofollow" />
-    <title>Markdown 博客编辑器</title>
+    <title>Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+    <link rel="stylesheet" href="../styles.css" />
     <style>
       :root {
-        --bg: #0f1115;
-        --surface: #161a22;
-        --surface-2: #1f2530;
-        --line: #2e3747;
-        --text: #eff3ff;
-        --muted: #9eadcc;
-        --accent: #4ea1ff;
-        --accent-ink: #051020;
+        --surface-2: color-mix(in srgb, var(--surface, #161a22), #0c1220 30%);
+        --line: var(--surface-alt, #2e3747);
+        --text: var(--text, #eff3ff);
+        --muted: var(--muted, #9eadcc);
+        --accent: var(--accent, #4ea1ff);
+        --accent-ink: var(--accent-ink, #051020);
         --danger: #ff4f68;
       }
 
@@ -27,20 +33,34 @@
       body {
         margin: 0;
         min-height: 100%;
-        background: radial-gradient(circle at 12% 0%, #1f2738 0%, var(--bg) 34%);
+        background:
+          radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--accent), #0f172a 84%) 0%, transparent 38%),
+          var(--bg);
         color: var(--text);
-        font-family: "Segoe UI", "Noto Sans SC", sans-serif;
+        font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
       }
 
       .wrap {
         width: min(1220px, calc(100% - 24px));
-        margin: 18px auto 36px;
+        margin: 12px auto 36px;
       }
 
       .panel {
         border: 1px solid var(--line);
-        background: color-mix(in srgb, var(--surface), transparent 6%);
+        background: color-mix(in srgb, var(--surface), transparent 8%);
         padding: 14px;
+      }
+
+      .editor-top {
+        margin-top: 8px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .editor-top::before {
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.46);
       }
 
       h1 {
@@ -60,11 +80,26 @@
         font-size: 0.94rem;
       }
 
+      .flow-list {
+        margin: 10px 0 0;
+        padding-left: 20px;
+        display: grid;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
       .three-col {
         margin-top: 10px;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 10px;
+      }
+
+      .group-card {
+        border: 1px solid var(--line);
+        background: color-mix(in srgb, var(--surface), transparent 10%);
+        padding: 10px;
       }
 
       .grid {
@@ -74,7 +109,7 @@
 
       .row {
         display: grid;
-        grid-template-columns: 170px minmax(0, 1fr) auto;
+        grid-template-columns: 150px minmax(0, 1fr) auto;
         gap: 8px;
         align-items: center;
       }
@@ -93,7 +128,19 @@
       }
 
       .row.two-col {
-        grid-template-columns: 170px minmax(0, 1fr);
+        grid-template-columns: 150px minmax(0, 1fr);
+      }
+
+      .split-inline {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr);
+        gap: 8px;
+        align-items: center;
+      }
+
+      .split-inline .sep {
+        text-align: center;
+        color: var(--muted);
       }
 
       .row.two > div {
@@ -109,12 +156,18 @@
         font: inherit;
       }
 
-      input {
+      input:not([type="checkbox"]) {
         width: 100%;
-        border: 1px solid var(--line);
-        background: var(--surface-2);
+        border: 1px solid color-mix(in srgb, var(--quote-mark), var(--surface-alt) 45%);
+        background: var(--quote-bg);
         color: var(--text);
         padding: 8px 10px;
+      }
+
+      input:not([type="checkbox"]):focus,
+      textarea:focus {
+        outline: 1px solid color-mix(in srgb, var(--quote-mark), var(--accent) 35%);
+        outline-offset: 1px;
       }
 
       .check-row {
@@ -159,6 +212,11 @@
         font-size: 0.84rem;
       }
 
+      .hint.block {
+        display: block;
+        margin-top: 2px;
+      }
+
       .editor-layout {
         margin-top: 10px;
         display: grid;
@@ -183,8 +241,8 @@
         width: 100%;
         min-height: 520px;
         resize: vertical;
-        border: 1px solid var(--line);
-        background: #0f141d;
+        border: 1px solid color-mix(in srgb, var(--quote-mark), var(--surface-alt) 45%);
+        background: var(--quote-bg);
         color: var(--text);
         padding: 12px;
         line-height: 1.65;
@@ -192,7 +250,7 @@
 
       .preview-wrap {
         border: 1px solid var(--line);
-        background: #0f141d;
+        background: var(--quote-bg);
         min-height: 564px;
         overflow: auto;
       }
@@ -208,49 +266,14 @@
         line-height: 1.65;
       }
 
-      .preview-body h1,
-      .preview-body h2,
-      .preview-body h3 {
-        margin-top: 1.1em;
-        margin-bottom: 0.35em;
-      }
-
-      .preview-body p {
-        margin: 0.35em 0 0.8em;
-      }
-
-      .preview-body code {
-        background: #1a2333;
-        padding: 0.1em 0.35em;
-      }
-
-      .preview-body pre {
-        overflow: auto;
-        padding: 10px;
-        background: #101827;
-        border: 1px solid #22304a;
-      }
-
-      .preview-body img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        border: 1px solid var(--line);
-        margin: 8px 0;
-      }
-
-      .preview-body blockquote {
-        margin: 0.7em 0;
-        padding: 0.5em 0.8em;
-        border-left: 3px solid #35517f;
-        background: #121b2b;
-        color: #dbe8ff;
+      .preview-body.markdown-content {
+        min-height: 540px;
       }
 
       .log {
         margin-top: 10px;
         border: 1px solid var(--line);
-        background: #0d1219;
+        background: var(--quote-bg);
         padding: 10px;
       }
 
@@ -290,64 +313,78 @@
       }
     </style>
   </head>
-  <body>
+  <body data-page="blog" data-theme="dark">
+    <header class="top-nav shell editor-top">
+      <a class="brand" href="../index.html">Editor</a>
+      <button id="theme-toggle" class="btn theme-toggle" type="button">切换主题</button>
+    </header>
+
     <main class="wrap">
       <section class="panel">
-        <h1>Markdown / 博客可视化编辑器</h1>
-        <p class="desc">支持拖图和粘贴截图，自动插入图片语法；可导出文章并一键更新 posts.json。</p>
+        <h1>Markdown</h1>
+        <p class="desc"> </p>
+        <ol class="flow-list">
+          <li>先选图片主目录（`assets/Blog`），填文章文件名（如 `P1`）。</li>
+          <li>点“创建并切换”，自动创建 `assets/Blog/P1` 并切换。</li>
+          <li>拖图到下方编辑区，自动复制并插入 Markdown 图片地址。</li>
+          <li>在头文字区填写 `title / MI / hidden` 等信息后导出 MD。</li>
+          <li>私密密码在 `ninocat_private/tools/secrets` 编辑；再运行 `update-posts-index.bat` 与 `add-post.bat`。</li>
+        </ol>
 
         <div class="three-col">
-          <div class="grid">
-            <h2>图片插入</h2>
+          <div class="grid group-card">
+            <h2>常用目录与图片</h2>
             <div class="row">
-              <label for="img-prefix">图片 URL 前缀</label>
+              <label for="post-file-name">文章文件名</label>
+              <input id="post-file-name" type="text" placeholder="P1" />
+              <button id="create-image-subdir" class="btn" type="button">创建并切换</button>
+            </div>
+            <div class="row">
+              <label for="img-prefix">图片主目录</label>
               <input id="img-prefix" type="text" value="./assets/Blog" />
               <button id="pick-image-folder" class="btn" type="button">选择图片目录</button>
             </div>
-            <div class="row">
-              <label for="name-rule">无文件名截图前缀</label>
-              <input id="name-rule" type="text" value="post" />
-              <div class="hint" id="image-folder-state">未选目录：仅插入 Markdown，不写入图片文件。</div>
-            </div>
-            <p class="hint">建议图片前缀统一为 `./assets/Blog/文章名`，可先点“创建并切换”自动生成子目录。</p>
-            <div class="row">
+            <div class="row two-col">
               <label id="create-image-subdir-label">自动子目录</label>
-              <div class="hint" id="create-image-subdir-hint">按文章文件名创建并切换到图片子目录。</div>
-              <button id="create-image-subdir" class="btn ghost" type="button">创建并切换</button>
+              <div class="hint block" id="create-image-subdir-hint">按文章文件名创建并切换到图片子目录。</div>
             </div>
+            <div class="row two-col">
+              <label for="name-rule">截图命名前缀</label>
+              <input id="name-rule" type="text" value="post" />
+            </div>
+            <div class="hint" id="image-folder-state">未选目录：仅插入 Markdown，不写入图片文件。</div>
+            <p class="hint">建议顺序：填文章名 -> 创建并切换 -> 拖图。</p>
             <div class="check-row">
               <input id="auto-cover" type="checkbox" checked />
               <label for="auto-cover">第一张图自动写入 cover</label>
             </div>
           </div>
 
-          <div class="grid">
-            <h2>Front Matter</h2>
+          <div class="grid group-card">
+            <h2>头文字</h2>
             <div class="row">
               <label for="fm-title">title</label>
               <input id="fm-title" type="text" placeholder="第一篇文章" />
-              <button id="fm-apply" class="btn" type="button">写入头部</button>
-            </div>
-            <div class="row two">
-              <div>
-                <label for="fm-date">date</label>
-                <input id="fm-date" type="date" />
-              </div>
-              <div>
-                <label for="fm-tags">tags</label>
-                <input id="fm-tags" type="text" value="Blog" />
-              </div>
-            </div>
-            <div class="row">
-              <label for="fm-summary">summary</label>
-              <input id="fm-summary" type="text" placeholder="一句话摘要" />
               <button id="fm-read" class="btn ghost" type="button">读取头部</button>
             </div>
-            <div class="row">
+            <div class="row two-col">
+              <label for="fm-date">date/tags</label>
+              <div class="split-inline">
+                <input id="fm-date" type="date" />
+                <span class="sep">|</span>
+                <input id="fm-tags" type="text" value="Blog" placeholder="tags" />
+              </div>
+            </div>
+            <div class="row two-col">
+              <label for="fm-summary">summary</label>
+              <input id="fm-summary" type="text" placeholder="一句话摘要" />
+            </div>
+            <div class="hint">摘要会用于博客卡片描述。</div>
+            <div class="row two-col">
               <label for="fm-cover">cover</label>
               <input id="fm-cover" type="text" placeholder="./assets/Blog/P0/P0.jpg" />
-              <button id="fm-new" class="btn ghost" type="button">新建模板</button>
             </div>
+            <div class="hint">可留空，拖入首图后自动填写。</div>
             <div class="row two">
               <div>
                 <label for="fm-hidden">hidden</label>
@@ -362,14 +399,18 @@
               <label for="fm-mi-question">MI提问</label>
               <input id="fm-mi-question" type="text" placeholder="例如：我们的暗号是什么？" />
             </div>
-            <p class="hint">留空表示非加密文章。格式会自动写成 `MI: 提问|编号`。</p>
+            <div class="stack">
+              <button id="fm-apply" class="btn" type="button">写入头部</button>
+              <button id="fm-new" class="btn ghost" type="button">新建模板</button>
+            </div>
+            <p class="hint">`MI` 留空表示非加密文章；会写成 `MI: 提问|编号`。</p>
           </div>
 
-          <div class="grid">
-            <h2>发布导出</h2>
+          <div class="grid group-card">
+            <h2>导出</h2>
             <div class="row">
-              <label for="post-file-name">文章文件名</label>
-              <input id="post-file-name" type="text" placeholder="P1" />
+              <label for="post-folder-state-readonly">文章目录</label>
+              <input id="post-folder-state-readonly" type="text" value="请选择 ninocat_private/content/blog" readonly />
               <button id="pick-post-folder" class="btn" type="button">选择文章目录</button>
             </div>
             <div class="hint" id="post-folder-state">请选择本地 content/blog 目录后再导出（建议私密仓库目录）。</div>
@@ -379,14 +420,13 @@
             </div>
             <div class="stack">
               <button id="export-md" class="btn" type="button">导出 MD</button>
-              <button id="export-and-index" class="btn ghost" type="button">导出 + 更新索引</button>
             </div>
             <div class="stack">
               <button id="copy-md" class="btn ghost" type="button">复制 Markdown</button>
               <button id="download-md" class="btn ghost" type="button">下载 Markdown</button>
               <button id="clear-log" class="btn warn" type="button">清空日志</button>
             </div>
-            <p class="hint">“导出 + 更新索引”会生成与 `update-posts-index.bat` 相同结果的 `posts.json`。</p>
+            <p class="hint">密码维护：`ninocat_private/tools/secrets`。导出后运行：`update-posts-index.bat` + `add-post.bat`。</p>
           </div>
         </div>
       </section>
@@ -416,7 +456,7 @@
                 </label>
               </div>
             </div>
-            <article id="md-preview" class="preview-body"></article>
+            <article id="md-preview" class="preview-body markdown-content"></article>
           </div>
         </div>
       </section>
@@ -427,6 +467,13 @@
       </section>
     </main>
 
+    <footer class="site-footer shell">
+      <p data-site="footer-line1">Copyright © 2026 Nino</p>
+      <p data-site="footer-line2">All rights reserved.</p>
+    </footer>
+
+    <script src="../js/common.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
     <script src="./blog-editor.js"></script>
   </body>
 </html>

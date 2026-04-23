@@ -30,10 +30,10 @@
   const postFileNameInput = document.getElementById("post-file-name");
   const pickPostFolderBtn = document.getElementById("pick-post-folder");
   const postFolderState = document.getElementById("post-folder-state");
+  const postFolderStateReadonly = document.getElementById("post-folder-state-readonly");
   const importMdBtn = document.getElementById("import-md");
   const importMdInput = document.getElementById("import-md-file");
   const exportMdBtn = document.getElementById("export-md");
-  const exportAndIndexBtn = document.getElementById("export-and-index");
 
   const copyBtn = document.getElementById("copy-md");
   const downloadBtn = document.getElementById("download-md");
@@ -61,6 +61,13 @@
     imageRootKey: "image-root",
     postDirKey: "post-dir",
   };
+
+  const shared = window.SiteCommon || {};
+  const sharedMarkdownToHtml =
+    typeof shared.markdownToHtml === "function" ? shared.markdownToHtml : (text) => String(text || "");
+  const sharedEnhanceCodeBlocks =
+    typeof shared.enhanceCodeBlocks === "function" ? shared.enhanceCodeBlocks : () => {};
+  const sharedRenderMath = typeof shared.renderMath === "function" ? shared.renderMath : () => {};
 
   function todayYmd() {
     const now = new Date();
@@ -324,6 +331,9 @@
     if (!handle) return;
     postDirHandle = handle;
     postFolderState.textContent = `已选择文章目录：${handle.name}`;
+    if (postFolderStateReadonly) {
+      postFolderStateReadonly.value = handle.name;
+    }
     if (options.remember !== false) {
       await saveRememberedHandle(handleStore.postDirKey, handle);
     }
@@ -350,6 +360,9 @@
         if (allowed) {
           postDirHandle = rememberedPost;
           postFolderState.textContent = `已恢复文章目录：${rememberedPost.name}`;
+          if (postFolderStateReadonly) {
+            postFolderStateReadonly.value = rememberedPost.name;
+          }
         }
       } catch (_error) {
       }
@@ -748,60 +761,6 @@
     return { fileName };
   }
 
-  function ensureUniqueSlugs(items) {
-    const seen = new Map();
-    return items.map((item) => {
-      const count = seen.get(item.slug) || 0;
-      seen.set(item.slug, count + 1);
-      if (count === 0) return item;
-      return { ...item, slug: `${item.slug}-${count + 1}` };
-    });
-  }
-
-  async function updatePostsIndexFromFolder() {
-    if (!postDirHandle) {
-      appendLog("尚未选择文章目录。");
-      return;
-    }
-
-    const entries = [];
-    for await (const [name, handle] of postDirHandle.entries()) {
-      if (handle.kind !== "file") continue;
-      if (!name.toLowerCase().endsWith(".md")) continue;
-      const file = await handle.getFile();
-      const raw = await file.text();
-      const parsed = parseFrontMatterFromText(raw);
-      const meta = parsed?.meta || {};
-      const base = name.replace(/\.md$/i, "");
-      const slug = String(meta.slug || base).trim() || base;
-      const dateValue = safeDateValue(meta.date) ?? file.lastModified;
-      entries.push({ fileName: name, slug, dateValue });
-    }
-
-    entries.sort((a, b) => b.dateValue - a.dateValue);
-    const deduped = ensureUniqueSlugs(entries);
-    const indexPayload = {
-      posts: deduped.map((item) => ({
-        slug: item.slug,
-        file: `./content/blog/${item.fileName.replaceAll("\\", "/")}`,
-      })),
-    };
-
-    const jsonText = `${JSON.stringify(indexPayload, null, 2)}\n`;
-    const fileHandle = await postDirHandle.getFileHandle("posts.json", { create: true });
-    const writer = await fileHandle.createWritable();
-    await writer.write(jsonText);
-    await writer.close();
-
-    appendLog(`posts.json 已更新：${indexPayload.posts.length} 篇文章。`);
-  }
-
-  async function exportAndUpdateIndex() {
-    const exported = await exportMarkdownToPostFolder();
-    if (!exported) return;
-    await updatePostsIndexFromFolder();
-  }
-
   async function copyMarkdown() {
     try {
       await navigator.clipboard.writeText(editor.value);
@@ -820,19 +779,6 @@
     a.click();
     URL.revokeObjectURL(a.href);
     appendLog("已下载 Markdown 文件。");
-  }
-
-  function escapeHtml(input) {
-    return String(input || "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
-  }
-
-  function escapeAttr(input) {
-    return escapeHtml(input).replaceAll("`", "&#96;");
   }
 
   function resolvePreviewUrl(rawUrl) {
@@ -857,115 +803,37 @@
     return `${prefix}/${url}`;
   }
 
-  function inlineMarkdown(raw) {
-    let safe = escapeHtml(raw);
-    safe = safe.replace(
-      /!\[([^\]]*)\]\(([^)]+)\)/g,
-      (_m, alt, src) =>
-        `<img src="${escapeAttr(resolvePreviewUrl(src))}" alt="${escapeAttr(
-          alt
-        )}" loading="lazy" referrerpolicy="no-referrer" />`
-    );
-    safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
-    safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-    safe = safe.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-    safe = safe.replace(
-      /\[([^\]]+)\]\(([^)]+)\)/g,
-      (_m, label, href) =>
-        `<a href="${escapeAttr(resolvePreviewUrl(href))}" target="_blank" rel="noreferrer noopener">${label}</a>`
-    );
-    return safe;
-  }
-
-  function markdownToHtml(markdownText) {
-    const text = String(markdownText || "").replace(/\r\n/g, "\n");
+  function rewriteMarkdownLinksForPreview(markdown) {
+    const text = String(markdown || "").replace(/\r\n/g, "\n");
     const lines = text.split("\n");
     const out = [];
     let inCode = false;
-    let inUl = false;
-    let inOl = false;
-
-    const closeLists = () => {
-      if (inUl) {
-        out.push("</ul>");
-        inUl = false;
-      }
-      if (inOl) {
-        out.push("</ol>");
-        inOl = false;
-      }
-    };
 
     for (const line of lines) {
       if (line.startsWith("```")) {
-        closeLists();
-        if (!inCode) {
-          out.push("<pre><code>");
-          inCode = true;
-        } else {
-          out.push("</code></pre>");
-          inCode = false;
-        }
+        inCode = !inCode;
+        out.push(line);
         continue;
       }
-
       if (inCode) {
-        out.push(`${escapeHtml(line)}\n`);
+        out.push(line);
         continue;
       }
 
-      if (!line.trim()) {
-        closeLists();
-        continue;
-      }
-
-      if (/^#{1,4}\s/.test(line)) {
-        closeLists();
-        const m = line.match(/^(#{1,4})\s(.+)$/);
-        if (m) {
-          const level = m[1].length;
-          out.push(`<h${level}>${inlineMarkdown(m[2])}</h${level}>`);
-        }
-        continue;
-      }
-
-      if (/^>\s?/.test(line)) {
-        closeLists();
-        out.push(`<blockquote>${inlineMarkdown(line.replace(/^>\s?/, ""))}</blockquote>`);
-        continue;
-      }
-
-      if (/^\d+\.\s+/.test(line)) {
-        if (!inOl) {
-          closeLists();
-          out.push("<ol>");
-          inOl = true;
-        }
-        out.push(`<li>${inlineMarkdown(line.replace(/^\d+\.\s+/, ""))}</li>`);
-        continue;
-      }
-
-      if (/^[-*]\s+/.test(line)) {
-        if (!inUl) {
-          closeLists();
-          out.push("<ul>");
-          inUl = true;
-        }
-        out.push(`<li>${inlineMarkdown(line.replace(/^[-*]\s+/, ""))}</li>`);
-        continue;
-      }
-
-      closeLists();
-      out.push(`<p>${inlineMarkdown(line)}</p>`);
+      const replaced = line.replace(/(!?\[[^\]]*\]\()([^)]+)(\))/g, (_m, p1, url, p3) => {
+        return `${p1}${resolvePreviewUrl(url)}${p3}`;
+      });
+      out.push(replaced);
     }
 
-    if (inCode) out.push("</code></pre>");
-    closeLists();
     return out.join("\n");
   }
 
   function renderPreview() {
-    preview.innerHTML = markdownToHtml(editor.value);
+    const source = rewriteMarkdownLinksForPreview(editor.value);
+    preview.innerHTML = sharedMarkdownToHtml(source);
+    sharedEnhanceCodeBlocks(preview);
+    sharedRenderMath(preview);
   }
 
   function schedulePreview() {
@@ -1028,7 +896,6 @@
       });
     }
     exportMdBtn.addEventListener("click", exportMarkdownToPostFolder);
-    exportAndIndexBtn.addEventListener("click", exportAndUpdateIndex);
     postFileNameInput.addEventListener("change", syncPrefixWithPostFileName);
     postFileNameInput.addEventListener("blur", syncPrefixWithPostFileName);
   }
@@ -1042,7 +909,35 @@
     editor.addEventListener("input", schedulePreview);
   }
 
+  async function applySharedSiteConfig() {
+    if (typeof shared.loadSiteConfig !== "function") return;
+    try {
+      const config = await shared.loadSiteConfig();
+      if (typeof shared.applyThemeConfig === "function") {
+        shared.applyThemeConfig(config);
+      }
+      if (typeof shared.initTheme === "function") {
+        shared.initTheme(config);
+      }
+      if (typeof shared.setupThemeToggle === "function") {
+        shared.setupThemeToggle();
+      }
+      if (typeof shared.applySiteText === "function") {
+        shared.applySiteText(config);
+      }
+      if (typeof shared.markActiveNav === "function") {
+        shared.markActiveNav();
+      }
+      if (config?.title) {
+        document.title = `${config.title} - Markdown 博客编辑器`;
+      }
+    } catch (error) {
+      appendLog(`加载站点主题配置失败：${error.message || error}`);
+    }
+  }
+
   async function init() {
+    await applySharedSiteConfig();
     initDefaults();
     if (createImageSubdirLabel) {
       createImageSubdirLabel.textContent = "\u81ea\u52a8\u5b50\u76ee\u5f55";

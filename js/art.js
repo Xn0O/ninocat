@@ -4,6 +4,7 @@
   initTheme,
   setupThemeToggle,
   applyHeaderImage,
+  applySiteText,
   markActiveNav,
   createEmptyTip,
   tagsFromText,
@@ -56,6 +57,7 @@ async function init() {
   initTheme(config);
   setupThemeToggle();
   applyHeaderImage(config);
+  applySiteText(config);
   markActiveNav();
 
   try {
@@ -75,3 +77,6 @@ async function init() {
 }
 
 init();
+
+
+

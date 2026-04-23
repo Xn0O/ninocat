@@ -66,6 +66,10 @@
       "text": "#000000"
     }
   },
+  "footer": {
+    "line1": "Copyright © 2026 Nino",
+    "line2": "All rights reserved."
+  },
   "headerImages": {
     "default": "./assets/hero-home.svg",
     "home": "./assets/hero-home.svg",

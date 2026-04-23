@@ -4,6 +4,7 @@
   initTheme,
   setupThemeToggle,
   applyHeaderImage,
+  applySiteText,
   markActiveNav,
   createEmptyTip,
   parseFrontMatter,
@@ -376,6 +377,7 @@ async function init() {
   initTheme(config);
   setupThemeToggle();
   applyHeaderImage(config);
+  applySiteText(config);
   markActiveNav();
 
   if (!grid) {
@@ -422,3 +424,6 @@ async function init() {
 }
 
 init();
+
+
+

@@ -1,5 +1,8 @@
 ﻿(function () {
-  const SITE_CONFIG_PATH = "./data/site.json";
+  const SITE_CONFIG_PATH =
+    window.__SITE_CONFIG_PATH__ ||
+    document.documentElement?.getAttribute("data-site-config-path") ||
+    "./data/site.json";
   const THEME_KEY = "vb_theme";
 
   let siteConfigPromise = null;
@@ -172,6 +175,20 @@
   function setupBackToTop() {
     if (document.getElementById("back-to-top-btn")) return;
 
+    const getToolsHref = () => {
+      const path = String(window.location.pathname || "").toLowerCase();
+      if (path.includes("/tools/")) return "./blog-editor.html";
+      return "./tools/blog-editor.html";
+    };
+
+    const toolsBtn = document.createElement("a");
+    toolsBtn.id = "tools-entry-btn";
+    toolsBtn.className = "back-to-top back-to-top-tools";
+    toolsBtn.href = getToolsHref();
+    toolsBtn.setAttribute("aria-label", "打开博客编辑器");
+    toolsBtn.title = "打开博客编辑器";
+    document.body.appendChild(toolsBtn);
+
     const btn = document.createElement("button");
     btn.id = "back-to-top-btn";
     btn.className = "back-to-top";
@@ -183,8 +200,10 @@
     const updateVisibility = () => {
       if (window.scrollY > 260) {
         btn.classList.add("visible");
+        toolsBtn.classList.add("visible");
       } else {
         btn.classList.remove("visible");
+        toolsBtn.classList.remove("visible");
       }
     };
 
@@ -212,9 +231,9 @@
           title: "nino",
           brandIcon: "./assets/Home_Toy/M_0.png",
           brand: {
-            icon: "./assets/Home_Toy/M_0.png",
-            textSize: "1.08rem",
-            logoSize: "22px",
+            icon: "./assets/Home_Site/ninocatlogo.png",
+            textSize: "3.0rem",
+            logoSize: "48px",
             gap: "8px",
           },
           navItems: [
@@ -224,17 +243,17 @@
             { key: "about", label: "About", href: "./about.html" },
           ],
           navGlass: {
-            base: "rgba(132, 0, 255, 0.78)",
-            tint: "rgba(242, 185, 255, 0.36)",
-            glow: "rgba(104, 0, 255, 0.7)",
-            border: "rgba(255, 255, 255, 0.45)",
+            base: "rgba(255, 255, 255, 0.1)",
+            tint: "rgba(255, 255, 255, 0.08)",
+            glow: "rgba(255, 255, 255, 0.22)",
+            border: "rgba(255, 255, 255, 0.18)",
             ink: "#ffffff",
             mutedInk: "rgba(255, 255, 255, 0.9)",
             pill: "rgba(255, 255, 255, 0.14)",
             pillActive: "#ffffff",
-            pillActiveInk: "#5900b8",
+            pillActiveInk: "#111111",
             blur: "16px",
-            saturate: "180%",
+            saturate: "100%",
           },
           navGlassQuick: {
             color: "#ffffff",
@@ -272,6 +291,10 @@
               bg: "rgba(110, 167, 255, 0.38)",
               text: "#f8fbff",
             },
+          },
+          footer: {
+            line1: "Copyright © 2026 Nino",
+            line2: "All rights reserved.",
           },
           headerImages: {
             default: "./assets/hero-home.svg",
@@ -533,21 +556,22 @@
   }
 
   function applySiteText(config) {
-    if (config.title) {
-      document.querySelectorAll("[data-site='title']").forEach((el) => {
-        el.textContent = config.title;
+    const setSiteText = (key, value) => {
+      if (typeof value !== "string") return;
+      const text = value.trim();
+      if (!text) return;
+      document.querySelectorAll(`[data-site='${key}']`).forEach((el) => {
+        el.textContent = text;
       });
-    }
-    if (config.eyebrow) {
-      document.querySelectorAll("[data-site='eyebrow']").forEach((el) => {
-        el.textContent = config.eyebrow;
-      });
-    }
-    if (config.subtitle) {
-      document.querySelectorAll("[data-site='subtitle']").forEach((el) => {
-        el.textContent = config.subtitle;
-      });
-    }
+    };
+
+    setSiteText("title", config.title);
+    setSiteText("eyebrow", config.eyebrow);
+    setSiteText("subtitle", config.subtitle);
+
+    const footer = config?.footer && typeof config.footer === "object" ? config.footer : {};
+    setSiteText("footer-line1", footer.line1 ?? config?.footerLine1);
+    setSiteText("footer-line2", footer.line2 ?? config?.footerLine2);
   }
 
   function markActiveNav() {
@@ -592,14 +616,38 @@
     return { meta, body };
   }
 
+  function createMathPlaceholder(latexRaw, displayMode) {
+    const latex = String(latexRaw || "").trim();
+    if (!latex) return "";
+    const escapedLatex = escapeHtml(latex);
+    const cls = displayMode ? "math-block" : "math-inline";
+    return `<span class="${cls}" data-latex="${escapedLatex}">${escapedLatex}</span>`;
+  }
+
+  function extractInlineMathPlaceholders(text) {
+    const placeholders = [];
+    const replaced = String(text || "").replace(/(^|[^\\])\$(?!\$)([^\n$]+?)\$(?!\$)/g, (m, prefix, expr) => {
+      const placeholder = `\uE110${placeholders.length}\uE111`;
+      placeholders.push(createMathPlaceholder(expr, false));
+      return `${prefix}${placeholder}`;
+    });
+    return { text: replaced, placeholders };
+  }
+
   function inlineMarkdown(raw) {
-    return raw
+    const extracted = extractInlineMathPlaceholders(raw);
+    let rendered = extracted.text
       .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy" />')
       .replace(/&lt;(https?:\/\/[^<>\s]+)&gt;/g, '<a href="$1" target="_blank" rel="noreferrer noopener">$1</a>')
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/\*([^*]+)\*/g, "<em>$1</em>")
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
+
+    extracted.placeholders.forEach((html, idx) => {
+      rendered = rendered.replace(`\uE110${idx}\uE111`, html);
+    });
+    return rendered;
   }
 
   function normalizeCodeLang(raw) {
@@ -855,6 +903,44 @@
         continue;
       }
 
+      const mathDelim =
+        line.match(/^\s*\$\$(.*)$/) || line.match(/^\s*\\\[(.*)$/);
+      if (mathDelim) {
+        closeLists();
+        const isBracketStyle = line.trimStart().startsWith("\\[");
+        const endPattern = isBracketStyle ? /(.*)\\\]\s*$/ : /(.*)\$\$\s*$/;
+        const first = mathDelim[1] || "";
+        const mathLines = [];
+        let closed = false;
+
+        if (first && endPattern.test(first)) {
+          const match = first.match(endPattern);
+          mathLines.push((match && match[1]) || "");
+          closed = true;
+        } else if (first) {
+          mathLines.push(first);
+        }
+
+        if (!closed) {
+          while (i + 1 < lines.length) {
+            i += 1;
+            const current = lines[i];
+            const endMatch = current.match(endPattern);
+            if (endMatch) {
+              if (endMatch[1]) {
+                mathLines.push(endMatch[1]);
+              }
+              closed = true;
+              break;
+            }
+            mathLines.push(current);
+          }
+        }
+
+        out.push(createMathPlaceholder(mathLines.join("\n"), true));
+        continue;
+      }
+
       if (line.trim() === "") {
         closeLists();
         continue;
@@ -995,6 +1081,31 @@
     });
   }
 
+  function renderMath(root = document) {
+    if (!root || typeof root.querySelectorAll !== "function") return;
+
+    root.querySelectorAll(".math-inline[data-latex], .math-block[data-latex]").forEach((node) => {
+      const latex = String(node.getAttribute("data-latex") || "");
+      if (!latex) return;
+
+      const displayMode = node.classList.contains("math-block");
+      if (window.katex && typeof window.katex.render === "function") {
+        try {
+          window.katex.render(latex, node, {
+            throwOnError: false,
+            displayMode,
+            strict: "ignore",
+          });
+          return;
+        } catch (error) {
+          console.warn("KaTeX 渲染失败。", error);
+        }
+      }
+
+      node.textContent = displayMode ? `$$${latex}$$` : `$${latex}$`;
+    });
+  }
+
   window.SiteCommon = {
     loadSiteConfig,
     applyThemeConfig,
@@ -1010,6 +1121,7 @@
     parseFrontMatter,
     markdownToHtml,
     enhanceCodeBlocks,
+    renderMath,
     tagsFromText,
     isHiddenMeta,
     parseMiMeta,

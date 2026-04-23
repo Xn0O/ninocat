@@ -4,10 +4,12 @@
   initTheme,
   setupThemeToggle,
   applyHeaderImage,
+  applySiteText,
   markActiveNav,
   createEmptyTip,
   markdownToHtml,
   enhanceCodeBlocks,
+  renderMath,
 } = window.SiteCommon;
 
 const ABOUT_PATH = "./content/about.md";
@@ -19,6 +21,7 @@ async function init() {
   initTheme(config);
   setupThemeToggle();
   applyHeaderImage(config);
+  applySiteText(config);
   markActiveNav();
 
   try {
@@ -27,6 +30,7 @@ async function init() {
     const markdown = await res.text();
     aboutContainer.innerHTML = markdownToHtml(markdown);
     enhanceCodeBlocks(aboutContainer);
+    renderMath(aboutContainer);
   } catch (error) {
     console.error(error);
     aboutContainer.appendChild(createEmptyTip("关于页加载失败，请检查 content/about.md。"));

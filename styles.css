@@ -712,6 +712,23 @@ a {
   color: var(--code-tok-attr);
 }
 
+.markdown-content .math-inline {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.markdown-content .math-block {
+  display: block;
+  margin: 0.7em 0;
+  overflow-x: auto;
+  padding: 0.1em 0;
+}
+
+.markdown-content .math-block .katex-display {
+  margin: 0.2em 0;
+}
+
 .markdown-content img {
   display: block;
   max-width: 100%;
@@ -1172,6 +1189,18 @@ a {
   mask-repeat: no-repeat;
 }
 
+.back-to-top-tools {
+  bottom: 62px;
+  text-decoration: none;
+}
+
+.back-to-top-tools::before {
+  width: 15px;
+  height: 15px;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M21.71 20.29l-5.4-5.4a7 7 0 01-8.88-8.88l3.12 3.12 2.12-2.12-3.12-3.12a7 7 0 008.88 8.88l5.4 5.4a1 1 0 001.41-1.41zM5 19h7v2H5a3 3 0 01-3-3v-7h2v7a1 1 0 001 1z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M21.71 20.29l-5.4-5.4a7 7 0 01-8.88-8.88l3.12 3.12 2.12-2.12-3.12-3.12a7 7 0 008.88 8.88l5.4 5.4a1 1 0 001.41-1.41zM5 19h7v2H5a3 3 0 01-3-3v-7h2v7a1 1 0 001 1z'/%3E%3C/svg%3E");
+}
+
 .back-to-top.visible {
   opacity: 1;
   transform: translateY(0);
@@ -1192,6 +1221,10 @@ a {
     bottom: 14px;
     width: 38px;
     height: 34px;
+  }
+
+  .back-to-top-tools {
+    bottom: 56px;
   }
 
   .game-grid {
