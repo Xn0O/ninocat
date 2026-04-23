@@ -11,6 +11,7 @@
   tagsFromText,
   isHiddenMeta,
   parseMiMeta,
+  resolveAssetUrl,
 } = window.SiteCommon;
 
 const POSTS_INDEX = "./content/blog/posts.json";
@@ -138,7 +139,7 @@ function renderCard(post) {
   cover.className = "item-cover";
   cover.loading = "lazy";
   cover.alt = `${post.title || post.slug} 头图`;
-  cover.src = post.cover || DEFAULT_COVER;
+  cover.src = resolveAssetUrl(post.cover || DEFAULT_COVER);
 
   const body = document.createElement("div");
   body.className = "item-body";

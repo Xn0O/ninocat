@@ -6,6 +6,7 @@
   const THEME_KEY = "vb_theme";
 
   let siteConfigPromise = null;
+  let activeSiteConfig = null;
 
   function normalizeCssSize(value, fallback) {
     if (typeof value === "number" && Number.isFinite(value) && value > 0) {
@@ -36,6 +37,60 @@
     return Math.min(max, Math.max(min, value));
   }
 
+  function isLocalPreviewEnv() {
+    const protocol = String(window.location?.protocol || "").toLowerCase();
+    if (protocol === "file:") return true;
+
+    const host = String(window.location?.hostname || "").toLowerCase();
+    return host === "localhost" || host === "127.0.0.1" || host === "::1";
+  }
+
+  function getAssetCdnConfig(config) {
+    const raw = config?.assetCdn && typeof config.assetCdn === "object" ? config.assetCdn : {};
+    const base = typeof raw.base === "string" ? raw.base.trim().replace(/\/+$/, "") : "";
+    const enabled = raw.enabled !== false;
+    const useOnLocal = raw.useOnLocal === true;
+    return { base, enabled, useOnLocal };
+  }
+
+  function normalizeAssetPath(pathname) {
+    let value = String(pathname || "").trim().replaceAll("\\", "/");
+    if (!value) return "";
+
+    while (value.startsWith("../")) {
+      value = value.slice(3);
+    }
+    if (value.startsWith("./")) {
+      value = value.slice(2);
+    }
+    if (value.startsWith("/")) {
+      value = value.slice(1);
+    }
+    if (!/^assets\//i.test(value)) {
+      return "";
+    }
+    return value.replace(/\/{2,}/g, "/");
+  }
+
+  function resolveAssetUrl(rawUrl, options = {}) {
+    const input = String(rawUrl || "").trim();
+    if (!input) return input;
+    if (/^(https?:|data:|blob:|mailto:|tel:|#|\/\/)/i.test(input)) return input;
+
+    const match = input.match(/^([^?#]*)([?#].*)?$/);
+    const pathname = match ? match[1] : input;
+    const suffix = match ? match[2] || "" : "";
+    const normalized = normalizeAssetPath(pathname);
+    if (!normalized) return input;
+
+    const config = options?.config || activeSiteConfig;
+    const cdn = getAssetCdnConfig(config);
+    if (!cdn.enabled || !cdn.base) return input;
+    if (isLocalPreviewEnv() && !cdn.useOnLocal) return input;
+
+    return `${cdn.base}/${normalized}${suffix}`;
+  }
+
   function rgbaFromColor(color, alpha, fallback) {
     const rgb = parseColorToRgb(color);
     if (!rgb) return fallback;
@@ -49,7 +104,7 @@
 
     const fromFlat = typeof config?.brandIcon === "string" ? config.brandIcon.trim() : "";
     const fromNested = typeof brand.icon === "string" ? brand.icon.trim() : "";
-    const iconPath = fromFlat || fromNested;
+    const iconPath = resolveAssetUrl(fromFlat || fromNested, { config });
     if (iconPath) {
       const safePath = iconPath.replaceAll('"', '\\"');
       root.setProperty("--brand-icon-url", `url("${safePath}")`);
@@ -274,6 +329,11 @@
             blur: "16px",
             saturate: "100%",
           },
+          assetCdn: {
+            enabled: false,
+            base: "",
+            useOnLocal: false,
+          },
           eyebrow: "eyebrow",
           subtitle: "subtitle",
           defaultTheme: "dark",
@@ -314,6 +374,7 @@
           },
         }))
         .then((config) => {
+          activeSiteConfig = config || null;
           applyBrandConfig(config);
           applyNavGlassConfig(config);
           applyNavConfig(config);
@@ -574,7 +635,7 @@
       ...(pageEntry || {}),
     };
 
-    heroImage.src = merged.src || fallback.src;
+    heroImage.src = resolveAssetUrl(merged.src || fallback.src, { config });
     heroImage.style.setProperty("--hero-fit", sanitizeFit(merged.fit));
     heroImage.style.setProperty("--hero-position", sanitizePosition(merged.position));
     heroImage.style.setProperty("--hero-ratio", sanitizeRatio(merged.ratio));
@@ -687,7 +748,10 @@
   function inlineMarkdown(raw) {
     const extracted = extractInlineMathPlaceholders(raw);
     let rendered = extracted.text
-      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy" />')
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, src) => {
+        const resolvedSrc = escapeHtml(resolveAssetUrl(src));
+        return `<img src="${resolvedSrc}" alt="${alt}" loading="lazy" />`;
+      })
       .replace(/&lt;(https?:\/\/[^<>\s]+)&gt;/g, '<a href="$1" target="_blank" rel="noreferrer noopener">$1</a>')
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
@@ -1177,6 +1241,7 @@
     parseMiMeta,
     createEmptyTip,
     applyBrandConfig,
+    resolveAssetUrl,
     setTheme,
     getTheme,
   };

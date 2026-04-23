@@ -35,6 +35,11 @@
     "blur": "16px",
     "saturate": "100%"
   },
+  "assetCdn": {
+    "enabled": true,
+    "base": "https://cdn.jsdelivr.net/gh/xn0o/ninocat@main",
+    "useOnLocal": false
+  },
   "eyebrow": "ninocat",
   "subtitle": "点击/长按NINO猫互动",
   "defaultTheme": "dark",

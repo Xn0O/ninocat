@@ -8,6 +8,7 @@
   markActiveNav,
   createEmptyTip,
   tagsFromText,
+  resolveAssetUrl,
 } = window.SiteCommon;
 
 const ART_PATH = "./data/art.json";
@@ -21,7 +22,7 @@ function artCard(item) {
   cover.className = "item-cover";
   cover.alt = `${item.title} 作品图`;
   cover.loading = "lazy";
-  cover.src = item.image || "./assets/hero-art.svg";
+  cover.src = resolveAssetUrl(item.image || "./assets/hero-art.svg");
 
   const body = document.createElement("div");
   body.className = "item-body";

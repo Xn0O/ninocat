@@ -14,6 +14,7 @@
   tagsFromText,
   isHiddenMeta,
   parseMiMeta,
+  resolveAssetUrl,
 } = window.SiteCommon;
 
 const POSTS_INDEX = "./content/blog/posts.json";
@@ -291,7 +292,7 @@ async function init() {
     appendMeta(meta, encrypted ? mi : null);
 
     if (heroNode && meta.cover) {
-      heroNode.src = meta.cover;
+      heroNode.src = resolveAssetUrl(meta.cover);
       heroNode.alt = `${meta.title || slug} 文章头图`;
     }
 

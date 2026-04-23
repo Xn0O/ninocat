@@ -8,6 +8,7 @@
   markActiveNav,
   createEmptyTip,
   tagsFromText,
+  resolveAssetUrl,
 } = window.SiteCommon;
 
 const GAMES_PATH = "./data/games.json";
@@ -129,13 +130,13 @@ function cardForGame(game) {
   coverPrimary.className = "game-cover game-cover-primary";
   coverPrimary.loading = "lazy";
   coverPrimary.alt = `${game.title} 封面`;
-  coverPrimary.src = game.cover;
+  coverPrimary.src = resolveAssetUrl(game.cover);
 
   const coverHover = document.createElement("img");
   coverHover.className = "game-cover game-cover-hover";
   coverHover.loading = "lazy";
   coverHover.alt = `${game.title} 悬浮图`;
-  coverHover.src = game.coverHover;
+  coverHover.src = resolveAssetUrl(game.coverHover);
 
   media.append(coverPrimary, coverHover);
 

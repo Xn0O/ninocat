@@ -5,6 +5,7 @@
   setupThemeToggle,
   applySiteText,
   markActiveNav,
+  resolveAssetUrl,
 } = window.SiteCommon;
 
 const DEFAULT_STRIPS = [
@@ -76,7 +77,7 @@ function renderStrips(strips) {
 
     const bg = document.createElement("div");
     bg.className = "home-strip-bg";
-    bg.style.backgroundImage = `url("${item.image}")`;
+    bg.style.backgroundImage = `url("${resolveAssetUrl(item.image)}")`;
     bg.dataset.speed = String(item.speed);
     bg.style.setProperty("--strip-fit", item.fit);
     bg.style.setProperty("--strip-position", item.position);
@@ -190,7 +191,7 @@ function setupHomeTitleRole(config) {
   };
   const resolvedTitleGap = resolveTitleGap(rawTitleGap);
 
-  role.src = stand;
+  role.src = resolveAssetUrl(stand);
   role.style.setProperty("--toy-shake-ms", `${shakeMs}ms`);
   role.style.setProperty("--home-role-scale", String(resolvedRoleScale));
   role.style.setProperty("--home-role-offset-x", `${resolvedRoleX}%`);
@@ -241,7 +242,7 @@ function setupHomeTitleRole(config) {
       return;
     }
     role.classList.remove("raised");
-    role.src = state === "transition" ? transition : stand;
+    role.src = resolveAssetUrl(state === "transition" ? transition : stand);
   };
 
   const startHold = (event) => {
