@@ -201,7 +201,7 @@ async function loadPosts() {
   const index = await indexRes.json();
   const files = Array.isArray(index.posts) ? index.posts : [];
 
-  const loaded = await Promise.all(
+  const loaded = await Promise.allSettled(
     files.map(async (item) => {
       const res = await fetch(withCacheBust(item.file), { cache: "no-store" });
       if (!res.ok) {
@@ -237,7 +237,15 @@ async function loadPosts() {
     })
   );
 
-  const visible = loaded.filter(Boolean);
+  const visible = loaded
+    .map((result) => {
+      if (result.status === "fulfilled") {
+        return result.value;
+      }
+      console.warn("[blog] 跳过加载失败文章：", result.reason);
+      return null;
+    })
+    .filter(Boolean);
   visible.sort((a, b) => String(b.date).localeCompare(String(a.date)));
   return visible;
 }
