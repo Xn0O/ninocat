@@ -377,6 +377,13 @@
     return `"${escaped}"`;
   }
 
+  function plainYamlValue(value) {
+    // Keep common fields readable without forced quotes.
+    return String(value || "")
+      .replace(/\r?\n/g, " ")
+      .trim();
+  }
+
   function collectFrontMatterForm() {
     const hidden = normalizeHiddenValue(fmHiddenInput?.value || "0");
     const mi = buildMiField(fmMiQuestionInput?.value, fmMiIdInput?.value);
@@ -394,14 +401,14 @@
 
   function buildFrontMatterText(values) {
     const lines = ["---"];
-    lines.push(`title: ${quoteYamlValue(values.title || "第一篇文章")}`);
+    lines.push(`title: ${plainYamlValue(values.title || "第一篇文章")}`);
     lines.push(`date: ${quoteYamlValue(values.date || todayYmd())}`);
-    lines.push(`summary: ${quoteYamlValue(values.summary || "旧的文章等以后有空了再迁移进来！")}`);
-    lines.push(`tags: ${quoteYamlValue(values.tags || "Blog")}`);
+    lines.push(`summary: ${plainYamlValue(values.summary || "旧的文章等以后有空了再迁移进来！")}`);
+    lines.push(`tags: ${plainYamlValue(values.tags || "Blog")}`);
     lines.push(`cover: ${quoteYamlValue(normalizePrefix(values.cover || "./assets/Blog/P0/P0.jpg"))}`);
     lines.push(`hidden: ${quoteYamlValue(normalizeHiddenValue(values.hidden || "0"))}`);
     if (values.mi) {
-      lines.push(`MI: ${quoteYamlValue(values.mi)}`);
+      lines.push(`MI: ${plainYamlValue(values.mi)}`);
     }
     lines.push("---");
     return `${lines.join("\n")}\n`;

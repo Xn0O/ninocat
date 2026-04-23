@@ -6,7 +6,7 @@ tags: Test
 cover: ./assets/Blog/P0/P1.jpg
 slug: Test
 hidden: 0
-MI: "密码是001|001"
+MI: 密码是001|001
 encRef: ./content/blog_encrypted/Test.enc.json
 ---
 
