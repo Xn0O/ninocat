@@ -1,18 +1,39 @@
 ﻿{
   "arts": [
     {
-      "title": "蓝色",
-      "description": "only blue~",
+      "title": "UFO!",
+      "description": "快看！！",
       "year": "2026",
-      "image": "./assets/Blog/P0/P0.jpg",
-      "tags": "概念|场景"
+      "image": "./assets/Art/0.jpg",
+      "tags": "摸鱼"
     },
     {
-      "title": "红色",
-      "description": "红色代表什么",
+      "title": "Ghost",
+      "description": "幽灵~",
       "year": "2026",
-      "image": "./assets/Blog/P0/P1.jpg",
-      "tags": "角色|设计"
+      "image": "./assets/Art/1.jpg",
+      "tags": "摸鱼"
+    },
+    {
+      "title": "盯",
+      "description": "...",
+      "year": "2026",
+      "image": "./assets/Art/2.png",
+      "tags": "摸鱼"
+    },
+    {
+      "title": "雪",
+      "description": "说起来，我从来没见过雪..",
+      "year": "2026",
+      "image": "./assets/Art/3.jpg",
+      "tags": "摸鱼"
+    },
+    {
+      "title": "神秘",
+      "description": "正在帮木头人实现心愿",
+      "year": "2026",
+      "image": "./assets/Art/4.jpg",
+      "tags": "摸鱼"
     }
   ]
 }

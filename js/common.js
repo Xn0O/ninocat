@@ -1160,6 +1160,119 @@
     return node;
   }
 
+  function ensureImageLightbox() {
+    let mask = document.getElementById("image-lightbox");
+    if (mask) return mask;
+
+    mask = document.createElement("div");
+    mask.id = "image-lightbox";
+    mask.className = "image-lightbox";
+    mask.setAttribute("aria-hidden", "true");
+
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "image-lightbox-close";
+    closeBtn.setAttribute("aria-label", "关闭大图");
+    closeBtn.textContent = "×";
+
+    const img = document.createElement("img");
+    img.className = "image-lightbox-img";
+    img.alt = "";
+
+    const caption = document.createElement("p");
+    caption.className = "image-lightbox-caption";
+    caption.hidden = true;
+
+    mask.append(closeBtn, img, caption);
+    document.body.appendChild(mask);
+
+    const close = () => {
+      mask.classList.remove("open");
+      mask.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("lightbox-open");
+      img.removeAttribute("src");
+      img.alt = "";
+      caption.textContent = "";
+      caption.hidden = true;
+    };
+
+    closeBtn.addEventListener("click", close);
+    mask.addEventListener("click", (event) => {
+      if (event.target === mask) close();
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && mask.classList.contains("open")) {
+        close();
+      }
+    });
+
+    mask.openImage = (src, alt) => {
+      img.src = src;
+      img.alt = alt || "大图预览";
+      if (alt) {
+        caption.textContent = alt;
+        caption.hidden = false;
+      } else {
+        caption.textContent = "";
+        caption.hidden = true;
+      }
+      mask.classList.add("open");
+      mask.setAttribute("aria-hidden", "false");
+      document.body.classList.add("lightbox-open");
+    };
+
+    return mask;
+  }
+
+  function canBindImageLightbox(img) {
+    if (!(img instanceof HTMLImageElement)) return false;
+    if (img.dataset.noLightbox === "1") return false;
+    if (img.matches(".hero-image, [data-hero-image]")) return false;
+    if (img.closest("a, button, .home-title-role-hit, .game-media, #image-lightbox")) return false;
+
+    const src = String(img.currentSrc || img.src || "").trim();
+    if (!src) return false;
+    return true;
+  }
+
+  function setupImageLightbox(root = document) {
+    if (!root || typeof root.querySelectorAll !== "function") return;
+    const lightbox = ensureImageLightbox();
+
+    root.querySelectorAll("img").forEach((img) => {
+      if (img.dataset.lightboxBound === "1") return;
+      if (!canBindImageLightbox(img)) return;
+
+      img.dataset.lightboxBound = "1";
+      img.classList.add("zoomable-image");
+      if (!img.hasAttribute("tabindex")) {
+        img.tabIndex = 0;
+      }
+      if (!img.hasAttribute("role")) {
+        img.setAttribute("role", "button");
+      }
+      if (!img.getAttribute("aria-label")) {
+        const hint = img.alt ? `${img.alt}（点击查看大图）` : "点击查看大图";
+        img.setAttribute("aria-label", hint);
+      }
+
+      const open = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const src = String(img.currentSrc || img.src || "").trim();
+        if (!src) return;
+        lightbox.openImage(src, img.alt || "");
+      };
+
+      img.addEventListener("click", open);
+      img.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          open(event);
+        }
+      });
+    });
+  }
+
   function enhanceCodeBlocks(root = document) {
     if (!root || typeof root.querySelectorAll !== "function") return;
 
@@ -1236,6 +1349,7 @@
     markdownToHtml,
     enhanceCodeBlocks,
     renderMath,
+    setupImageLightbox,
     tagsFromText,
     isHiddenMeta,
     parseMiMeta,

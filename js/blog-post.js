@@ -15,6 +15,7 @@
   isHiddenMeta,
   parseMiMeta,
   resolveAssetUrl,
+  setupImageLightbox,
 } = window.SiteCommon;
 
 const POSTS_INDEX = "./content/blog/posts.json";
@@ -240,6 +241,7 @@ async function renderEncryptedBody(mi, encRef) {
       contentNode.innerHTML = markdownToHtml(markdown);
       enhanceCodeBlocks(contentNode);
       renderMath(contentNode);
+      setupImageLightbox(document.querySelector("main") || document);
       return;
     } catch (_error) {
       decryptError = "密码错误，或加密数据已损坏，请重试。";
@@ -295,6 +297,8 @@ async function init() {
       heroNode.src = resolveAssetUrl(meta.cover);
       heroNode.alt = `${meta.title || slug} 文章头图`;
     }
+
+    setupImageLightbox(document.querySelector("main") || document);
 
     if (encrypted) {
       await renderEncryptedBody(mi, encRef);

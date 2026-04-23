@@ -165,7 +165,7 @@
     "roleScale": 1.5,
     "titleGap": "0px",
     "roleXPercent": 0,
-    "roleYPercent": 28,
+    "roleYPercent": 0,
     "shakeMs": 240
   }
 }

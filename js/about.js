@@ -10,6 +10,7 @@
   markdownToHtml,
   enhanceCodeBlocks,
   renderMath,
+  setupImageLightbox,
 } = window.SiteCommon;
 
 const ABOUT_PATH = "./content/about.md";
@@ -31,6 +32,7 @@ async function init() {
     aboutContainer.innerHTML = markdownToHtml(markdown);
     enhanceCodeBlocks(aboutContainer);
     renderMath(aboutContainer);
+    setupImageLightbox(aboutContainer);
   } catch (error) {
     console.error(error);
     aboutContainer.appendChild(createEmptyTip("关于页加载失败，请检查 content/about.md。"));

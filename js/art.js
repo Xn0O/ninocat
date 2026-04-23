@@ -9,6 +9,7 @@
   createEmptyTip,
   tagsFromText,
   resolveAssetUrl,
+  setupImageLightbox,
 } = window.SiteCommon;
 
 const ART_PATH = "./data/art.json";
@@ -71,6 +72,7 @@ async function init() {
       return;
     }
     items.forEach((item) => grid.appendChild(artCard(item)));
+    setupImageLightbox(grid);
   } catch (error) {
     console.error(error);
     grid.appendChild(createEmptyTip("美术数据加载失败，请检查 data/art.json。"));
