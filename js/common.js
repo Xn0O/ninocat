@@ -545,17 +545,227 @@
 
   function inlineMarkdown(raw) {
     return raw
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy" />')
+      .replace(/&lt;(https?:\/\/[^<>\s]+)&gt;/g, '<a href="$1" target="_blank" rel="noreferrer noopener">$1</a>')
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/\*([^*]+)\*/g, "<em>$1</em>")
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
   }
 
+  function normalizeCodeLang(raw) {
+    const text = String(raw || "").trim().toLowerCase();
+    if (!text) return "plain";
+    if (text === "c#" || text === "cs" || text === "csharp") return "csharp";
+    if (text === "c++" || text === "cpp" || text === "cc" || text === "cxx") return "cpp";
+    if (text === "py" || text === "python") return "python";
+    if (text === "htm" || text === "html" || text === "xml") return "html";
+    if (text === "hlsl") return "hlsl";
+    return text;
+  }
+
+  function escapeRegExp(input) {
+    return String(input).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function highlightCode(code, lang) {
+    const normalizedLang = normalizeCodeLang(lang);
+    const protectedHtml = new Map();
+    let tokenCounter = 0;
+    let text = escapeHtml(code);
+
+    const tokenKey = () => {
+      const n = tokenCounter++;
+      let x = n;
+      let letters = "";
+      do {
+        letters = String.fromCharCode(65 + (x % 26)) + letters;
+        x = Math.floor(x / 26) - 1;
+      } while (x >= 0);
+      return `\uE000${letters}\uE001`;
+    };
+
+    const protect = (pattern, cssToken) => {
+      text = text.replace(pattern, (m) => {
+        const key = tokenKey();
+        protectedHtml.set(key, `<span class="tok-${cssToken}">${m}</span>`);
+        return key;
+      });
+    };
+
+    const highlightKeywords = (keywords) => {
+      if (!keywords.length) return;
+      const re = new RegExp(`\\b(${keywords.map(escapeRegExp).join("|")})\\b`, "g");
+      text = text.replace(re, '<span class="tok-kw">$1</span>');
+    };
+
+    if (normalizedLang === "csharp") {
+      protect(/\/\*[\s\S]*?\*\//g, "comment");
+      protect(/\/\/[^\n]*/g, "comment");
+      protect(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, "str");
+      highlightKeywords([
+        "public",
+        "private",
+        "protected",
+        "internal",
+        "class",
+        "struct",
+        "enum",
+        "interface",
+        "namespace",
+        "using",
+        "void",
+        "int",
+        "float",
+        "double",
+        "decimal",
+        "string",
+        "bool",
+        "var",
+        "new",
+        "return",
+        "if",
+        "else",
+        "switch",
+        "case",
+        "for",
+        "foreach",
+        "while",
+        "do",
+        "break",
+        "continue",
+        "null",
+        "true",
+        "false",
+        "static",
+        "readonly",
+        "const",
+        "this",
+        "base",
+      ]);
+    } else if (normalizedLang === "cpp") {
+      protect(/\/\*[\s\S]*?\*\//g, "comment");
+      protect(/\/\/[^\n]*/g, "comment");
+      protect(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, "str");
+      highlightKeywords([
+        "int",
+        "float",
+        "double",
+        "char",
+        "bool",
+        "void",
+        "class",
+        "struct",
+        "enum",
+        "namespace",
+        "template",
+        "typename",
+        "auto",
+        "const",
+        "constexpr",
+        "static",
+        "public",
+        "private",
+        "protected",
+        "virtual",
+        "override",
+        "new",
+        "delete",
+        "return",
+        "if",
+        "else",
+        "switch",
+        "case",
+        "for",
+        "while",
+        "do",
+        "break",
+        "continue",
+        "nullptr",
+        "true",
+        "false",
+      ]);
+    } else if (normalizedLang === "hlsl") {
+      protect(/\/\*[\s\S]*?\*\//g, "comment");
+      protect(/\/\/[^\n]*/g, "comment");
+      protect(/"(?:\\.|[^"\\])*"/g, "str");
+      highlightKeywords([
+        "float",
+        "float2",
+        "float3",
+        "float4",
+        "float3x3",
+        "float4x4",
+        "half",
+        "int",
+        "uint",
+        "bool",
+        "Texture2D",
+        "SamplerState",
+        "cbuffer",
+        "struct",
+        "return",
+        "if",
+        "else",
+        "for",
+        "while",
+        "static",
+        "const",
+        "true",
+        "false",
+      ]);
+    } else if (normalizedLang === "python") {
+      protect(/#([^\n]*)/g, "comment");
+      protect(/("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g, "str");
+      highlightKeywords([
+        "def",
+        "class",
+        "import",
+        "from",
+        "as",
+        "if",
+        "elif",
+        "else",
+        "for",
+        "while",
+        "try",
+        "except",
+        "finally",
+        "with",
+        "return",
+        "yield",
+        "lambda",
+        "pass",
+        "break",
+        "continue",
+        "True",
+        "False",
+        "None",
+      ]);
+    } else if (normalizedLang === "html") {
+      protect(/&lt;!--[\s\S]*?--&gt;/g, "comment");
+      text = text.replace(/(&lt;\/?)([a-zA-Z][\w:-]*)([\s\S]*?)(\/?&gt;)/g, (_m, p1, name, attrs, p4) => {
+        const highlightedAttrs = attrs
+          .replace(/([a-zA-Z_:][\w:.-]*)(=)/g, '<span class="tok-attr">$1</span>$2')
+          .replace(/(&quot;[^&]*?&quot;|'[^']*?')/g, '<span class="tok-str">$1</span>');
+        return `${p1}<span class="tok-tag">${name}</span>${highlightedAttrs}${p4}`;
+      });
+    }
+
+    for (const [key, value] of protectedHtml.entries()) {
+      text = text.split(key).join(value);
+    }
+
+    return text;
+  }
+
   function markdownToHtml(markdownText) {
-    const text = markdownText.replace(/\r\n/g, "\n");
+    const text = String(markdownText || "").replace(/\r\n/g, "\n");
     const lines = text.split("\n");
     const out = [];
     let inCode = false;
+    let codeLang = "plain";
+    let codeBuffer = [];
     let inUl = false;
     let inOl = false;
 
@@ -570,32 +780,44 @@
       }
     };
 
-    for (const line of lines) {
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i];
       const safe = escapeHtml(line);
+      const fenceMatch = line.match(/^```(.*)$/);
 
-      if (safe.startsWith("```")) {
+      if (fenceMatch) {
         closeLists();
         if (!inCode) {
-          out.push("<pre><code>");
           inCode = true;
+          codeLang = normalizeCodeLang(fenceMatch[1]);
+          codeBuffer = [];
         } else {
-          out.push("</code></pre>");
+          const highlighted = highlightCode(codeBuffer.join("\n"), codeLang);
+          out.push(`<pre class="code-block" data-lang="${codeLang}"><code class="language-${codeLang}">${highlighted}</code></pre>`);
           inCode = false;
+          codeLang = "plain";
+          codeBuffer = [];
         }
         continue;
       }
 
       if (inCode) {
-        out.push(`${safe}\n`);
+        codeBuffer.push(line);
         continue;
       }
 
-      if (safe.trim() === "") {
+      if (line.trim() === "") {
         closeLists();
         continue;
       }
 
-      if (/^#{1,4}\s/.test(safe)) {
+      if (/^(\s*)([-*_])(?:\s*\2){2,}\s*$/.test(line)) {
+        closeLists();
+        out.push("<hr />");
+        continue;
+      }
+
+      if (/^#{1,4}\s/.test(line)) {
         closeLists();
         const m = safe.match(/^(#{1,4})\s(.+)$/);
         if (m) {
@@ -605,13 +827,29 @@
         continue;
       }
 
-      if (/^>\s?/.test(safe)) {
+      if (/^>\s?/.test(line)) {
         closeLists();
-        out.push(`<blockquote>${inlineMarkdown(safe.replace(/^>\s?/, ""))}</blockquote>`);
+        const quoteLines = [];
+        while (i < lines.length) {
+          const current = lines[i];
+          if (/^>\s?/.test(current)) {
+            quoteLines.push(current.replace(/^>\s?/, ""));
+            i += 1;
+            continue;
+          }
+          if (current.trim() === "" && /^>\s?/.test(lines[i + 1] || "")) {
+            quoteLines.push("");
+            i += 1;
+            continue;
+          }
+          break;
+        }
+        i -= 1;
+        out.push(`<blockquote>${markdownToHtml(quoteLines.join("\n"))}</blockquote>`);
         continue;
       }
 
-      if (/^\d+\.\s+/.test(safe)) {
+      if (/^\d+\.\s+/.test(line)) {
         if (!inOl) {
           closeLists();
           out.push("<ol>");
@@ -621,7 +859,7 @@
         continue;
       }
 
-      if (/^[-*]\s+/.test(safe)) {
+      if (/^[-*]\s+/.test(line)) {
         if (!inUl) {
           closeLists();
           out.push("<ul>");
@@ -635,7 +873,10 @@
       out.push(`<p>${inlineMarkdown(safe)}</p>`);
     }
 
-    if (inCode) out.push("</code></pre>");
+    if (inCode) {
+      const highlighted = highlightCode(codeBuffer.join("\n"), codeLang);
+      out.push(`<pre class="code-block" data-lang="${codeLang}"><code class="language-${codeLang}">${highlighted}</code></pre>`);
+    }
     closeLists();
     return out.join("\n");
   }
@@ -655,6 +896,41 @@
     return node;
   }
 
+  function enhanceCodeBlocks(root = document) {
+    if (!root || typeof root.querySelectorAll !== "function") return;
+
+    root.querySelectorAll("pre.code-block").forEach((pre) => {
+      if (pre.querySelector(".code-copy-btn")) return;
+
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "code-copy-btn";
+      copyBtn.textContent = "复制";
+      copyBtn.setAttribute("aria-label", "复制代码");
+
+      let resetTimer = 0;
+      copyBtn.addEventListener("click", async () => {
+        const code = pre.querySelector("code");
+        const text = code ? code.textContent || "" : "";
+        if (!text) return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.textContent = "已复制";
+        } catch (error) {
+          copyBtn.textContent = "复制失败";
+        }
+
+        if (resetTimer) window.clearTimeout(resetTimer);
+        resetTimer = window.setTimeout(() => {
+          copyBtn.textContent = "复制";
+        }, 1400);
+      });
+
+      pre.insertBefore(copyBtn, pre.firstChild);
+    });
+  }
+
   window.SiteCommon = {
     loadSiteConfig,
     applyThemeConfig,
@@ -669,6 +945,7 @@
     markActiveNav,
     parseFrontMatter,
     markdownToHtml,
+    enhanceCodeBlocks,
     tagsFromText,
     createEmptyTip,
     applyBrandConfig,

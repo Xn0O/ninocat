@@ -7,6 +7,7 @@
   markActiveNav,
   createEmptyTip,
   markdownToHtml,
+  enhanceCodeBlocks,
   parseFrontMatter,
   tagsFromText,
 } = window.SiteCommon;
@@ -63,8 +64,32 @@ async function init() {
     const { meta, body } = parseFrontMatter(raw);
     titleNode.textContent = meta.title || slug;
 
-    const tags = tagsFromText(meta.tags).join(" / ");
-    metaNode.textContent = [meta.date || "未填写日期", tags].filter(Boolean).join(" · ");
+    const tags = tagsFromText(meta.tags);
+    metaNode.replaceChildren();
+
+    const appendText = (text) => {
+      const node = document.createElement("span");
+      node.textContent = text;
+      metaNode.appendChild(node);
+    };
+
+    if (meta.date) {
+      appendText(meta.date);
+    } else {
+      appendText("未填写日期");
+    }
+
+    if (tags.length) {
+      appendText(" · ");
+      tags.forEach((tag, index) => {
+        const link = document.createElement("a");
+        link.href = `./blog.html?tag=${encodeURIComponent(tag)}`;
+        link.className = "post-tag-link";
+        link.textContent = tag;
+        metaNode.appendChild(link);
+        if (index < tags.length - 1) appendText(" / ");
+      });
+    }
 
     if (heroNode && meta.cover) {
       heroNode.src = meta.cover;
@@ -72,6 +97,7 @@ async function init() {
     }
 
     contentNode.innerHTML = markdownToHtml(body);
+    enhanceCodeBlocks(contentNode);
     document.title = `${meta.title || slug} - 博客`;
   } catch (error) {
     console.error(error);

@@ -7,6 +7,7 @@
   markActiveNav,
   createEmptyTip,
   markdownToHtml,
+  enhanceCodeBlocks,
 } = window.SiteCommon;
 
 const ABOUT_PATH = "./content/about.md";
@@ -25,6 +26,7 @@ async function init() {
     if (!res.ok) throw new Error("无法加载 about.md");
     const markdown = await res.text();
     aboutContainer.innerHTML = markdownToHtml(markdown);
+    enhanceCodeBlocks(aboutContainer);
   } catch (error) {
     console.error(error);
     aboutContainer.appendChild(createEmptyTip("关于页加载失败，请检查 content/about.md。"));

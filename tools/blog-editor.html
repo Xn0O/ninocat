@@ -1,0 +1,408 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="googlebot" content="noindex, nofollow" />
+    <title>Markdown 博客编辑器</title>
+    <style>
+      :root {
+        --bg: #0f1115;
+        --surface: #161a22;
+        --surface-2: #1f2530;
+        --line: #2e3747;
+        --text: #eff3ff;
+        --muted: #9eadcc;
+        --accent: #4ea1ff;
+        --accent-ink: #051020;
+        --danger: #ff4f68;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: radial-gradient(circle at 12% 0%, #1f2738 0%, var(--bg) 34%);
+        color: var(--text);
+        font-family: "Segoe UI", "Noto Sans SC", sans-serif;
+      }
+
+      .wrap {
+        width: min(1220px, calc(100% - 24px));
+        margin: 18px auto 36px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        background: color-mix(in srgb, var(--surface), transparent 6%);
+        padding: 14px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: clamp(1.2rem, 3.6vw, 2rem);
+      }
+
+      h2 {
+        margin: 0 0 8px;
+        font-size: 0.98rem;
+        color: var(--muted);
+      }
+
+      .desc {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .three-col {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 170px minmax(0, 1fr) auto;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .row label {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .row.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .row.two > div {
+        display: grid;
+        grid-template-columns: 80px minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+      }
+
+      input,
+      textarea,
+      button {
+        font: inherit;
+      }
+
+      input {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+        color: var(--text);
+        padding: 8px 10px;
+      }
+
+      .check-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+      }
+
+      .check-row input {
+        width: auto;
+      }
+
+      .stack {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: 0;
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-weight: 700;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .btn.ghost {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--line);
+      }
+
+      .btn.warn {
+        background: var(--danger);
+        color: #fff;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      .editor-layout {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      .drop {
+        border: 1px dashed color-mix(in srgb, var(--accent), #fff 20%);
+        background: color-mix(in srgb, var(--surface), #0a1328 28%);
+        padding: 12px;
+        color: #d7e6ff;
+      }
+
+      .drop.active {
+        border-style: solid;
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent), transparent 65%) inset;
+      }
+
+      textarea {
+        margin-top: 10px;
+        width: 100%;
+        min-height: 520px;
+        resize: vertical;
+        border: 1px solid var(--line);
+        background: #0f141d;
+        color: var(--text);
+        padding: 12px;
+        line-height: 1.65;
+      }
+
+      .preview-wrap {
+        border: 1px solid var(--line);
+        background: #0f141d;
+        min-height: 564px;
+        overflow: auto;
+      }
+
+      .preview-controls {
+        padding: 10px;
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--surface), transparent 8%);
+      }
+
+      .preview-body {
+        padding: 12px;
+        line-height: 1.65;
+      }
+
+      .preview-body h1,
+      .preview-body h2,
+      .preview-body h3 {
+        margin-top: 1.1em;
+        margin-bottom: 0.35em;
+      }
+
+      .preview-body p {
+        margin: 0.35em 0 0.8em;
+      }
+
+      .preview-body code {
+        background: #1a2333;
+        padding: 0.1em 0.35em;
+      }
+
+      .preview-body pre {
+        overflow: auto;
+        padding: 10px;
+        background: #101827;
+        border: 1px solid #22304a;
+      }
+
+      .preview-body img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        border: 1px solid var(--line);
+        margin: 8px 0;
+      }
+
+      .preview-body blockquote {
+        margin: 0.7em 0;
+        padding: 0.5em 0.8em;
+        border-left: 3px solid #35517f;
+        background: #121b2b;
+        color: #dbe8ff;
+      }
+
+      .log {
+        margin-top: 10px;
+        border: 1px solid var(--line);
+        background: #0d1219;
+        padding: 10px;
+      }
+
+      #log-list {
+        margin: 0;
+        padding-left: 20px;
+        display: grid;
+        gap: 6px;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 1120px) {
+        .three-col {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 980px) {
+        .editor-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .row {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+
+        .row.two {
+          grid-template-columns: 1fr;
+        }
+
+        .row.two > div {
+          grid-template-columns: 70px minmax(0, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="panel">
+        <h1>Markdown / 博客可视化编辑器</h1>
+        <p class="desc">支持拖图和粘贴截图，自动插入图片语法；可导出文章并一键更新 posts.json。</p>
+
+        <div class="three-col">
+          <div class="grid">
+            <h2>图片插入</h2>
+            <div class="row">
+              <label for="img-prefix">图片 URL 前缀</label>
+              <input id="img-prefix" type="text" value="./assets/Blog" />
+              <button id="pick-image-folder" class="btn" type="button">选择图片目录</button>
+            </div>
+            <div class="row">
+              <label for="name-rule">无文件名截图前缀</label>
+              <input id="name-rule" type="text" value="post" />
+              <div class="hint" id="image-folder-state">未选目录：仅插入 Markdown，不写入图片文件。</div>
+            </div>
+            <div class="row">
+              <label id="create-image-subdir-label">自动子目录</label>
+              <div class="hint" id="create-image-subdir-hint">按文章文件名创建并切换到图片子目录。</div>
+              <button id="create-image-subdir" class="btn ghost" type="button">创建并切换</button>
+            </div>
+            <div class="check-row">
+              <input id="auto-cover" type="checkbox" checked />
+              <label for="auto-cover">第一张图自动写入 cover</label>
+            </div>
+          </div>
+
+          <div class="grid">
+            <h2>Front Matter</h2>
+            <div class="row">
+              <label for="fm-title">title</label>
+              <input id="fm-title" type="text" placeholder="第一篇文章" />
+              <button id="fm-apply" class="btn" type="button">写入头部</button>
+            </div>
+            <div class="row two">
+              <div>
+                <label for="fm-date">date</label>
+                <input id="fm-date" type="date" />
+              </div>
+              <div>
+                <label for="fm-tags">tags</label>
+                <input id="fm-tags" type="text" value="Blog" />
+              </div>
+            </div>
+            <div class="row">
+              <label for="fm-summary">summary</label>
+              <input id="fm-summary" type="text" placeholder="一句话摘要" />
+              <button id="fm-read" class="btn ghost" type="button">读取头部</button>
+            </div>
+            <div class="row">
+              <label for="fm-cover">cover</label>
+              <input id="fm-cover" type="text" placeholder="./assets/Blog/P0/P0.jpg" />
+              <button id="fm-new" class="btn ghost" type="button">新建模板</button>
+            </div>
+          </div>
+
+          <div class="grid">
+            <h2>发布导出</h2>
+            <div class="row">
+              <label for="post-file-name">文章文件名</label>
+              <input id="post-file-name" type="text" placeholder="P1" />
+              <button id="pick-post-folder" class="btn" type="button">选择文章目录</button>
+            </div>
+            <div class="hint" id="post-folder-state">请选择本地 content/blog 目录后再导出。</div>
+            <div class="stack">
+              <button id="import-md" class="btn ghost" type="button">导入 MD</button>
+              <input id="import-md-file" type="file" accept=".md,.markdown,.mdown,text/markdown,text/plain" hidden />
+            </div>
+            <div class="stack">
+              <button id="export-md" class="btn" type="button">导出 MD</button>
+              <button id="export-and-index" class="btn ghost" type="button">导出 + 更新索引</button>
+            </div>
+            <div class="stack">
+              <button id="copy-md" class="btn ghost" type="button">复制 Markdown</button>
+              <button id="download-md" class="btn ghost" type="button">下载 Markdown</button>
+              <button id="clear-log" class="btn warn" type="button">清空日志</button>
+            </div>
+            <p class="hint">“导出 + 更新索引”会生成与 `update-posts-index.bat` 相同结果的 `posts.json`。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top: 10px">
+        <div class="editor-layout">
+          <div>
+            <div id="drop-zone" class="drop">把图片拖到这里，或在编辑框中直接粘贴截图（Ctrl+V）。</div>
+            <textarea
+              id="md-editor"
+              spellcheck="false"
+              placeholder="---&#10;title: 第一篇文章&#10;date: 2026-04-21&#10;summary: 旧的文章等以后有空了再迁移进来！&#10;tags: Blog&#10;cover: ./assets/Blog/P0/P0.jpg&#10;---&#10;正文内容"
+            ></textarea>
+          </div>
+
+          <div class="preview-wrap">
+            <div class="preview-controls">
+              <div class="stack">
+                <button id="refresh-preview" class="btn ghost" type="button">刷新预览</button>
+                <label class="check-row" style="margin: 0">
+                  <input id="auto-preview" type="checkbox" checked />
+                  <span>自动预览</span>
+                </label>
+                <label class="check-row" style="margin: 0">
+                  <span>预览路径前缀</span>
+                  <input id="preview-prefix" type="text" value=".." style="width: 84px" />
+                </label>
+              </div>
+            </div>
+            <article id="md-preview" class="preview-body"></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="log">
+        <h2>日志</h2>
+        <ol id="log-list"></ol>
+      </section>
+    </main>
+
+    <script src="./blog-editor.js"></script>
+  </body>
+</html>

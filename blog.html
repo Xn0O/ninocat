@@ -36,6 +36,16 @@
         </div>
       </section>
 
+      <section class="toolbar-block block blog-toolbar">
+        <div class="blog-search-row">
+          <label class="sr-only" for="blog-search-input">搜索文章</label>
+          <input id="blog-search-input" class="blog-search-input" type="search" placeholder="搜索标题 / 摘要 / 标签" />
+          <button id="blog-search-clear" class="btn" type="button">清空</button>
+        </div>
+        <div id="blog-tag-filter" class="chip-row" aria-label="博客标签归档"></div>
+        <p id="blog-filter-meta" class="blog-filter-meta"></p>
+      </section>
+
       <section class="card-grid blog-list" id="blog-grid"></section>
       <section class="blog-pagination" id="blog-pagination" aria-label="博客分页" hidden>
         <button class="btn" id="blog-prev" type="button">上一页</button>
