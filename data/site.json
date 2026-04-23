@@ -37,7 +37,7 @@
   },
   "assetCdn": {
     "enabled": true,
-    "base": "https://cdn.jsdelivr.net/gh/xn0o/ninocat@main",
+    "base": "https://cdn.osyb.cn/gh/xn0o/ninocat",
     "useOnLocal": false
   },
   "eyebrow": "ninocat",
@@ -85,7 +85,7 @@
   },
   "footer": {
     "line1": "Copyright © 2026 Nino",
-    "line2": "All rights reserved."
+    "line2": "(✿◡‿◡)"
   },
   "headerImages": {
     "default": "./assets/hero-home.svg",
