@@ -18,12 +18,17 @@ const grid = document.getElementById("art-grid");
 function artCard(item) {
   const card = document.createElement("article");
   card.className = "item-card";
+  card.draggable = false;
+  card.setAttribute("draggable", "false");
+  card.addEventListener("dragstart", (event) => event.preventDefault());
 
   const cover = document.createElement("img");
   cover.className = "item-cover";
   cover.alt = `${item.title} 作品图`;
   cover.loading = "lazy";
   cover.src = resolveAssetUrl(item.image || "./assets/hero-art.svg");
+  cover.draggable = false;
+  cover.setAttribute("draggable", "false");
 
   const body = document.createElement("div");
   body.className = "item-body";

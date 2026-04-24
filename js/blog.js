@@ -134,12 +134,17 @@ function renderCard(post) {
   card.className = "item-card item-card-link";
   card.href = `./blog-post.html?slug=${encodeURIComponent(post.slug)}`;
   card.setAttribute("aria-label", `打开文章：${post.title || post.slug}`);
+  card.draggable = false;
+  card.setAttribute("draggable", "false");
+  card.addEventListener("dragstart", (event) => event.preventDefault());
 
   const cover = document.createElement("img");
   cover.className = "item-cover";
   cover.loading = "lazy";
   cover.alt = `${post.title || post.slug} 头图`;
   cover.src = resolveAssetUrl(post.cover || DEFAULT_COVER);
+  cover.draggable = false;
+  cover.setAttribute("draggable", "false");
 
   const body = document.createElement("div");
   body.className = "item-body";

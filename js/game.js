@@ -115,11 +115,16 @@ function openModal(game) {
 function cardForGame(game) {
   const card = document.createElement("article");
   card.className = "game-card";
+  card.draggable = false;
+  card.setAttribute("draggable", "false");
+  card.addEventListener("dragstart", (event) => event.preventDefault());
 
   const media = document.createElement("button");
   media.type = "button";
   media.className = "game-media";
   media.setAttribute("aria-label", `试玩 ${game.title}`);
+  media.draggable = false;
+  media.setAttribute("draggable", "false");
   if (game.playUrl) {
     media.addEventListener("click", () => openModal(game));
   } else {
@@ -131,12 +136,16 @@ function cardForGame(game) {
   coverPrimary.loading = "lazy";
   coverPrimary.alt = `${game.title} 封面`;
   coverPrimary.src = resolveAssetUrl(game.cover);
+  coverPrimary.draggable = false;
+  coverPrimary.setAttribute("draggable", "false");
 
   const coverHover = document.createElement("img");
   coverHover.className = "game-cover game-cover-hover";
   coverHover.loading = "lazy";
   coverHover.alt = `${game.title} 悬浮图`;
   coverHover.src = resolveAssetUrl(game.coverHover);
+  coverHover.draggable = false;
+  coverHover.setAttribute("draggable", "false");
 
   media.append(coverPrimary, coverHover);
 

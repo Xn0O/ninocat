@@ -296,6 +296,12 @@ async function init() {
     if (heroNode && meta.cover) {
       heroNode.src = resolveAssetUrl(meta.cover);
       heroNode.alt = `${meta.title || slug} 文章头图`;
+      heroNode.draggable = false;
+      heroNode.setAttribute("draggable", "false");
+      if (!heroNode.dataset.dragLocked) {
+        heroNode.addEventListener("dragstart", (event) => event.preventDefault());
+        heroNode.dataset.dragLocked = "1";
+      }
     }
 
     setupImageLightbox(document.querySelector("main") || document);

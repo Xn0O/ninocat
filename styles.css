@@ -437,6 +437,14 @@ a {
   transform-origin: center;
 }
 
+.home-strip,
+.home-strip * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
 .home-strip + .home-strip {
   margin-top: clamp(-62px, -4.6vw, -30px);
 }
@@ -579,6 +587,16 @@ a {
   grid-template-rows: auto 1fr;
   transition: transform 180ms ease;
   transform-origin: center;
+}
+
+.item-card,
+.item-card *,
+.game-card,
+.game-card * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
 }
 
 .item-card:hover,

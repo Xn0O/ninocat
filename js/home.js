@@ -74,6 +74,9 @@ function renderStrips(strips) {
     const card = document.createElement("a");
     card.className = "home-strip";
     card.href = item.href;
+    card.draggable = false;
+    card.setAttribute("draggable", "false");
+    card.addEventListener("dragstart", (event) => event.preventDefault());
 
     const bg = document.createElement("div");
     bg.className = "home-strip-bg";
