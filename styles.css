@@ -417,16 +417,16 @@ a {
 .home-strip-list {
   display: grid;
   gap: 0;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .home-strip {
   position: relative;
   --strip-pad: clamp(12px, 2.2vw, 22px);
   --strip-slant: 22%;
-  min-height: clamp(210px, 28vw, 360px);
+  min-height: clamp(260px, 34vw, 460px);
   overflow: hidden;
   display: grid;
   align-items: end;
@@ -1396,6 +1396,10 @@ body.lightbox-open {
   .home-strip-content {
     margin: var(--strip-pad);
     width: auto;
+  }
+
+  .home-strip-list {
+    width: 100%;
   }
 
   .home-strip {
