@@ -7,6 +7,7 @@
 
   let siteConfigPromise = null;
   let activeSiteConfig = null;
+  let navAutoHideBound = false;
 
   function normalizeCssSize(value, fallback) {
     if (typeof value === "number" && Number.isFinite(value) && value > 0) {
@@ -287,6 +288,87 @@
     }
   }
 
+  function setupAutoHideNav(config) {
+    const nav = document.querySelector(".top-nav");
+    if (!nav) return;
+
+    const pageKey = String(document.body?.dataset?.page || "").trim().toLowerCase();
+    const pathname = String(window.location?.pathname || "").trim().toLowerCase();
+    const isBlogPostPage = /(^|\/)blog-post\.html$/.test(pathname);
+    const isLabPage = pageKey === "lab" || /(^|\/)lab\.html$/.test(pathname);
+    const pageAllowed = isBlogPostPage || isLabPage;
+    if (!pageAllowed) {
+      nav.classList.remove("is-auto-hidden");
+      return;
+    }
+
+    const navConfig = config?.nav && typeof config.nav === "object" ? config.nav : {};
+    const enabledRaw = navConfig.autoHide ?? config?.navAutoHide;
+    const enabled = enabledRaw === undefined ? true : enabledRaw !== false;
+
+    if (!enabled) {
+      nav.classList.remove("is-auto-hidden");
+      return;
+    }
+
+    if (navAutoHideBound) return;
+    navAutoHideBound = true;
+
+    const minYRaw = Number(navConfig.autoHideMinY ?? config?.navAutoHideMinY);
+    const deltaRaw = Number(navConfig.autoHideDelta ?? config?.navAutoHideDelta);
+    const minY = Number.isFinite(minYRaw) ? Math.max(0, minYRaw) : 90;
+    const minDelta = Number.isFinite(deltaRaw) ? Math.max(1, deltaRaw) : 8;
+
+    let lastY = Math.max(0, window.scrollY || 0);
+    let ticking = false;
+
+    const applyByScroll = () => {
+      const y = Math.max(0, window.scrollY || 0);
+      const delta = y - lastY;
+
+      if (y <= minY) {
+        nav.classList.remove("is-auto-hidden");
+        lastY = y;
+        return;
+      }
+
+      if (Math.abs(delta) < minDelta) {
+        lastY = y;
+        return;
+      }
+
+      if (delta > 0) {
+        nav.classList.add("is-auto-hidden");
+      } else {
+        nav.classList.remove("is-auto-hidden");
+      }
+
+      lastY = y;
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        applyByScroll();
+        ticking = false;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener(
+      "resize",
+      () => {
+        if ((window.scrollY || 0) <= minY) {
+          nav.classList.remove("is-auto-hidden");
+        }
+      },
+      { passive: true }
+    );
+
+    applyByScroll();
+  }
+
   async function loadSiteConfig() {
     if (!siteConfigPromise) {
       siteConfigPromise = fetch(SITE_CONFIG_PATH, { cache: "no-store" })
@@ -380,6 +462,7 @@
           applyBrandConfig(config);
           applyNavGlassConfig(config);
           applyNavConfig(config);
+          setupAutoHideNav(config);
           setupBackToTop();
           applyPageHeroText(config);
           return config;

@@ -176,11 +176,21 @@ function mapPointerToCanvas(event, canvas) {
   };
 }
 
+function isTouchPointer(event) {
+  return String(event?.pointerType || "").toLowerCase() === "touch";
+}
+
+function isMousePointer(event) {
+  const type = String(event?.pointerType || "").toLowerCase();
+  return !type || type === "mouse";
+}
+
 function updateWidgetTransform(widget) {
   widget.style.transform = `translate(${state.widgetDrag.x}px, ${state.widgetDrag.y}px)`;
 }
 
 function isEdgeDragStart(event, windowEl) {
+  if (!isMousePointer(event)) return false;
   if (event.button !== undefined && event.button !== 0) return false;
   const rect = windowEl.getBoundingClientRect();
   const x = event.clientX - rect.left;
@@ -193,6 +203,7 @@ function isEdgeDragStart(event, windowEl) {
 }
 
 function isEdgeHover(event, windowEl) {
+  if (!isMousePointer(event)) return false;
   const rect = windowEl.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
@@ -425,9 +436,23 @@ async function init() {
   };
 
   let lastPoint = null;
+  const activeTouchPointers = new Set();
 
   const onCanvasDown = (event) => {
-    event.preventDefault();
+    const touch = isTouchPointer(event);
+    if (touch) {
+      if (event.pointerId !== undefined) {
+        activeTouchPointers.add(event.pointerId);
+      }
+      if (activeTouchPointers.size > 1) {
+        state.drawing = false;
+        lastPoint = null;
+        return;
+      }
+    } else {
+      event.preventDefault();
+    }
+
     const point = mapPointerToCanvas(event, canvas);
     if (state.tool === TOOL.bucket) {
       floodFill(ctx, point.x, point.y, state.color);
@@ -436,7 +461,7 @@ async function init() {
     state.drawing = true;
     lastPoint = point;
     drawStrokePoint(point.x, point.y);
-    if (canvas.setPointerCapture && event.pointerId !== undefined) {
+    if (!touch && canvas.setPointerCapture && event.pointerId !== undefined) {
       try {
         canvas.setPointerCapture(event.pointerId);
       } catch (_) {}
@@ -444,6 +469,7 @@ async function init() {
   };
 
   const onCanvasMove = (event) => {
+    if (isTouchPointer(event) && activeTouchPointers.size > 1) return;
     if (!state.drawing) return;
     const point = mapPointerToCanvas(event, canvas);
 
@@ -473,7 +499,10 @@ async function init() {
     lastPoint = point;
   };
 
-  const onCanvasUp = () => {
+  const onCanvasUp = (event) => {
+    if (isTouchPointer(event) && event.pointerId !== undefined) {
+      activeTouchPointers.delete(event.pointerId);
+    }
     state.drawing = false;
     lastPoint = null;
   };

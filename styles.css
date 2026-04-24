@@ -154,6 +154,14 @@ a {
   z-index: 40;
   isolation: isolate;
   padding: 10px 12px;
+  transition: transform 220ms ease, opacity 220ms ease;
+  will-change: transform;
+}
+
+.top-nav.is-auto-hidden {
+  transform: translateY(calc(-100% - 8px));
+  opacity: 0.01;
+  pointer-events: none;
 }
 
 .top-nav::before {
@@ -1226,7 +1234,7 @@ a {
   max-width: var(--lab-window-width, 1170px);
   position: relative;
   transform: translate(0, 0);
-  touch-action: none;
+  touch-action: pinch-zoom;
 }
 
 .paint-window {
@@ -1281,7 +1289,7 @@ a {
 }
 
 .paint-canvas {
-  touch-action: none;
+  touch-action: pinch-zoom;
   cursor: crosshair;
 }
 
