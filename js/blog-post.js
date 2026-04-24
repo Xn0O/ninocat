@@ -23,6 +23,7 @@ const titleNode = document.getElementById("post-title");
 const metaNode = document.getElementById("post-meta");
 const contentNode = document.getElementById("post-content");
 const heroNode = document.querySelector("[data-hero-image]");
+let tocResizeBound = false;
 
 function withCacheBust(url) {
   const u = new URL(String(url || ""), window.location.href);
@@ -224,6 +225,115 @@ function appendMeta(meta, mi) {
   }
 }
 
+function clearPostToc() {
+  const toc = document.getElementById("post-toc");
+  if (toc) toc.remove();
+  const pageMain = document.querySelector("main.page-main");
+  if (pageMain) pageMain.classList.remove("post-has-toc");
+}
+
+function slugifyHeading(text) {
+  const raw = String(text || "").trim().toLowerCase();
+  if (!raw) return "section";
+  const cleaned = raw
+    .replace(/[^\w\u4e00-\u9fff\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return cleaned || "section";
+}
+
+function buildPostToc() {
+  clearPostToc();
+  if (!contentNode) return;
+  const pageMain = document.querySelector("main.page-main");
+  if (!pageMain) return;
+
+  const headings = Array.from(contentNode.querySelectorAll("h1, h2, h3, h4"));
+  if (!headings.length) return;
+  pageMain.classList.add("post-has-toc");
+
+  const used = new Set();
+  headings.forEach((heading, index) => {
+    const level = Number.parseInt(heading.tagName.slice(1), 10) || 1;
+    const base = slugifyHeading(heading.textContent || `section-${index + 1}`);
+    let id = base;
+    let serial = 2;
+    while (used.has(id) || document.getElementById(id)) {
+      id = `${base}-${serial}`;
+      serial += 1;
+    }
+    used.add(id);
+    heading.id = id;
+    heading.dataset.tocLevel = String(level);
+  });
+
+  const nav = document.createElement("nav");
+  nav.className = "post-toc block";
+  nav.id = "post-toc";
+  nav.setAttribute("aria-label", "文章目录");
+
+  const title = document.createElement("h2");
+  title.className = "post-toc-title";
+  title.textContent = "文章目录";
+
+  const list = document.createElement("ul");
+  list.className = "post-toc-list";
+
+  const isMobile = window.matchMedia("(max-width: 900px)").matches;
+  let tocHeadings = headings;
+  if (isMobile) {
+    const minLevel = headings.reduce((acc, heading) => {
+      const level = Number.parseInt(heading.tagName.slice(1), 10) || 1;
+      return Math.min(acc, level);
+    }, 9);
+    tocHeadings = headings.filter((heading) => {
+      const level = Number.parseInt(heading.tagName.slice(1), 10) || 1;
+      return level === minLevel;
+    });
+  }
+
+  tocHeadings.forEach((heading) => {
+    const level = Number.parseInt(heading.tagName.slice(1), 10) || 1;
+    const li = document.createElement("li");
+    li.className = "post-toc-item";
+
+    const link = document.createElement("a");
+    link.className = `post-toc-link level-${Math.min(4, Math.max(1, level))}`;
+    link.href = `#${heading.id}`;
+    link.textContent = heading.textContent || "";
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      heading.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (history.replaceState) history.replaceState(null, "", `#${heading.id}`);
+    });
+
+    li.appendChild(link);
+    list.appendChild(li);
+  });
+
+  nav.append(title, list);
+  pageMain.insertBefore(nav, contentNode);
+}
+
+function bindResponsiveTocRefresh() {
+  if (tocResizeBound) return;
+  tocResizeBound = true;
+
+  let timer = null;
+  window.addEventListener(
+    "resize",
+    () => {
+      if (timer) window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        const hasHeading = Boolean(contentNode?.querySelector("h1, h2, h3, h4"));
+        if (hasHeading) buildPostToc();
+      }, 140);
+    },
+    { passive: true }
+  );
+}
+
 async function renderEncryptedBody(mi, encRef) {
   let decryptError = "";
   const payload = await loadEncryptedPayload(encRef);
@@ -232,6 +342,7 @@ async function renderEncryptedBody(mi, encRef) {
     const password = await showUnlockDialog(mi?.question || "请输入密码", decryptError);
     if (password == null) {
       contentNode.replaceChildren();
+      clearPostToc();
       contentNode.appendChild(createEmptyTip("已取消解密。"));
       return;
     }
@@ -241,6 +352,7 @@ async function renderEncryptedBody(mi, encRef) {
       contentNode.innerHTML = markdownToHtml(markdown);
       enhanceCodeBlocks(contentNode);
       renderMath(contentNode);
+      buildPostToc();
       setupImageLightbox(document.querySelector("main") || document);
       return;
     } catch (_error) {
@@ -257,6 +369,7 @@ async function init() {
   applyHeaderImage(config);
   applySiteText(config);
   markActiveNav();
+  bindResponsiveTocRefresh();
 
   const slug = getSlug();
   if (!slug) {
@@ -304,14 +417,14 @@ async function init() {
       }
     }
 
-    setupImageLightbox(document.querySelector("main") || document);
-
     if (encrypted) {
       await renderEncryptedBody(mi, encRef);
     } else {
       contentNode.innerHTML = markdownToHtml(body);
       enhanceCodeBlocks(contentNode);
       renderMath(contentNode);
+      buildPostToc();
+      setupImageLightbox(document.querySelector("main") || document);
     }
 
     document.title = `${meta.title || slug} - 博客`;

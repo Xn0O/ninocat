@@ -1,20 +1,12 @@
 {
   "posts": [
     {
-      "slug": "P2",
-      "file": "./content/blog/P2.md"
+      "slug": "P1",
+      "file": "./content/blog/P1.md"
     },
     {
       "slug": "Test0",
       "file": "./content/blog/Test0.md"
-    },
-    {
-      "slug": "Test",
-      "file": "./content/blog/Test.md",
-      "encrypted": true,
-      "miQuestion": "密码是001",
-      "miId": "001",
-      "encRef": "./content/blog_encrypted/Test.enc.json"
     }
   ]
 }

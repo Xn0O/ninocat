@@ -34,6 +34,23 @@
       "year": "2026",
       "image": "./assets/Art/4.jpg",
       "tags": "摸鱼"
+    },
+    {
+      "title": "杂项",
+      "type": "comic",
+      "year": "2026",
+      "cover": "./assets/Art/5.png",
+      "pages": [
+        "./assets/Art/CM1/M2.jpg",
+        "./assets/Art/CM1/M3.jpg",
+        "./assets/Art/CM1/M4.jpg",
+        "./assets/Art/CM1/M5.jpg",
+        "./assets/Art/CM1/M6.jpg",
+        "./assets/Art/CM1/M7.jpg"
+      ],
+      "description": "封面使用实验区的画图绘制",
+      "tags": "漫画"
     }
+    
   ]
 }

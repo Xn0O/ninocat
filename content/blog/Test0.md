@@ -3,10 +3,9 @@ title: Blog相关
 date: 2026-04-22
 summary: 写一下使用说明吧
 tags: Blog,本站
-cover: ./assets/Blog/P0/P0.jpg
+cover: ./assets/Blog/P0/P3.png
 hidden: 0
 ---
-
 # BlogEditor页面说明
 -------
 * 使用步骤：
