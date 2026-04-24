@@ -128,6 +128,7 @@
       { key: "game", label: "Game", href: "./game.html" },
       { key: "art", label: "Art", href: "./art.html" },
       { key: "about", label: "About", href: "./about.html" },
+      { key: "lab", label: "Lab", href: "./lab.html" },
     ];
 
     const flatItems = Array.isArray(config?.navItems) ? config.navItems : [];
@@ -309,6 +310,7 @@
             { key: "game", label: "Game", href: "./game.html" },
             { key: "art", label: "Art", href: "./art.html" },
             { key: "about", label: "About", href: "./about.html" },
+            { key: "lab", label: "Lab", href: "./lab.html" },
           ],
           navGlass: {
             base: "rgba(255, 255, 255, 0.1)",
@@ -336,7 +338,7 @@
           },
           eyebrow: "eyebrow",
           subtitle: "subtitle",
-          defaultTheme: "dark",
+          defaultTheme: "light",
           themes: {
             light: {
               bg: "#f2f2f2",

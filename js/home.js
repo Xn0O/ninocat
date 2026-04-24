@@ -41,22 +41,51 @@ const DEFAULT_STRIPS = [
     image: "./assets/hero-about.svg",
     speed: 0.1,
   },
+  {
+    key: "lab",
+    href: "./lab.html",
+    title: "实验区",
+    desc: "互动小玩意",
+    image: "./assets/hero-home.svg",
+    speed: 0.12,
+  },
 ];
+
+function detectStripMedia(rawSrc) {
+  const src = String(rawSrc || "").trim();
+  if (!src) return { kind: "image", src: "" };
+  const clean = src.split("#")[0].split("?")[0].toLowerCase();
+  if (/\.(mp4|webm|ogg|m4v|mov)$/i.test(clean)) {
+    return { kind: "video", src };
+  }
+  return { kind: "image", src };
+}
 
 function normalizeStrips(config) {
   const incoming = Array.isArray(config?.homeStrips) ? config.homeStrips : [];
-  if (incoming.length !== 4) return DEFAULT_STRIPS;
+  const source = incoming.length ? incoming : DEFAULT_STRIPS;
 
-  return incoming.map((item, index) => {
-    const fallback = DEFAULT_STRIPS[index];
+  return source.map((item, index) => {
+    const fallback = DEFAULT_STRIPS[index] || {
+      key: `section-${index + 1}`,
+      href: "#",
+      title: "未命名分区",
+      desc: "",
+      image: "./assets/hero-home.svg",
+      speed: 0.12,
+    };
     const parsedSpeed = Number(item?.speed);
     const speed = Number.isFinite(parsedSpeed) ? parsedSpeed : fallback.speed;
+    const explicitVideo = typeof item?.video === "string" ? item.video.trim() : "";
+    const rawMediaSrc = explicitVideo || item?.image || fallback.image;
+    const media = detectStripMedia(rawMediaSrc);
     return {
       key: item?.key || fallback.key,
       href: item?.href || fallback.href,
       title: item?.title || fallback.title,
       desc: item?.desc || fallback.desc,
-      image: item?.image || fallback.image,
+      image: media.src || fallback.image,
+      mediaKind: media.kind,
       speed: Math.max(0, Math.min(1, speed)),
       fit: item?.fit === "contain" ? "contain" : "cover",
       position: typeof item?.position === "string" && item.position.trim() ? item.position.trim() : "center",
@@ -80,7 +109,30 @@ function renderStrips(strips) {
 
     const bg = document.createElement("div");
     bg.className = "home-strip-bg";
-    bg.style.backgroundImage = `url("${resolveAssetUrl(item.image)}")`;
+    const resolvedMediaSrc = resolveAssetUrl(item.image);
+    if (item.mediaKind === "video") {
+      const video = document.createElement("video");
+      video.className = "home-strip-bg-video";
+      video.src = resolvedMediaSrc;
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.setAttribute("aria-hidden", "true");
+      video.setAttribute("disablepictureinpicture", "true");
+      const tryPlay = () => {
+        const task = video.play();
+        if (task && typeof task.catch === "function") {
+          task.catch(() => {});
+        }
+      };
+      video.addEventListener("loadeddata", tryPlay, { once: true });
+      bg.appendChild(video);
+      tryPlay();
+    } else {
+      bg.style.backgroundImage = `url("${resolvedMediaSrc}")`;
+    }
     bg.dataset.speed = String(item.speed);
     bg.style.setProperty("--strip-fit", item.fit);
     bg.style.setProperty("--strip-position", item.position);

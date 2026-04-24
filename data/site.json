@@ -27,6 +27,11 @@
       "key": "about",
       "label": "关于",
       "href": "./about.html"
+    },
+    {
+      "key": "lab",
+      "label": "实验区",
+      "href": "./lab.html"
     }
   ],
   "navGlassQuick": {
@@ -35,6 +40,7 @@
     "blur": "16px",
     "saturate": "100%"
   },
+  "navPillActiveInk": "#1900ff",
   "assetCdn": {
     "enabled": true,
     "base": "https://cdn.osyb.cn/gh/xn0o/ninocat",
@@ -42,7 +48,7 @@
   },
   "eyebrow": "ninocat",
   "subtitle": "点击/长按NINO猫互动",
-  "defaultTheme": "dark",
+  "defaultTheme": "light",
   "themes": {
     "light": {
       "bg": "#f7f7f7",
@@ -153,6 +159,15 @@
       "fit": "cover",
       "image": "./assets/Home_Site/B_3.jpg",
       "speed": 0.3
+    },
+    {
+      "key": "lab",
+      "href": "./lab.html",
+      "title": "实验区",
+      "desc": "互动小玩意",
+      "fit": "cover",
+      "image": "./assets/Home_Site/Test.mp4",
+      "speed": 0.45
     }
   ],
   "homeToy": {

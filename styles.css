@@ -211,8 +211,8 @@ a {
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--nav-muted-ink);
-  background: var(--nav-pill-bg);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 0;
   padding: 6px 10px;
 }
@@ -225,7 +225,7 @@ a {
 
 .top-nav nav a:hover {
   color: var(--nav-ink);
-  border-color: rgba(255, 255, 255, 0.36);
+  border-color: transparent;
 }
 
 .top-nav .theme-toggle {
@@ -465,6 +465,15 @@ a {
   will-change: transform;
 }
 
+.home-strip-bg-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: var(--strip-fit, cover);
+  object-position: var(--strip-position, center);
+  pointer-events: none;
+}
+
 .home-strip-shade {
   position: absolute;
   inset: 0;
@@ -624,11 +633,18 @@ a {
 }
 
 #art-grid {
-  align-items: start;
+  display: block;
+  column-width: clamp(220px, 24vw, 340px);
+  column-gap: 0;
 }
 
 #art-grid .item-card {
-  grid-template-rows: auto auto;
+  display: block;
+  width: 100%;
+  margin: 0;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 #art-grid .item-cover {
@@ -1404,7 +1420,8 @@ body.lightbox-open {
   }
 
   #art-grid {
-    gap: 0;
+    column-count: 1;
+    column-gap: 0;
   }
 
   #game-frame {

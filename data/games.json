@@ -13,6 +13,19 @@
       "tags": "Unity|本地",
       "order": 1
     },
+    {
+      "id": "thecat-web",
+      "title": "地狱猫",
+      "description": "废弃的游戏",
+      "status": "可玩",
+      "category": "文字",
+      "cover": "./assets/GamePic/thecat_0.jpg",
+      "coverHover": "./assets/GamePic/thecat_1.jpg",
+      "embedUrl": "./games/Thecat_Web/index.html",
+      "launchMode": "auto",
+      "tags": "Unity|本地",
+      "order": 2
+    },
     
     {
       "id": "remote-unity-example",
