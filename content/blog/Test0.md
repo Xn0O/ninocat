@@ -21,4 +21,20 @@ hidden: 0
 # 发布
 * 直接push origin即可
 ------
-其他应该没什么要补充的了...
+游戏页面的外链格式：
+```json
+    {
+      "id": "remote-unity-example",
+      "title": "外部网页",
+      "description": "外部地址示例；若内嵌被拦截会自动提示新标签打开。",
+      "status": "外部",
+      "category": "test",
+      "cover": "./assets/Blog/P0/P0.jpg",
+      "coverHover": "./assets/Blog/P0/P1.jpg",
+      "embedUrl": "https://example.com/unityweb/index.html",
+      "openUrl": "https://example.com/unityweb/index.html",
+      "launchMode": "auto",
+      "tags": "远程|外部",
+      "order": 99
+    }
+```

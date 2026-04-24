@@ -41,6 +41,9 @@
     "saturate": "100%"
   },
   "navPillActiveInk": "#1900ff",
+  "labPainter": {
+    "windowWidth": "360px"
+  },
   "assetCdn": {
     "enabled": true,
     "base": "https://cdn.osyb.cn/gh/xn0o/ninocat",

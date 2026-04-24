@@ -1213,6 +1213,155 @@ a {
   width: fit-content;
 }
 
+.lab-stage {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 14px;
+  overflow: visible;
+}
+
+.paint-widget {
+  width: min(var(--lab-window-width, 1170px), calc(100vw - 56px));
+  max-width: var(--lab-window-width, 1170px);
+  position: relative;
+  transform: translate(0, 0);
+  touch-action: none;
+}
+
+.paint-window {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1170 / 1394;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.paint-window.edge-draggable {
+  cursor: move;
+}
+
+.paint-window-base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.paint-draw-layer,
+.paint-tools,
+.paint-color {
+  position: absolute;
+}
+
+.paint-draw-layer {
+  overflow: hidden;
+}
+
+.paint-draw-base,
+.paint-canvas,
+.paint-draw-top {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.paint-draw-base,
+.paint-draw-top {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.paint-canvas {
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.paint-tools {
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: var(--tool-gap, 16px);
+}
+
+.paint-tool-btn {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.paint-tool-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+.paint-tool-btn.active img {
+  filter: brightness(0.6) saturate(0.9);
+}
+
+.paint-color {
+  overflow: hidden;
+}
+
+.paint-color-base,
+.paint-color-top,
+.paint-color-swatch,
+.paint-color-hit {
+  position: absolute;
+  inset: 0;
+}
+
+.paint-color-base,
+.paint-color-top {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.paint-color-swatch {
+  left: 16%;
+  right: 16%;
+  top: 16%;
+  bottom: 16%;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.paint-color-hit {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.paint-color-native-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.paint-export-btn {
+  display: block;
+  margin: 14px auto 0;
+}
+
 .zoomable-image {
   cursor: zoom-in;
 }
@@ -1417,6 +1566,14 @@ body.lightbox-open {
 
   .game-grid {
     grid-template-columns: 1fr;
+  }
+
+  .lab-stage {
+    padding: 10px;
+  }
+
+  .paint-widget {
+    width: min(var(--lab-window-width, 1170px), calc(100vw - 28px));
   }
 
   #art-grid {
