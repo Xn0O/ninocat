@@ -134,6 +134,8 @@
       "desc": "梦游产物",
       "fit": "cover",
       "image": "./assets/Home_Site/B_0.jpg",
+      "hoverImage": "",
+      "hoverVideo": "./assets/Home_Site/B_0.mp4",
       "speed": 0.8
     },
     {
@@ -143,6 +145,7 @@
       "desc": "钝意开发中",
       "fit": "cover",
       "image": "./assets/Home_Site/B_1.jpg",
+      "hoverVideo": "./assets/Home_Site/B_1.mp4",
       "speed": 0.7
     },
     {
@@ -152,6 +155,7 @@
       "desc": "存放处",
       "fit": "cover",
       "image": "./assets/Home_Site/B_2.jpg",
+      "hoverVideo": "./assets/Home_Site/B_2.mp4",
       "speed": 0.5
     },
     {
@@ -161,6 +165,7 @@
       "desc": "关于",
       "fit": "cover",
       "image": "./assets/Home_Site/B_3.jpg",
+      "hoverVideo": "./assets/Home_Site/B_3.mp4",
       "speed": 0.3
     },
     {
@@ -170,6 +175,7 @@
       "desc": "互动小玩意",
       "fit": "cover",
       "image": "./assets/Home_Site/backgr.jpg",
+      "hoverVideo": "./assets/Home_Site/B_4.mp4",
       "speed": 0.45
     }
   ],

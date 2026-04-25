@@ -42,17 +42,12 @@
         <button type="button" class="btn" id="random-play">随机试玩</button>
       </section>
 
-      <section id="game-grid" class="game-grid"></section>
-    </main>
-
-    <div class="modal" id="game-modal" aria-hidden="true">
-      <div class="modal-mask" data-close="1"></div>
-      <section class="modal-panel">
-        <header>
-          <h2 id="modal-title">游戏预览</h2>
-          <button type="button" class="close-btn" id="modal-close" aria-label="关闭">×</button>
+      <section id="game-player" class="game-player" hidden>
+        <header class="game-player-header">
+          <h2 id="player-title">本站游玩</h2>
+          <button type="button" class="close-btn" id="player-close" aria-label="关闭">×</button>
         </header>
-        <div class="modal-body">
+        <div class="game-player-body">
           <p id="embed-hint" class="embed-hint" hidden></p>
           <a id="embed-open-link" class="btn embed-open-link" href="#" target="_blank" rel="noreferrer noopener" hidden>
             打开完整页面
@@ -67,7 +62,9 @@
           ></iframe>
         </div>
       </section>
-    </div>
+
+      <section id="game-grid" class="game-grid"></section>
+    </main>
 
     <footer class="site-footer shell">
       <p data-site="footer-line1">Copyright © 2026 Nino</p>

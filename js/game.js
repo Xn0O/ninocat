@@ -16,9 +16,9 @@ const gameGrid = document.getElementById("game-grid");
 const filterRoot = document.getElementById("game-filter");
 const randomBtn = document.getElementById("random-play");
 
-const modal = document.getElementById("game-modal");
-const modalTitle = document.getElementById("modal-title");
-const modalClose = document.getElementById("modal-close");
+const player = document.getElementById("game-player");
+const playerTitle = document.getElementById("player-title");
+const playerClose = document.getElementById("player-close");
 const frame = document.getElementById("game-frame");
 const embedHint = document.getElementById("embed-hint");
 const embedOpenLink = document.getElementById("embed-open-link");
@@ -76,31 +76,29 @@ function setEmbedHint(visible, message, fallbackUrl) {
   }
 }
 
-function openInNewTab(url) {
-  if (!url) return;
-  window.open(url, "_blank", "noopener,noreferrer");
-}
-
-function closeModal() {
+function closePlayer() {
   clearHintTimer();
-  modal.classList.remove("open");
-  modal.setAttribute("aria-hidden", "true");
+  if (player) player.hidden = true;
   frame.src = "about:blank";
   setEmbedHint(false, "", "");
 }
 
-function openModal(game) {
-  if (!game.playUrl) return;
-
-  if (game.launchMode === "newtab") {
-    openInNewTab(game.openUrl);
+function openInSite(game) {
+  if (!game.playUrl) {
+    if (game.openUrl) {
+      window.location.href = game.openUrl;
+    }
     return;
   }
 
-  modalTitle.textContent = game.title;
+  if (game.launchMode === "newtab") {
+    window.location.href = game.openUrl;
+    return;
+  }
+
+  playerTitle.textContent = `${game.title} · 本站游玩`;
   frame.src = game.playUrl;
-  modal.classList.add("open");
-  modal.setAttribute("aria-hidden", "false");
+  if (player) player.hidden = false;
   setEmbedHint(false, "", "");
 
   // 远程站点可能通过 X-Frame-Options/CSP 阻止 iframe 嵌入。
@@ -122,11 +120,11 @@ function cardForGame(game) {
   const media = document.createElement("button");
   media.type = "button";
   media.className = "game-media";
-  media.setAttribute("aria-label", `试玩 ${game.title}`);
+  media.setAttribute("aria-label", `游玩 ${game.title}`);
   media.draggable = false;
   media.setAttribute("draggable", "false");
-  if (game.playUrl) {
-    media.addEventListener("click", () => openModal(game));
+  if (game.playUrl || game.openUrl) {
+    media.addEventListener("click", () => openInSite(game));
   } else {
     media.disabled = true;
   }
@@ -178,9 +176,9 @@ function cardForGame(game) {
   const previewBtn = document.createElement("button");
   previewBtn.type = "button";
   previewBtn.className = "btn";
-  previewBtn.textContent = game.launchMode === "newtab" ? "打开网页" : "弹窗试玩";
-  if (game.playUrl) {
-    previewBtn.addEventListener("click", () => openModal(game));
+  previewBtn.textContent = game.launchMode === "newtab" || !game.playUrl ? "打开网页" : "本站游玩";
+  if (game.playUrl || game.openUrl) {
+    previewBtn.addEventListener("click", () => openInSite(game));
   } else {
     previewBtn.disabled = true;
   }
@@ -237,18 +235,10 @@ function renderGames() {
   visible.forEach((game) => gameGrid.appendChild(cardForGame(game)));
 }
 
-function bindModal() {
-  modalClose.addEventListener("click", closeModal);
-  modal.addEventListener("click", (event) => {
-    if (event.target instanceof HTMLElement && event.target.dataset.close) {
-      closeModal();
-    }
-  });
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeModal();
-    }
-  });
+function bindPlayer() {
+  if (playerClose) {
+    playerClose.addEventListener("click", closePlayer);
+  }
   frame.addEventListener("load", () => {
     clearHintTimer();
   });
@@ -259,11 +249,7 @@ function bindRandom() {
     const list = state.games.filter((g) => g.playUrl || g.openUrl);
     if (!list.length) return;
     const pick = list[Math.floor(Math.random() * list.length)];
-    if (pick.launchMode === "newtab") {
-      openInNewTab(pick.openUrl);
-    } else {
-      openModal(pick);
-    }
+    openInSite(pick);
   });
 }
 
@@ -297,7 +283,7 @@ async function init() {
     gameGrid.appendChild(createEmptyTip("游戏数据加载失败，请检查 data/games.json。"));
   }
 
-  bindModal();
+  bindPlayer();
   bindRandom();
 }
 

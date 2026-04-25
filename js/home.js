@@ -51,14 +51,53 @@ const DEFAULT_STRIPS = [
   },
 ];
 
-function detectStripMedia(rawSrc) {
+function detectStripMedia(rawSrc, forcedKind = "") {
   const src = String(rawSrc || "").trim();
   if (!src) return { kind: "image", src: "" };
+  if (forcedKind === "video") return { kind: "video", src };
+  if (forcedKind === "image") return { kind: "image", src };
   const clean = src.split("#")[0].split("?")[0].toLowerCase();
   if (/\.(mp4|webm|ogg|m4v|mov)$/i.test(clean)) {
     return { kind: "video", src };
   }
   return { kind: "image", src };
+}
+
+function createStripMediaLayer(media, fit, position, layerClass) {
+  if (!media || !media.src) return null;
+  const resolvedMediaSrc = resolveAssetUrl(media.src);
+
+  if (media.kind === "video") {
+    const video = document.createElement("video");
+    video.className = `home-strip-media home-strip-media-video ${layerClass}`;
+    video.src = resolvedMediaSrc;
+    video.autoplay = true;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+    video.setAttribute("aria-hidden", "true");
+    video.setAttribute("disablepictureinpicture", "true");
+    video.style.objectFit = fit;
+    video.style.objectPosition = position;
+    const tryPlay = () => {
+      const task = video.play();
+      if (task && typeof task.catch === "function") {
+        task.catch(() => {});
+      }
+    };
+    video.addEventListener("loadeddata", tryPlay, { once: true });
+    tryPlay();
+    return video;
+  }
+
+  const image = document.createElement("div");
+  image.className = `home-strip-media ${layerClass}`;
+  image.style.backgroundImage = `url("${resolvedMediaSrc}")`;
+  image.style.backgroundSize = fit;
+  image.style.backgroundPosition = position;
+  image.style.backgroundRepeat = "no-repeat";
+  return image;
 }
 
 function normalizeStrips(config) {
@@ -78,7 +117,17 @@ function normalizeStrips(config) {
     const speed = Number.isFinite(parsedSpeed) ? parsedSpeed : fallback.speed;
     const explicitVideo = typeof item?.video === "string" ? item.video.trim() : "";
     const rawMediaSrc = explicitVideo || item?.image || fallback.image;
-    const media = detectStripMedia(rawMediaSrc);
+    const media = explicitVideo
+      ? detectStripMedia(rawMediaSrc, "video")
+      : detectStripMedia(rawMediaSrc);
+
+    const explicitHoverVideo = typeof item?.hoverVideo === "string" ? item.hoverVideo.trim() : "";
+    const explicitHoverImage = typeof item?.hoverImage === "string" ? item.hoverImage.trim() : "";
+    const rawHoverSrc = explicitHoverVideo || explicitHoverImage;
+    const hoverMedia = explicitHoverVideo
+      ? detectStripMedia(rawHoverSrc, "video")
+      : detectStripMedia(rawHoverSrc);
+
     return {
       key: item?.key || fallback.key,
       href: item?.href || fallback.href,
@@ -86,6 +135,9 @@ function normalizeStrips(config) {
       desc: item?.desc || fallback.desc,
       image: media.src || fallback.image,
       mediaKind: media.kind,
+      hoverImage: hoverMedia.src,
+      hoverMediaKind: hoverMedia.kind,
+      hasHoverMedia: Boolean(hoverMedia.src),
       speed: Math.max(0, Math.min(1, speed)),
       fit: item?.fit === "contain" ? "contain" : "cover",
       position: typeof item?.position === "string" && item.position.trim() ? item.position.trim() : "center",
@@ -109,29 +161,24 @@ function renderStrips(strips) {
 
     const bg = document.createElement("div");
     bg.className = "home-strip-bg";
-    const resolvedMediaSrc = resolveAssetUrl(item.image);
-    if (item.mediaKind === "video") {
-      const video = document.createElement("video");
-      video.className = "home-strip-bg-video";
-      video.src = resolvedMediaSrc;
-      video.autoplay = true;
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.preload = "metadata";
-      video.setAttribute("aria-hidden", "true");
-      video.setAttribute("disablepictureinpicture", "true");
-      const tryPlay = () => {
-        const task = video.play();
-        if (task && typeof task.catch === "function") {
-          task.catch(() => {});
-        }
-      };
-      video.addEventListener("loadeddata", tryPlay, { once: true });
-      bg.appendChild(video);
-      tryPlay();
-    } else {
-      bg.style.backgroundImage = `url("${resolvedMediaSrc}")`;
+    const baseLayer = createStripMediaLayer(
+      { kind: item.mediaKind, src: item.image },
+      item.fit,
+      item.position,
+      "home-strip-media-base"
+    );
+    if (baseLayer) bg.appendChild(baseLayer);
+    if (item.hasHoverMedia) {
+      const hoverLayer = createStripMediaLayer(
+        { kind: item.hoverMediaKind, src: item.hoverImage },
+        item.fit,
+        item.position,
+        "home-strip-media-hover"
+      );
+      if (hoverLayer) {
+        bg.appendChild(hoverLayer);
+        card.classList.add("has-hover-media");
+      }
     }
     bg.dataset.speed = String(item.speed);
     bg.style.setProperty("--strip-fit", item.fit);
