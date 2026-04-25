@@ -6,7 +6,11 @@
     },
     {
       "slug": "Test0",
-      "file": "./content/blog/Test0.md"
+      "file": "./content/blog/Test0.md",
+      "encrypted": true,
+      "miQuestion": "输入NINO",
+      "miId": "NINO",
+      "encRef": "./content/blog_encrypted/Test0.enc.json"
     }
   ]
 }

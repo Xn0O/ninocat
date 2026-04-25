@@ -65,16 +65,16 @@ body[data-theme="light"] {
   --accent-ink: var(--light-accent-ink);
   --emphasis-bg: rgba(0, 0, 0, 0.08);
   --emphasis-bg-strong: rgba(0, 0, 0, 0.12);
-  --code-block-bg: #222222;
-  --code-block-border: #7f98c2;
-  --code-block-fg: #eef4ff;
-  --code-block-label: #d2def7;
-  --code-tok-comment: #aebbd6;
-  --code-tok-kw: #7fc5ff;
-  --code-tok-str: #ffd189;
-  --code-tok-num: #95e7b0;
-  --code-tok-tag: #7ad7ff;
-  --code-tok-attr: #dbe7ff;
+  --code-block-bg: #f7f2ea;
+  --code-block-border: #e6ddd0;
+  --code-block-fg: #1a1a1a;
+  --code-block-label: #9a907e;
+  --code-tok-comment: #928a7e;
+  --code-tok-kw: #b5121c;
+  --code-tok-str: #156b3c;
+  --code-tok-num: #0550ae;
+  --code-tok-tag: #b5121c;
+  --code-tok-attr: #6f42c1;
   --quote-bg: rgba(48, 70, 106, 0.09);
   --quote-mark: rgba(35, 55, 90, 0.12);
   --nav-ink: #111111;
@@ -96,18 +96,18 @@ body[data-theme="dark"] {
   --muted: var(--dark-muted);
   --accent: var(--dark-accent);
   --accent-ink: var(--dark-accent-ink);
-  --emphasis-bg: rgba(255, 255, 255, 0);
-  --emphasis-bg-strong: rgba(255, 255, 255, 0.18);
-  --code-block-bg: #000000;
-  --code-block-border: #372861;
-  --code-block-fg: #f7fbff;
-  --code-block-label: #d6e2ff;
-  --code-tok-comment: #9fb0cc;
-  --code-tok-kw: #57bbff;
-  --code-tok-str: #ffd27a;
+  --emphasis-bg: rgba(255, 255, 255, 0.15);
+  --emphasis-bg-strong: rgba(255, 255, 255, 0.28);
+  --code-block-bg: #212121;
+  --code-block-border: #333333;
+  --code-block-fg: #e8edf5;
+  --code-block-label: #9aa8c2;
+  --code-tok-comment: #8a9bb5;
+  --code-tok-kw: #6fc2ff;
+  --code-tok-str: #ffc97a;
   --code-tok-num: #7cf2a8;
-  --code-tok-tag: #65ddff;
-  --code-tok-attr: #d9e7ff;
+  --code-tok-tag: #6fc2ff;
+  --code-tok-attr: #d4e1ff;
   --quote-bg: rgba(210, 228, 255, 0.08);
   --quote-mark: rgba(235, 243, 255, 0.13);
   --nav-pill-active-ink: #1900ff;
@@ -566,7 +566,7 @@ a {
 
 .hero-copy h1 {
   margin: 6px 0 0;
-  font-family: "Syne", sans-serif;
+  font-family: "Noto Serif SC", "Syne", serif;
   font-size: clamp(1.8rem, 5vw, 3.6rem);
   line-height: 0.95;
 }
@@ -988,7 +988,7 @@ a {
 .markdown-content h2,
 .markdown-content h3,
 .markdown-content h4 {
-  font-family: "Syne", sans-serif;
+  font-family: "Noto Serif SC", "Syne", serif;
   margin: 1.2em 0 0.5em;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -998,6 +998,7 @@ a {
 .markdown-content p,
 .markdown-content li,
 .markdown-content blockquote {
+  font-family: "Noto Serif SC", "STSong", "SimSun", "Songti SC", serif;
   color: var(--muted);
   line-height: 1.8;
   overflow-wrap: anywhere;
@@ -1024,7 +1025,7 @@ a {
   background: var(--emphasis-bg);
   color: var(--text);
   padding: 0.1em 0.36em;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: "Noto Serif SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 .markdown-content pre {
@@ -1037,26 +1038,55 @@ a {
   word-break: normal;
 }
 
+.markdown-content pre::-webkit-scrollbar {
+  height: 32px;
+  background: var(--code-block-bg);
+  border-top: 1px solid var(--code-block-border);
+}
+
+.markdown-content pre::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--code-block-border), transparent 75%);
+}
+
+.markdown-content pre::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--code-block-border), var(--code-block-fg) 20%);
+  border-radius: 0;
+}
+
+.markdown-content pre::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--code-block-border), var(--code-block-fg) 35%);
+}
+
+.markdown-content pre::-webkit-scrollbar-thumb:active {
+  background: color-mix(in srgb, var(--code-block-border), var(--code-block-fg) 50%);
+}
+
 .markdown-content pre.code-block {
   position: relative;
-  padding-top: 36px;
+  padding-top: 34px;
 }
 
 .markdown-content pre.code-block::before {
   content: attr(data-lang);
   position: absolute;
-  top: 9px;
-  right: 8px;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 7px 12px;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   color: var(--code-block-label);
-  opacity: 0.92;
+  border-bottom: 1px solid var(--code-block-border);
 }
 
 .markdown-content .code-copy-btn {
   position: absolute;
-  top: 6px;
+  top: 5px;
   left: 8px;
+  z-index: 1;
   border: 1px solid var(--code-block-border);
   background: color-mix(in srgb, var(--code-block-bg), #ffffff 8%);
   color: var(--code-block-fg);
@@ -1064,7 +1094,7 @@ a {
   font-size: 0.74rem;
   font-weight: 700;
   line-height: 1;
-  padding: 5px 8px;
+  padding: 4px 9px;
   cursor: pointer;
 }
 
@@ -1073,9 +1103,42 @@ a {
 }
 
 .markdown-content pre code {
+  counter-reset: code-line;
+}
+
+.code-line {
+  display: block;
+  counter-increment: code-line;
+  padding-left: 4em;
+  position: relative;
+  min-height: 1.5em;
+}
+
+.code-line::before {
+  content: counter(code-line);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.8em;
+  height: 100%;
+  text-align: right;
+  padding: 0 0.5em 0 0;
+  color: var(--code-block-fg);
+  opacity: 0.22;
+  font-size: 0.82em;
+  line-height: inherit;
+  background: color-mix(in srgb, var(--code-block-bg), var(--code-block-fg) 3.5%);
+  border-right: 1px solid color-mix(in srgb, var(--code-block-border), transparent 72%);
+  user-select: none;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.markdown-content pre code {
   background: transparent;
   padding: 0;
   color: var(--code-block-fg);
+  font-family: "Noto Serif SC", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 .markdown-content pre code .tok-comment {
@@ -1124,6 +1187,35 @@ a {
   max-width: 100%;
   height: auto;
   margin: 0.8rem 0;
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid var(--surface-alt);
+  padding: 8px 12px;
+  text-align: inherit;
+}
+
+.markdown-content th {
+  background: var(--emphasis-bg-strong);
+  font-weight: 700;
+}
+
+.markdown-content td {
+  background: var(--surface);
+}
+
+.markdown-content tr:nth-child(even) td {
+  background: var(--emphasis-bg);
 }
 
 .markdown-content blockquote {

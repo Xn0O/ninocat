@@ -866,6 +866,42 @@
 
   function highlightCode(code, lang) {
     const normalizedLang = normalizeCodeLang(lang);
+
+    if (typeof hljs !== "undefined" && normalizedLang !== "plain") {
+      try {
+        const result = hljs.highlight(code, { language: normalizedLang, ignoreIllegals: true });
+        return result.value.replace(/<span class="(hljs-[^"]+)">/g, (_m, cls) => {
+          const map = {
+            "hljs-keyword": "tok-kw",
+            "hljs-string": "tok-str",
+            "hljs-number": "tok-num",
+            "hljs-comment": "tok-comment",
+            "hljs-built_in": "tok-kw",
+            "hljs-type": "tok-kw",
+            "hljs-literal": "tok-kw",
+            "hljs-title": "tok-tag",
+            "hljs-attr": "tok-attr",
+            "hljs-meta": "tok-comment",
+            "hljs-meta-keyword": "tok-kw",
+            "hljs-meta-string": "tok-str",
+            "hljs-symbol": "tok-str",
+            "hljs-section": "tok-tag",
+            "hljs-variable": "tok-kw",
+            "hljs-template-variable": "tok-str",
+            "hljs-doctag": "tok-comment",
+            "hljs-addition": "tok-str",
+            "hljs-deletion": "tok-str",
+            "hljs-selector-tag": "tok-kw",
+            "hljs-selector-id": "tok-tag",
+            "hljs-selector-class": "tok-attr",
+          };
+          return map[cls] ? `<span class="${map[cls]}">` : "<span>";
+        });
+      } catch (_e) {
+        // fall through to custom highlighter
+      }
+    }
+
     const protectedHtml = new Map();
     let tokenCounter = 0;
     let text = escapeHtml(code);
@@ -1065,6 +1101,35 @@
     let inUl = false;
     let inOl = false;
 
+    const parseTableRow = (row) => {
+      const trimmed = row.trim();
+      if (!trimmed.startsWith("|") || !trimmed.endsWith("|")) return [];
+      const inner = trimmed.slice(1, -1);
+      const cells = [];
+      let current = "";
+      let inCode = false;
+      for (let i = 0; i < inner.length; i++) {
+        const ch = inner[i];
+        if (ch === "`") {
+          inCode = !inCode;
+          current += ch;
+        } else if (ch === "|" && !inCode) {
+          cells.push(current);
+          current = "";
+        } else {
+          current += ch;
+        }
+      }
+      cells.push(current);
+      return cells;
+    };
+
+    const wrapCodeLines = (codeHtml) => {
+      const lines = codeHtml.split("\n");
+      if (lines.length > 1 && lines[lines.length - 1] === "") lines.pop();
+      return lines.map((line) => `<span class="code-line">${line || " "}</span>`).join("\n");
+    };
+
     const closeLists = () => {
       if (inUl) {
         out.push("</ul>");
@@ -1089,7 +1154,7 @@
           codeBuffer = [];
         } else {
           const highlighted = highlightCode(codeBuffer.join("\n"), codeLang);
-          out.push(`<pre class="code-block" data-lang="${codeLang}"><code class="language-${codeLang}">${highlighted}</code></pre>`);
+          out.push(`<pre class="code-block" data-lang="${codeLang}"><code class="language-${codeLang}">${wrapCodeLines(highlighted)}</code></pre>`);
           inCode = false;
           codeLang = "plain";
           codeBuffer = [];
@@ -1203,13 +1268,62 @@
         continue;
       }
 
+      if (/^\|.+\|$/.test(line)) {
+        closeLists();
+        const tableRows = [];
+        while (i < lines.length) {
+          const cur = lines[i];
+          if (!/^\|.+\|$/.test(cur)) break;
+          tableRows.push(cur);
+          i += 1;
+        }
+        i -= 1;
+
+        if (tableRows.length >= 2 && /^[\s:|,-]+$/.test(tableRows[1].replace(/\|/g, ""))) {
+          const headerCells = parseTableRow(tableRows[0]);
+          const alignRow = tableRows[1];
+          const aligns = parseTableRow(alignRow).map((cell) => {
+            const t = cell.trim();
+            if (/^:-+:$/.test(t)) return '"center"';
+            if (/^:-+$/.test(t)) return '"left"';
+            if (/^-+:$/.test(t)) return '"right"';
+            return '""';
+          });
+
+          out.push("<table>");
+          out.push("<thead><tr>");
+          headerCells.forEach((cell, idx) => {
+            const a = aligns[idx] || '""';
+            out.push(`<th align=${a}>${inlineMarkdown(escapeHtml(cell.trim()))}</th>`);
+          });
+          out.push("</tr></thead>");
+          out.push("<tbody>");
+          for (let r = 2; r < tableRows.length; r += 1) {
+            const cells = parseTableRow(tableRows[r]);
+            out.push("<tr>");
+            cells.forEach((cell, idx) => {
+              const a = aligns[idx] || '""';
+              out.push(`<td align=${a}>${inlineMarkdown(escapeHtml(cell.trim()))}</td>`);
+            });
+            out.push("</tr>");
+          }
+          out.push("</tbody></table>");
+        } else {
+          // Not a valid table — render each row as a paragraph
+          tableRows.forEach((row) => {
+            out.push(`<p>${inlineMarkdown(escapeHtml(row))}</p>`);
+          });
+        }
+        continue;
+      }
+
       closeLists();
       out.push(`<p>${inlineMarkdown(safe)}</p>`);
     }
 
     if (inCode) {
       const highlighted = highlightCode(codeBuffer.join("\n"), codeLang);
-      out.push(`<pre class="code-block" data-lang="${codeLang}"><code class="language-${codeLang}">${highlighted}</code></pre>`);
+      out.push(`<pre class="code-block" data-lang="${codeLang}"><code class="language-${codeLang}">${wrapCodeLines(highlighted)}</code></pre>`);
     }
     closeLists();
     return out.join("\n");

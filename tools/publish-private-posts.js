@@ -84,7 +84,7 @@ function safeDateValue(value, fallback) {
 function quoteYaml(value) {
   const text = String(value == null ? "" : value).trim();
   if (!text) return "";
-  if (/^[\w./:-]+$/.test(text)) return text;
+  if (/^[\w\p{L}.,/:-]+$/u.test(text)) return text;
   const escaped = text.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
   return `"${escaped}"`;
 }
