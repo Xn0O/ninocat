@@ -79,6 +79,7 @@ function setEmbedHint(visible, message, fallbackUrl) {
 function closePlayer() {
   clearHintTimer();
   if (player) player.hidden = true;
+  document.body.classList.remove("game-player-open");
   frame.src = "about:blank";
   setEmbedHint(false, "", "");
 }
@@ -99,6 +100,7 @@ function openInSite(game) {
   playerTitle.textContent = `${game.title} · 本站游玩`;
   frame.src = game.playUrl;
   if (player) player.hidden = false;
+  document.body.classList.add("game-player-open");
   setEmbedHint(false, "", "");
 
   // 远程站点可能通过 X-Frame-Options/CSP 阻止 iframe 嵌入。

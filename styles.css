@@ -1371,6 +1371,8 @@ a {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .game-card {
@@ -1384,7 +1386,7 @@ a {
 .game-card:hover,
 .game-card:focus-within {
   transform: scale(1.02);
-  z-index: 3;
+  z-index: 2;
 }
 
 .game-media {
@@ -1612,7 +1614,8 @@ a {
   background: var(--surface);
   position: sticky;
   top: calc(var(--back-to-top-top, 72px) + 6px);
-  z-index: 18;
+  z-index: 32;
+  isolation: isolate;
 }
 
 .game-player[hidden] {
@@ -1641,6 +1644,31 @@ a {
   align-content: start;
   padding: 10px;
   background: var(--surface);
+}
+
+@media (min-width: 901px) {
+  body[data-page="game"].game-player-open .page-main {
+    height: auto;
+    overflow: visible;
+    gap: 12px;
+  }
+
+  body[data-page="game"].game-player-open .game-player {
+    position: static;
+    top: auto;
+    margin-top: 0;
+  }
+
+  body[data-page="game"].game-player-open #game-frame {
+    height: clamp(320px, 56vh, 760px);
+  }
+
+  body[data-page="game"].game-player-open .game-grid {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
+    padding-bottom: 0;
+  }
 }
 
 .lab-stage {
@@ -2046,6 +2074,33 @@ body.lightbox-open {
 
   #game-frame {
     height: calc(62vh - 20px);
+  }
+
+  body[data-page="game"].game-player-open .page-main {
+    height: auto;
+    overflow: visible;
+    gap: 10px;
+  }
+
+  body[data-page="game"].game-player-open .game-player {
+    position: static;
+    top: auto;
+    margin-top: 0;
+  }
+
+  body[data-page="game"].game-player-open .game-player-body {
+    min-height: 0;
+  }
+
+  body[data-page="game"].game-player-open #game-frame {
+    height: clamp(220px, 44svh, 460px);
+  }
+
+  body[data-page="game"].game-player-open .game-grid {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
+    padding-bottom: 0;
   }
 
   .home-strip-content {
