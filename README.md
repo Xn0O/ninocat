@@ -1,2 +1,2 @@
 # ninocat
-web
+xn0o.github.io/ninocat/
