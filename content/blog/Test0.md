@@ -5,7 +5,7 @@ summary: 使用说明
 tags: Blog,本站
 cover: ./assets/Blog/P0/P3.png
 slug: Test0
-hidden: 0
+hidden: 1
 MI: 输入NINO|NINO
 encRef: ./content/blog_encrypted/Test0.enc.json
 ---
