@@ -33,8 +33,8 @@
       body {
         margin: 0;
         min-height: 100%;
-        background: #fff !important;
-        color: #1a1a2e;
+        background: var(--surface, #161a22);
+        color: var(--text, #eff3ff);
         font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
       }
 
@@ -157,8 +157,8 @@
       input:not([type="checkbox"]) {
         width: 100%;
         border: 1px solid color-mix(in srgb, var(--quote-mark), var(--surface-alt) 45%);
-        background: #fff;
-        color: #1a1a2e;
+        background: var(--surface, #161a22);
+        color: var(--text, #eff3ff);
         padding: 8px 10px;
       }
 
@@ -224,9 +224,9 @@
 
       .drop {
         border: 1px dashed color-mix(in srgb, var(--accent), #fff 20%);
-        background: #f5f7fa;
+        background: color-mix(in srgb, var(--surface, #161a22), var(--surface-alt) 35%);
         padding: 12px;
-        color: #4a5568;
+        color: var(--muted, #9eadcc);
       }
 
       .drop.active {
@@ -240,15 +240,15 @@
         min-height: 520px;
         resize: vertical;
         border: 1px solid color-mix(in srgb, var(--quote-mark), var(--surface-alt) 45%);
-        background: #fff;
-        color: #1a1a2e;
+        background: var(--surface, #161a22);
+        color: var(--text, #eff3ff);
         padding: 12px;
         line-height: 1.65;
       }
 
       .preview-wrap {
         border: 1px solid var(--line);
-        background: #fff;
+        background: var(--surface, #161a22);
         min-height: 564px;
         overflow: auto;
       }
@@ -256,7 +256,7 @@
       .preview-controls {
         padding: 10px;
         border-bottom: 1px solid var(--line);
-        background: #fff;
+        background: var(--surface, #161a22);
       }
 
       .preview-body {
@@ -326,7 +326,7 @@
 
       .page-panel .page-body {
         border: 1px solid var(--line);
-        background: #fff;
+        background: var(--surface, #161a22);
         padding: 14px;
       }
 
@@ -343,9 +343,6 @@
         font-size: 0.95rem;
       }
 
-      .log {
-        background: #fff !important;
-      }
 
       @media (max-width: 1120px) {
         .three-col {
@@ -375,7 +372,7 @@
       }
     </style>
   </head>
-  <body data-page="blog" data-theme="light">
+  <body data-page="blog" data-theme="dark">
 
     <main class="wrap">
       <div class="page-indicator" id="page-indicator">
