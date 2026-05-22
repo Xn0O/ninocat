@@ -54,6 +54,7 @@ body {
   margin: 0;
 }
 
+html[data-theme="light"],
 body[data-theme="light"] {
   --bg: var(--light-bg);
   --surface: var(--light-surface);
@@ -87,6 +88,7 @@ body[data-theme="light"] {
   --home-strip-index: var(--light-home-strip-index);
 }
 
+html[data-theme="dark"],
 body[data-theme="dark"] {
   --bg: var(--dark-bg);
   --surface: var(--dark-surface);
