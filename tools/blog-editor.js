@@ -1007,6 +1007,53 @@
     editor.addEventListener("input", schedulePreview);
   }
 
+  /* Page navigation via URL */
+  let currentStep = 1;
+  const TOTAL_STEPS = 4;
+
+  function getStepFromUrl() {
+    const m = location.search.match(/[?&]step=(\d+)/);
+    return m ? Math.max(1, Math.min(TOTAL_STEPS, Number(m[1]) || 1)) : 1;
+  }
+
+  function renderStep(n) {
+    document.querySelectorAll(".page-panel").forEach((el) => {
+      el.classList.toggle("active", Number(el.dataset.step) === n);
+    });
+    document.querySelectorAll(".page-dot").forEach((el, i) => {
+      const idx = i + 1;
+      el.classList.toggle("active", idx === n);
+      el.classList.toggle("done", idx < n);
+    });
+    if (n === 3) schedulePreview();
+  }
+
+  function goToStep(n) {
+    n = Math.max(1, Math.min(TOTAL_STEPS, Number(n) || 1));
+    if (n === currentStep) return;
+    currentStep = n;
+    history.pushState({ step: n }, "", `?step=${n}`);
+    renderStep(n);
+  }
+
+  function bindPageNavigation() {
+    document.addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-next], [data-prev]");
+      if (!btn) return;
+      const next = btn.getAttribute("data-next");
+      const prev = btn.getAttribute("data-prev");
+      if (next) goToStep(next);
+      if (prev) goToStep(prev);
+    });
+    window.addEventListener("popstate", (event) => {
+      const n = event.state && event.state.step ? event.state.step : getStepFromUrl();
+      if (n !== currentStep) {
+        currentStep = n;
+        renderStep(n);
+      }
+    });
+  }
+
   async function applySharedSiteConfig() {
     if (typeof shared.loadSiteConfig !== "function") return;
     try {
@@ -1070,6 +1117,7 @@
     bindFrontMatterButtons();
     bindPublishButtons();
     bindPreviewEvents();
+    bindPageNavigation();
     bindDrop(dropZone, "拖拽");
     bindDrop(editor, "拖拽");
     bindPaste();
@@ -1082,6 +1130,9 @@
     });
 
     renderPreview();
+    currentStep = getStepFromUrl();
+    history.replaceState({ step: currentStep }, "", `?step=${currentStep}`);
+    renderStep(currentStep);
     appendLog("编辑器已就绪：支持拖图、导出、更新索引与图片预览。");
     appendLog("建议先选择私密仓库目录 E:/Blog_VB/ninocat_private/content/blog，再执行导出。");
   }

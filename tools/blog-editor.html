@@ -33,10 +33,8 @@
       body {
         margin: 0;
         min-height: 100%;
-        background:
-          radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--accent), #0f172a 84%) 0%, transparent 38%),
-          var(--bg);
-        color: var(--text);
+        background: #fff !important;
+        color: #1a1a2e;
         font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
       }
 
@@ -159,8 +157,8 @@
       input:not([type="checkbox"]) {
         width: 100%;
         border: 1px solid color-mix(in srgb, var(--quote-mark), var(--surface-alt) 45%);
-        background: var(--quote-bg);
-        color: var(--text);
+        background: #fff;
+        color: #1a1a2e;
         padding: 8px 10px;
       }
 
@@ -226,9 +224,9 @@
 
       .drop {
         border: 1px dashed color-mix(in srgb, var(--accent), #fff 20%);
-        background: color-mix(in srgb, var(--surface), #0a1328 28%);
+        background: #f5f7fa;
         padding: 12px;
-        color: #d7e6ff;
+        color: #4a5568;
       }
 
       .drop.active {
@@ -242,15 +240,15 @@
         min-height: 520px;
         resize: vertical;
         border: 1px solid color-mix(in srgb, var(--quote-mark), var(--surface-alt) 45%);
-        background: var(--quote-bg);
-        color: var(--text);
+        background: #fff;
+        color: #1a1a2e;
         padding: 12px;
         line-height: 1.65;
       }
 
       .preview-wrap {
         border: 1px solid var(--line);
-        background: var(--quote-bg);
+        background: #fff;
         min-height: 564px;
         overflow: auto;
       }
@@ -258,7 +256,7 @@
       .preview-controls {
         padding: 10px;
         border-bottom: 1px solid var(--line);
-        background: color-mix(in srgb, var(--surface), transparent 8%);
+        background: #fff;
       }
 
       .preview-body {
@@ -283,6 +281,70 @@
         display: grid;
         gap: 6px;
         font-size: 0.9rem;
+      }
+
+      /* Page navigation */
+      .page-indicator {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+
+      .page-dot {
+        height: 4px;
+        border-radius: 2px;
+        background: var(--line);
+        transition: background 0.25s;
+      }
+      .page-dot.active {
+        background: var(--accent);
+      }
+      .page-dot.done {
+        background: color-mix(in srgb, var(--accent), transparent 50%);
+      }
+
+      .page-panel {
+        display: none;
+      }
+      .page-panel.active {
+        display: block;
+      }
+
+      .page-panel .page-head {
+        margin-bottom: 14px;
+      }
+      .page-panel .page-head .page-num {
+        font-size: 0.8rem;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+      .page-panel .page-head h1 {
+        margin: 2px 0 0;
+        font-size: clamp(1.1rem, 3vw, 1.5rem);
+      }
+
+      .page-panel .page-body {
+        border: 1px solid var(--line);
+        background: #fff;
+        padding: 14px;
+      }
+
+      .page-panel .page-foot {
+        margin-top: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .page-panel .page-foot .btn {
+        min-width: 100px;
+        padding: 10px 16px;
+        font-size: 0.95rem;
+      }
+
+      .log {
+        background: #fff !important;
       }
 
       @media (max-width: 1120px) {
@@ -313,154 +375,168 @@
       }
     </style>
   </head>
-  <body data-page="blog" data-theme="dark">
-    <header class="top-nav shell editor-top">
-      <a class="brand" href="../index.html">*</a>
-      <button id="theme-toggle" class="btn theme-toggle" type="button">切换主题</button>
-    </header>
+  <body data-page="blog" data-theme="light">
 
     <main class="wrap">
-      <section class="panel">
-        <h1>Markdown</h1>
-        <p class="desc"> </p>
-        <ol class="flow-list">
-          <li>先选图片主目录（`assets/Blog`），填文章文件名（如 `P1`）。</li>
-          <li>点“创建并切换”，自动创建 `assets/Blog/P1` 并切换。</li>
-          <li>拖图到下方编辑区，自动复制并插入 Markdown 图片地址。</li>
-          <li>在头文字区填写 `title / MI / hidden` 等信息后导出 MD。</li>
-          <li>私密密码在 `ninocat_private/tools/secrets` 编辑；再运行 `update-posts-index.bat` 与 `add-post.bat`。</li>
-        </ol>
+      <div class="page-indicator" id="page-indicator">
+        <div class="page-dot active"></div>
+        <div class="page-dot"></div>
+        <div class="page-dot"></div>
+        <div class="page-dot"></div>
+      </div>
 
-        <div class="three-col">
-          <div class="grid group-card">
-            <h2>常用目录与图片</h2>
-            <div class="row">
-              <label for="post-file-name">文章文件名</label>
-              <input id="post-file-name" type="text" placeholder="P1" />
-              <button id="create-image-subdir" class="btn" type="button">创建并切换</button>
-            </div>
-            <div class="row">
-              <label for="img-prefix">图片主目录</label>
-              <input id="img-prefix" type="text" value="./assets/Blog" />
-              <button id="pick-image-folder" class="btn" type="button">选择图片目录</button>
-            </div>
-            <div class="row two-col">
-              <label id="create-image-subdir-label">自动子目录</label>
-              <div class="hint block" id="create-image-subdir-hint">按文章文件名创建并切换到图片子目录。</div>
-            </div>
-            <div class="row two-col">
-              <label for="name-rule">截图命名前缀</label>
-              <input id="name-rule" type="text" value="post" />
-            </div>
-            <div class="hint" id="image-folder-state">未选目录：仅插入 Markdown，不写入图片文件。</div>
-            <p class="hint">建议顺序：填文章名 -> 创建并切换 -> 拖图。</p>
-            <div class="check-row">
-              <input id="auto-cover" type="checkbox" checked />
-              <label for="auto-cover">第一张图自动写入 cover</label>
-            </div>
+      <div id="page-container">
+        <section class="page-panel active" data-step="1">
+          <div class="page-head">
+            <p class="page-num">1 / 4</p>
+            <h1>文章信息</h1>
           </div>
-
-          <div class="grid group-card">
-            <h2>头文字</h2>
+          <div class="page-body">
             <div class="row">
-              <label for="fm-title">title</label>
+              <label for="fm-title">标题 title</label>
               <input id="fm-title" type="text" placeholder="第一篇文章" />
-              <button id="fm-read" class="btn ghost" type="button">读取头部</button>
+              <button id="fm-read" class="btn ghost" type="button">读取</button>
             </div>
-            <div class="row two-col">
-              <label for="fm-date">date/tags</label>
+            <div class="row two-col" style="margin-top:8px">
+              <label for="fm-date">日期 / 标签</label>
               <div class="split-inline">
                 <input id="fm-date" type="date" />
                 <span class="sep">|</span>
                 <input id="fm-tags" type="text" value="Blog" placeholder="tags" />
               </div>
             </div>
-            <div class="row two-col">
-              <label for="fm-summary">summary</label>
+            <div class="row two-col" style="margin-top:8px">
+              <label for="fm-summary">摘要 summary</label>
               <input id="fm-summary" type="text" placeholder="一句话摘要" />
             </div>
-            <div class="hint">摘要会用于博客卡片描述。</div>
-            <div class="row two-col">
-              <label for="fm-cover">cover</label>
-              <input id="fm-cover" type="text" placeholder="./assets/Blog/P0/P0.jpg" />
+            <div class="row two-col" style="margin-top:8px">
+              <label for="fm-cover">封面 cover</label>
+              <input id="fm-cover" type="text" value="./assets/Blog/" />
             </div>
-            <div class="hint">可留空，拖入首图后自动填写。</div>
-            <div class="row two">
+            <div class="row two" style="margin-top:8px">
               <div>
-                <label for="fm-hidden">hidden</label>
+                <label for="fm-hidden">隐藏 hidden</label>
                 <input id="fm-hidden" type="number" min="0" max="1" step="1" value="0" />
               </div>
               <div>
-                <label for="fm-mi-id">MI编号</label>
+                <label for="fm-mi-id">MI 编号</label>
                 <input id="fm-mi-id" type="text" placeholder="001" />
               </div>
             </div>
-            <div class="row two-col">
-              <label for="fm-mi-question">MI提问</label>
+            <div class="row two-col" style="margin-top:8px">
+              <label for="fm-mi-question">MI 提问</label>
               <input id="fm-mi-question" type="text" placeholder="例如：我们的暗号是什么？" />
             </div>
-            <div class="stack">
+            <div class="stack" style="margin-top:10px">
               <button id="fm-apply" class="btn" type="button">写入头部</button>
               <button id="fm-new" class="btn ghost" type="button">新建模板</button>
             </div>
-            <p class="hint">`MI` 留空表示非加密文章；会写成 `MI: 提问|编号`。</p>
           </div>
+          <div class="page-foot">
+            <span></span>
+            <button class="btn" data-next="2">下一步 &rarr;</button>
+          </div>
+        </section>
 
-          <div class="grid group-card">
-            <h2>导出</h2>
+        <section class="page-panel" data-step="2">
+          <div class="page-head">
+            <p class="page-num">2 / 4</p>
+            <h1>图片设置</h1>
+          </div>
+          <div class="page-body">
+            <div class="row">
+              <label for="post-file-name">文章文件名</label>
+              <input id="post-file-name" type="text" placeholder="P1" />
+              <button id="create-image-subdir" class="btn" type="button">创建并切换</button>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <label for="img-prefix">图片主目录</label>
+              <input id="img-prefix" type="text" value="./assets/Blog" />
+              <button id="pick-image-folder" class="btn" type="button">选择目录</button>
+            </div>
+            <div class="row two-col" style="margin-top:8px">
+              <label for="name-rule">截图命名前缀</label>
+              <input id="name-rule" type="text" value="post" />
+            </div>
+            <p class="hint" id="image-folder-state" style="margin-top:8px">未选目录：仅插入 Markdown，不写入图片文件。</p>
+            <div class="check-row" style="margin-top:8px">
+              <input id="auto-cover" type="checkbox" checked />
+              <label for="auto-cover">第一张图自动写入 cover</label>
+            </div>
+          </div>
+          <div class="page-foot">
+            <button class="btn ghost" data-prev="1">&larr; 上一步</button>
+            <button class="btn" data-next="3">下一步 &rarr;</button>
+          </div>
+        </section>
+
+        <section class="page-panel" data-step="3">
+          <div class="page-head">
+            <p class="page-num">3 / 4</p>
+            <h1>正文编辑</h1>
+          </div>
+          <div class="page-body" style="padding:0;border:0;background:transparent">
+            <div class="editor-layout">
+              <div>
+                <div id="drop-zone" class="drop">把图片拖到这里，或在编辑框中直接粘贴截图（Ctrl+V）。</div>
+                <textarea id="md-editor" spellcheck="false" placeholder="---&#10;title: 第一篇文章&#10;date: 2026-04-21&#10;summary: 旧的文章等以后有空了再迁移进来！&#10;tags: Blog&#10;cover: ./assets/Blog/P0/P0.jpg&#10;hidden: 0&#10;MI: 问题|001&#10;---&#10;正文内容"></textarea>
+              </div>
+              <div class="preview-wrap">
+                <div class="preview-controls">
+                  <div class="stack">
+                    <button id="refresh-preview" class="btn ghost" type="button">刷新</button>
+                    <button id="fullscreen-preview" class="btn ghost" type="button">全屏</button>
+                    <label class="check-row" style="margin:0">
+                      <input id="auto-preview" type="checkbox" checked />
+                      <span>自动</span>
+                    </label>
+                    <label class="check-row" style="margin:0">
+                      <span>前缀</span>
+                      <input id="preview-prefix" type="text" value=".." style="width:70px" />
+                    </label>
+                  </div>
+                </div>
+                <article id="md-preview" class="preview-body markdown-content"></article>
+              </div>
+            </div>
+          </div>
+          <div class="page-foot">
+            <button class="btn ghost" data-prev="2">&larr; 上一步</button>
+            <button class="btn" data-next="4">下一步 &rarr;</button>
+          </div>
+        </section>
+
+        <section class="page-panel" data-step="4">
+          <div class="page-head">
+            <p class="page-num">4 / 4</p>
+            <h1>导出</h1>
+          </div>
+          <div class="page-body">
             <div class="row">
               <label for="post-folder-state-readonly">文章目录</label>
               <input id="post-folder-state-readonly" type="text" value="请选择 ninocat_private/content/blog" readonly />
-              <button id="pick-post-folder" class="btn" type="button">选择文章目录</button>
+              <button id="pick-post-folder" class="btn" type="button">选择目录</button>
             </div>
-            <div class="hint" id="post-folder-state">选择私密仓库目录目录后再导出。</div>
-            <div class="stack">
+            <p class="hint" id="post-folder-state" style="margin-top:6px">选择私密仓库目录后再导出。</p>
+            <div class="stack" style="margin-top:10px">
               <button id="import-md" class="btn ghost" type="button">导入 MD</button>
               <input id="import-md-file" type="file" accept=".md,.markdown,.mdown,text/markdown,text/plain" hidden />
             </div>
-            <div class="stack">
+            <div class="stack" style="margin-top:6px">
               <button id="export-md" class="btn" type="button">导出 MD</button>
             </div>
-            <div class="stack">
-              <button id="copy-md" class="btn ghost" type="button">复制 Markdown</button>
-              <button id="download-md" class="btn ghost" type="button">下载 Markdown</button>
+            <div class="stack" style="margin-top:6px">
+              <button id="copy-md" class="btn ghost" type="button">复制 MD</button>
+              <button id="download-md" class="btn ghost" type="button">下载 MD</button>
               <button id="clear-log" class="btn warn" type="button">清空日志</button>
             </div>
-            <p class="hint">密码维护：`ninocat_private/tools/secrets`。导出后运行：`update-posts-index.bat` + `add-post.bat`。</p>
           </div>
-        </div>
-      </section>
-
-      <section class="panel" style="margin-top: 10px">
-        <div class="editor-layout">
-          <div>
-            <div id="drop-zone" class="drop">把图片拖到这里，或在编辑框中直接粘贴截图（Ctrl+V）。</div>
-            <textarea
-              id="md-editor"
-              spellcheck="false"
-              placeholder="---&#10;title: 第一篇文章&#10;date: 2026-04-21&#10;summary: 旧的文章等以后有空了再迁移进来！&#10;tags: Blog&#10;cover: ./assets/Blog/P0/P0.jpg&#10;hidden: 0&#10;MI: 问题|001&#10;---&#10;正文内容"
-            ></textarea>
+          <div class="page-foot">
+            <button class="btn ghost" data-prev="3">&larr; 上一步</button>
+            <span></span>
           </div>
-
-          <div class="preview-wrap">
-            <div class="preview-controls">
-              <div class="stack">
-                <button id="refresh-preview" class="btn ghost" type="button">刷新预览</button>
-                <button id="fullscreen-preview" class="btn ghost" type="button">全屏预览</button>
-                <label class="check-row" style="margin: 0">
-                  <input id="auto-preview" type="checkbox" checked />
-                  <span>自动预览</span>
-                </label>
-                <label class="check-row" style="margin: 0">
-                  <span>预览路径前缀</span>
-                  <input id="preview-prefix" type="text" value=".." style="width: 84px" />
-                </label>
-              </div>
-            </div>
-            <article id="md-preview" class="preview-body markdown-content"></article>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <section class="log">
         <h2>日志</h2>

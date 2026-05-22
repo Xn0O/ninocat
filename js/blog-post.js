@@ -389,13 +389,6 @@ async function init() {
     const raw = await loadMarkdown(entry.file);
     const { meta, body } = parseFrontMatter(raw);
 
-    if (isHiddenMeta(meta.hidden ?? entry.hidden)) {
-      titleNode.textContent = "文章不存在";
-      contentNode.replaceChildren();
-      contentNode.appendChild(createEmptyTip("这篇文章不存在，或已被移除。"));
-      return;
-    }
-
     titleNode.textContent = meta.title || slug;
 
     const mi =

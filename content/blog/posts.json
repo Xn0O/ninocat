@@ -1,16 +1,16 @@
 {
   "posts": [
     {
-      "slug": "P1",
-      "file": "./content/blog/P1.md"
+      "slug": "P4",
+      "file": "./content/blog/P4.md",
+      "encrypted": true,
+      "miQuestion": "项目名称？",
+      "miId": "P4",
+      "encRef": "./content/blog_encrypted/P4.enc.json"
     },
     {
-      "slug": "Test0",
-      "file": "./content/blog/Test0.md",
-      "encrypted": true,
-      "miQuestion": "输入NINO",
-      "miId": "NINO",
-      "encRef": "./content/blog_encrypted/Test0.enc.json"
+      "slug": "P1",
+      "file": "./content/blog/P1.md"
     }
   ]
 }

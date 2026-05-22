@@ -156,7 +156,6 @@ function collectPrivateMarkdown(config) {
         dateValue: safeDateValue(meta.date, stat.mtimeMs),
       };
     })
-    .filter((item) => item.hidden !== 1)
     .sort((a, b) => b.dateValue - a.dateValue);
 
   return ensureUniqueSlugs(entries);
@@ -216,7 +215,7 @@ function buildEncryptedStubMarkdown(post, encRef) {
   lines.push(`cover: ${quoteYaml(meta.cover || "")}`);
   lines.push(`slug: ${quoteYaml(post.slug)}`);
   lines.push("hidden: 0");
-  lines.push(`MI: ${quoteYaml(post.mi.raw)}`);
+  lines.push(`MI: ${post.mi.raw}`);
   lines.push(`encRef: ${quoteYaml(encRef)}`);
   lines.push("---");
   lines.push("");
@@ -254,8 +253,6 @@ function collectPublicVisiblePosts(config) {
       const raw = fs.readFileSync(abs, "utf8");
       const stat = fs.statSync(abs);
       const { meta } = parseFrontMatter(raw);
-      const hidden = toHiddenFlag(meta.hidden);
-      if (hidden === 1) return null;
 
       const base = path.basename(item.name, ".md");
       const slug = sanitizeSlugLike(meta.slug || base) || base;
@@ -299,7 +296,6 @@ function legacyBuildIndexFromPublic(config) {
         dateValue: safeDateValue(meta.date, stat.mtimeMs),
       };
     })
-    .filter((item) => item.hidden !== 1)
     .sort((a, b) => b.dateValue - a.dateValue);
 
   const deduped = ensureUniqueSlugs(entries);
