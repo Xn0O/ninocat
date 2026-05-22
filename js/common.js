@@ -633,6 +633,11 @@
 
   function setTheme(theme) {
     document.body.dataset.theme = theme === "light" ? "light" : "dark";
+    try {
+      sessionStorage.setItem(THEME_KEY, document.body.dataset.theme);
+    } catch (error) {
+      console.warn("无法存储主题偏好。", error);
+    }
   }
 
   function getTheme() {
@@ -640,7 +645,15 @@
   }
 
   function initTheme(config) {
-    const selected = config?.defaultTheme === "light" ? "light" : "dark";
+    let selected = config?.defaultTheme === "light" ? "light" : "dark";
+    try {
+      const saved = sessionStorage.getItem(THEME_KEY);
+      if (saved === "light" || saved === "dark") {
+        selected = saved;
+      }
+    } catch (error) {
+      console.warn("无法读取主题偏好。", error);
+    }
     setTheme(selected);
   }
 
