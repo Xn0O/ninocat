@@ -843,6 +843,96 @@
     sharedRenderMath(preview);
   }
 
+  function escHtml(text) {
+    return String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function openFullscreenPreview() {
+    const parsed = parseFrontMatterFromText(editor.value);
+    const meta = parsed ? parsed.meta : {};
+    const body = parsed ? parsed.body : editor.value || "";
+    const renderedHtml = sharedMarkdownToHtml(rewriteMarkdownLinksForPreview(body));
+    const title = escHtml(meta.title || "预览");
+    const theme = document.body.dataset.theme || "dark";
+
+    const coverUrl = meta.cover ? resolvePreviewUrl(meta.cover) : "";
+    const coverHtml = coverUrl
+      ? `<img class="hero-image" src="${escHtml(coverUrl)}" alt="${escHtml(meta.title || "文章")} 头图" draggable="false" />`
+      : "";
+
+    let metaHtml = "";
+    if (meta.date) {
+      metaHtml += `<span>${escHtml(meta.date)}</span>`;
+    } else {
+      metaHtml += "<span>未填写日期</span>";
+    }
+    if (meta.tags) {
+      const tags = String(meta.tags).split(/[,，\/\s]+/).filter(Boolean);
+      if (tags.length) {
+        metaHtml +=
+          " · " +
+          tags
+            .map((t) => `<a class="post-tag-link" href="#">${escHtml(t)}</a>`)
+            .join(" / ");
+      }
+    }
+
+    const baseHref = window.location.href.replace(/\/tools\/blog-editor\.html[^/]*$/, "/");
+
+    const fullHtml = [
+      '<!DOCTYPE html>',
+      '<html lang="zh-CN">',
+      "<head>",
+      '  <meta charset="UTF-8" />',
+      '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+      `  <title>${title} - 文章预览</title>`,
+      `  <base href="${baseHref}" />`,
+      '  <link rel="preconnect" href="https://fonts.googleapis.com" />',
+      '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />',
+      '  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet" />',
+      '  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />',
+      '  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />',
+      '  <link rel="stylesheet" href="./styles.css" />',
+      "</head>",
+      `<body data-page="blog" data-theme="${theme}">`,
+      '  <main class="shell page-main">',
+      '    <section class="page-hero">',
+      coverHtml,
+      '      <div class="hero-copy block">',
+      '        <a class="back-link" href="./blog.html">&lt; 返回博客</a>',
+      `        <h1 id="post-title">${title}</h1>`,
+      `        <p id="post-meta">${metaHtml}</p>`,
+      "      </div>",
+      "    </section>",
+      `    <article class="post-content block markdown-content" id="post-content">${renderedHtml}</article>`,
+      "  </main>",
+      '  <footer class="site-footer shell">',
+      '    <p data-site="footer-line1">Copyright © 2026 Nino</p>',
+      '    <p data-site="footer-line2">All rights reserved.</p>',
+      "  </footer>",
+      '  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"><\/script>',
+      '  <script src="https://cdn.jsdelivr.net/gh/highlightjs/highlightjs-hlsl/dist/hlsl.min.js"><\/script>',
+      '  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"><\/script>',
+      '  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"><\/script>',
+      "  <script>",
+      "    document.addEventListener('DOMContentLoaded',function(){",
+      "      if(typeof hljs!=='undefined')hljs.highlightAll();",
+      "      if(typeof renderMathInElement==='function')renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});",
+      "    });",
+      "  <\/script>",
+      "</body>",
+      "</html>",
+    ].join("\n");
+
+    const previewWin = window.open("", "_blank");
+    if (!previewWin) {
+      appendLog("全屏预览被浏览器拦截，请允许弹出窗口。");
+      return;
+    }
+    previewWin.document.write(fullHtml);
+    previewWin.document.close();
+  }
+
   function schedulePreview() {
     if (!autoPreviewInput.checked) return;
     if (previewTimer) window.clearTimeout(previewTimer);
@@ -909,6 +999,7 @@
 
   function bindPreviewEvents() {
     refreshPreviewBtn.addEventListener("click", renderPreview);
+    document.getElementById("fullscreen-preview").addEventListener("click", openFullscreenPreview);
     autoPreviewInput.addEventListener("change", () => {
       if (autoPreviewInput.checked) renderPreview();
     });
@@ -936,7 +1027,7 @@
         shared.markActiveNav();
       }
       if (config?.title) {
-        document.title = `${config.title} - Markdown 博客编辑器`;
+        document.title = `${config.title} - MarkdownEditor`;
       }
     } catch (error) {
       appendLog(`加载站点主题配置失败：${error.message || error}`);
