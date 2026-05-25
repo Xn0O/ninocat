@@ -3,7 +3,7 @@ title: GhostWish.1
 date: 2026-05-25
 summary: LD58游戏的后续开发日志
 tags: Blog,GameDev,Unity
-cover: ./assets/Blog/Gw1/05.PNG
+cover: ./assets/Blog/Gw1/05.png
 hidden: 0
 ---
 
