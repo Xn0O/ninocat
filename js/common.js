@@ -835,6 +835,10 @@
     let rendered = extracted.text
       .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, src) => {
         const resolvedSrc = escapeHtml(resolveAssetUrl(src));
+        const isVideo = /\.(mp4|webm|mov)$/i.test(src);
+        if (isVideo) {
+          return `<video controls preload="metadata" class="video-embed"><source src="${resolvedSrc}" type="video/${src.endsWith('.webm') ? 'webm' : src.endsWith('.mov') ? 'quicktime' : 'mp4'}"></video>`;
+        }
         return `<img src="${resolvedSrc}" alt="${alt}" loading="lazy" />`;
       })
       .replace(/&lt;(https?:\/\/[^<>\s]+)&gt;/g, '<a href="$1" target="_blank" rel="noreferrer noopener">$1</a>')
