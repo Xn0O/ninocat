@@ -192,7 +192,7 @@ function showUnlockDialog(question, errorText = "") {
   });
 }
 
-function appendMeta(meta, mi) {
+function appendMeta(meta, mi, charCount = 0) {
   metaNode.replaceChildren();
 
   const appendText = (text) => {
@@ -222,6 +222,10 @@ function appendMeta(meta, mi) {
 
   if (mi) {
     appendText(" · 加密");
+  }
+
+  if (charCount > 0) {
+    appendText(` · 字数 ${charCount}`);
   }
 }
 
@@ -354,6 +358,15 @@ async function renderEncryptedBody(mi, encRef) {
       renderMath(contentNode);
       buildPostToc();
       setupImageLightbox(document.querySelector("main") || document);
+      // Append char count after successful decryption
+      const chars = markdown.replace(/\s+/g, "");
+      if (chars.length) {
+        const sep = document.createTextNode(" · ");
+        const cnt = document.createElement("span");
+        cnt.textContent = `字数 ${chars.length}`;
+        metaNode.appendChild(sep);
+        metaNode.appendChild(cnt);
+      }
       return;
     } catch (_error) {
       decryptError = "密码错误，或加密数据已损坏，请重试。";
@@ -397,7 +410,7 @@ async function init() {
     const encRef = String(meta.encRef || entry.encRef || "").trim();
     const encrypted = Boolean((entry.encrypted || mi) && encRef);
 
-    appendMeta(meta, encrypted ? mi : null);
+    appendMeta(meta, encrypted ? mi : null, encrypted ? 0 : body.replace(/\s+/g, "").length);
 
     if (heroNode && meta.cover) {
       heroNode.src = resolveAssetUrl(meta.cover);

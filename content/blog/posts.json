@@ -1,6 +1,10 @@
 {
   "posts": [
     {
+      "slug": "Gw1",
+      "file": "./content/blog/Gw1.md"
+    },
+    {
       "slug": "P4",
       "file": "./content/blog/P4.md",
       "encrypted": true,
