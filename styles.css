@@ -1999,6 +1999,7 @@ body.lightbox-open {
   aspect-ratio: 8 / 3;
   object-fit: cover;
   object-position: center;
+  background: none;
 }
 
 .blog-pagination {

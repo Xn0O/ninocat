@@ -3,10 +3,10 @@ title: GhostWish.1
 date: 2026-05-25
 summary: LD58游戏的后续开发日志
 tags: Blog,GameDev,Unity
-cover: ./assets/Blog/Gw1/05.png
+cover: ./assets/Blog/Gw1/00.png
 hidden: 0
 ---
-
+![00](./assets/Blog/Gw1/05.png)
 # 1.LD58(2025.10)
 ## 美术素材
 刚开始不知道要做什么样的游戏，但是很喜欢动森的建模，就参考了动森的风格。
