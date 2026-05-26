@@ -291,8 +291,8 @@ function artCard(item) {
     cover.dataset.noLightbox = "1";
     const link = document.createElement("a");
     link.className = "gallery-card-link";
-    link.href = `./gallery.html?slug=${encodeURIComponent(slug)}`;
-    link.setAttribute("aria-label", `查看 ${item.title || "未命名"} 图集`);
+    link.href = "./gallery.html?slug=" + encodeURIComponent(slug);
+    link.setAttribute("aria-label", "查看 " + (item.title || "未命名") + " 图集");
     card.append(coverWrap, body);
     link.appendChild(card);
     return link;

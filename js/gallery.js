@@ -67,18 +67,12 @@
       descEl.textContent = item.description || '';
     }
 
-    // Hero image
-    var heroImg = document.querySelector('[data-hero-image]');
-    if (heroImg) {
-      var src = sc.resolveAssetUrl(item.cover || (item.images && item.images[0]) || '');
-      if (src) heroImg.src = src;
-    }
-
-    // Render images
+    // Render images (cover first, then the rest)
     var grid = document.getElementById('gallery-grid');
     if (!grid) return;
 
     var images = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
+    if (item.cover) images.unshift(item.cover);
     if (!images.length) {
       grid.appendChild(sc.createEmptyTip('这个图集还没有图片。'));
       return;
