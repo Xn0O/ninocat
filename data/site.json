@@ -50,8 +50,8 @@
     "useOnLocal": false
   },
   "eyebrow": "ninocat",
-  "subtitle": "点击/长按NINO猫互动",
-  "defaultTheme": "dark",
+  "subtitle": "-",
+  "defaultTheme": "light",
   "themes": {
     "light": {
       "bg": "#f7f7f7",

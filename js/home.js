@@ -251,7 +251,6 @@ function setupScrollParallax(pairs) {
 function setupHomeTitleRole(config) {
   const role = document.getElementById("home-title-role");
   if (!role) return;
-  const titleLine = role.closest(".home-title-line");
   const roleHit =
     role.parentElement && role.parentElement.classList.contains("home-title-role-hit")
       ? role.parentElement
@@ -278,53 +277,64 @@ function setupHomeTitleRole(config) {
   const roleYPercent = Number(toy.roleYPercent);
   const resolvedRoleX = Number.isFinite(roleXPercent) ? roleXPercent : 0;
   const resolvedRoleY = Number.isFinite(roleYPercent) ? roleYPercent : 0;
-  const rawTitleGap = toy.titleGap ?? toy.roleTitleGap;
-
-  const resolveTitleGap = (value) => {
-    if (typeof value === "number" && Number.isFinite(value) && value > 0) {
-      return `${value}px`;
-    }
-    if (typeof value !== "string") return "";
-    const text = value.trim();
-    if (!text) return "";
-    if (/^\d+(\.\d+)?(px|rem|em|vw|vh|%)$/i.test(text)) return text;
-    if (/^(clamp|calc|min|max)\(.+\)$/i.test(text)) return text;
-    return "";
-  };
-  const resolvedTitleGap = resolveTitleGap(rawTitleGap);
 
   role.src = resolveAssetUrl(stand);
   role.style.setProperty("--toy-shake-ms", `${shakeMs}ms`);
   role.style.setProperty("--home-role-scale", String(resolvedRoleScale));
   role.style.setProperty("--home-role-offset-x", `${resolvedRoleX}%`);
   role.style.setProperty("--home-role-offset-y", `${resolvedRoleY}%`);
-  if (titleLine && resolvedTitleGap) {
-    titleLine.style.setProperty("--home-title-gap", resolvedTitleGap);
-  }
-
-  const syncTitleSafeGap = () => {
-    if (!titleLine) return;
-    if (resolvedRoleY <= 0) {
-      titleLine.style.setProperty("--home-title-safe-gap", "0px");
-      return;
-    }
-    const roleHeight = role.getBoundingClientRect().height || role.offsetHeight || 0;
-    const yShift = (roleHeight * resolvedRoleY) / 100;
-    const safeGap = Math.min(240, Math.max(0, yShift));
-    titleLine.style.setProperty("--home-title-safe-gap", `${safeGap.toFixed(1)}px`);
-  };
-
-  syncTitleSafeGap();
-  role.addEventListener("load", syncTitleSafeGap);
-  window.addEventListener("resize", syncTitleSafeGap);
 
   role.draggable = false;
   role.setAttribute("draggable", "false");
 
+  /* ── drag state ── */
   let holding = false;
+  let isDragging = false;
   let pressTimer = 0;
   let releaseTimer = 0;
   let capturedPointerId = null;
+  let dragStartLeft = 12;
+  let dragStartBottom = 12;
+  let dragStartPointerX = 0;
+  let dragStartPointerY = 0;
+
+  const getPos = () => {
+    const L = parseFloat(roleHit.style.getPropertyValue("--home-toy-left")) || 12;
+    const B = parseFloat(roleHit.style.getPropertyValue("--home-toy-bottom")) || 12;
+    return { left: L, bottom: B };
+  };
+
+  const savePos = (L, B) => {
+    try {
+      localStorage.setItem("home_pet_left", String(L));
+      localStorage.setItem("home_pet_bottom", String(B));
+    } catch (_) {}
+  };
+
+  const clampPos = () => {
+    const L = parseFloat(roleHit.style.getPropertyValue("--home-toy-left")) || 12;
+    const B = parseFloat(roleHit.style.getPropertyValue("--home-toy-bottom")) || 12;
+    const w = roleHit.offsetWidth || 120;
+    const h = roleHit.offsetHeight || 120;
+    const maxL = Math.max(0, window.innerWidth - w - 12);
+    const maxB = Math.max(0, window.innerHeight - h - 12);
+    const clampedL = Math.min(L, maxL);
+    const clampedB = Math.min(B, maxB);
+    if (clampedL !== L) roleHit.style.setProperty("--home-toy-left", `${clampedL}px`);
+    if (clampedB !== B) roleHit.style.setProperty("--home-toy-bottom", `${clampedB}px`);
+  };
+
+  /* restore saved position */
+  (function restoreSavedPos() {
+    try {
+      const L = localStorage.getItem("home_pet_left");
+      const B = localStorage.getItem("home_pet_bottom");
+      if (L !== null) roleHit.style.setProperty("--home-toy-left", `${L}px`);
+      if (B !== null) roleHit.style.setProperty("--home-toy-bottom", `${B}px`);
+    } catch (_) {}
+  })();
+  /* clamp after first paint so offsetWidth is available */
+  window.requestAnimationFrame(() => window.requestAnimationFrame(clampPos));
 
   const clearTimers = () => {
     if (pressTimer) {
@@ -351,6 +361,13 @@ function setupHomeTitleRole(config) {
     if (event.button !== undefined && event.button !== 0) return;
     event.preventDefault();
 
+    const pos = getPos();
+    dragStartLeft = pos.left;
+    dragStartBottom = pos.bottom;
+    dragStartPointerX = event.clientX;
+    dragStartPointerY = event.clientY;
+    isDragging = false;
+
     holding = true;
     clearTimers();
     setState("transition");
@@ -371,12 +388,28 @@ function setupHomeTitleRole(config) {
     }, frameMs);
   };
 
+  const onPointerMove = (event) => {
+    if (!holding) return;
+    isDragging = true;
+    const dx = event.clientX - dragStartPointerX;
+    const dy = event.clientY - dragStartPointerY;
+    const newLeft = Math.max(0, dragStartLeft + dx);
+    const newBottom = Math.max(0, dragStartBottom - dy);
+    roleHit.style.setProperty("--home-toy-left", `${newLeft}px`);
+    roleHit.style.setProperty("--home-toy-bottom", `${newBottom}px`);
+  };
+
   const endHold = () => {
     if (!holding) return;
     holding = false;
     clearTimers();
-    setState("transition");
 
+    if (isDragging) {
+      const pos = getPos();
+      savePos(pos.left, pos.bottom);
+    }
+
+    setState("transition");
     releaseTimer = window.setTimeout(() => {
       if (!holding) {
         setState("stand");
@@ -386,18 +419,18 @@ function setupHomeTitleRole(config) {
     if (capturedPointerId !== null && roleHit.releasePointerCapture) {
       try {
         roleHit.releasePointerCapture(capturedPointerId);
-      } catch (_) {
-        // Ignore release errors when pointer capture is already lost.
-      }
+      } catch (_) {}
     }
     capturedPointerId = null;
   };
 
   roleHit.addEventListener("pointerdown", startHold);
+  roleHit.addEventListener("pointermove", onPointerMove);
   roleHit.addEventListener("pointerup", endHold);
   roleHit.addEventListener("pointercancel", endHold);
   roleHit.addEventListener("lostpointercapture", endHold);
   window.addEventListener("pointerup", endHold);
+  window.addEventListener("resize", clampPos);
   roleHit.addEventListener("dragstart", (event) => event.preventDefault());
   roleHit.addEventListener("contextmenu", (event) => {
     event.preventDefault();
