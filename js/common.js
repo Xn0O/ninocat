@@ -833,11 +833,17 @@
   function inlineMarkdown(raw) {
     const extracted = extractInlineMathPlaceholders(raw);
     let rendered = extracted.text
+      .replace(/->([\s\S]*?)<-/g, '<div class="center-wrap">$1</div>')
+      .replace(/-&gt;([\s\S]*?)&lt;-/g, '<div class="center-wrap">$1</div>')
+      .replace(/(?:!\[([^\]]*)\])?\+\>([\s\S]*?)\<\+/g, (_m, summary, content) => {
+        const label = (summary || '').trim() || '展开折叠内容';
+        return '<details class="foldable"><summary>' + label + '</summary>' + content + '</details>';
+      })
       .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, src) => {
         const resolvedSrc = escapeHtml(resolveAssetUrl(src));
         const isVideo = /\.(mp4|webm|mov)$/i.test(src);
         if (isVideo) {
-          return `<video controls preload="metadata" class="video-embed"><source src="${resolvedSrc}" type="video/${src.endsWith('.webm') ? 'webm' : src.endsWith('.mov') ? 'quicktime' : 'mp4'}"></video>`;
+          return `<video controls preload="metadata" class="video-embed" src="${resolvedSrc}#t=0.001"></video>`;
         }
         return `<img src="${resolvedSrc}" alt="${alt}" loading="lazy" />`;
       })
@@ -1097,7 +1103,19 @@
 
   function markdownToHtml(markdownText) {
     const text = String(markdownText || "").replace(/\r\n/g, "\n");
-    const lines = text.split("\n");
+
+    // Pre-process foldable blocks: +>...<+ (multi-line)
+    const foldableBlocks = [];
+    const textWithoutFoldables = text.replace(/(?:\!\[([^\]]*)\])?\+\>([\s\S]*?)\<\+/g, function (_m, summary, content) {
+      var label = (summary || '').trim() || '展开折叠内容';
+      var innerHtml = markdownToHtml(content);
+      var html = '<details class="foldable"><summary>' + label + '</summary>' + innerHtml + '</details>';
+      var idx = foldableBlocks.length;
+      foldableBlocks.push(html);
+      return ' ' + idx + ' ';
+    });
+
+    const lines = textWithoutFoldables.split("\n");
     const out = [];
     let inCode = false;
     let codeLang = "plain";
@@ -1330,7 +1348,14 @@
       out.push(`<pre class="code-block" data-lang="${codeLang}"><code class="language-${codeLang}">${wrapCodeLines(highlighted)}</code></pre>`);
     }
     closeLists();
-    return out.join("\n");
+    var result = out.join("\n");
+    // Restore foldable blocks
+    if (foldableBlocks.length) {
+      result = result.replace(/ (\d+) /g, function (_m, idx) {
+        return foldableBlocks[parseInt(idx, 10)] || '';
+      });
+    }
+    return result;
   }
 
   function tagsFromText(value) {

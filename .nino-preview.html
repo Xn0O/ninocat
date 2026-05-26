@@ -1209,6 +1209,23 @@ a {
   outline: none;
 }
 
+.markdown-content details.foldable {
+  margin: 0.8rem 0;
+  background: var(--surface-alt, rgba(128,128,128,0.06));
+  border-radius: 8px;
+  padding: 4px 12px;
+}
+.markdown-content details.foldable summary {
+  cursor: pointer;
+  padding: 6px 0;
+  font-weight: 500;
+  color: var(--text, inherit);
+  outline: none;
+}
+.markdown-content details.foldable summary::-webkit-details-marker {
+  color: var(--muted, #999);
+}
+
 .markdown-content table {
   border-collapse: collapse;
   width: 100%;
@@ -2009,6 +2026,7 @@ body.lightbox-open {
   aspect-ratio: 8 / 3;
   object-fit: cover;
   object-position: center;
+  background: none;
 }
 
 .blog-pagination {
