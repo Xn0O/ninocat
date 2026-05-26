@@ -54,6 +54,15 @@ function resolveComicPages(item) {
     .map((src) => resolveAssetUrl(src));
 }
 
+function slugify(text) {
+  return text.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9一-鿿\-]/g, '');
+}
+
+function resolveGalleryImages(item) {
+  const raw = Array.isArray(item.images) ? item.images : [];
+  return raw.filter(Boolean).map((src) => resolveAssetUrl(src));
+}
+
 function resolveCover(item) {
   return resolveAssetUrl(item.cover || item.image || "./assets/hero-art.svg");
 }
@@ -173,6 +182,7 @@ function artCard(item) {
 
   const comicPages = resolveComicPages(item);
   const isComic = String(item.type || "").trim().toLowerCase() === "comic" || comicPages.length > 0;
+  const isGallery = String(item.type || "").trim().toLowerCase() === "gallery";
   if (isComic) card.classList.add("item-card-comic");
 
   const cover = document.createElement("img");
@@ -197,6 +207,11 @@ function artCard(item) {
     const flag = document.createElement("span");
     flag.className = "art-type-flag";
     flag.textContent = "漫画";
+    meta.append(" · ", flag);
+  } else if (isGallery) {
+    const flag = document.createElement("span");
+    flag.className = "art-type-flag";
+    flag.textContent = "图集";
     meta.append(" · ", flag);
   }
 
@@ -269,6 +284,18 @@ function artCard(item) {
 
     panel.append(summary, pagesWrap);
     coverWrap.appendChild(panel);
+  }
+
+  if (isGallery) {
+    const slug = slugify(item.title || "");
+    cover.dataset.noLightbox = "1";
+    const link = document.createElement("a");
+    link.className = "gallery-card-link";
+    link.href = `./gallery.html?slug=${encodeURIComponent(slug)}`;
+    link.setAttribute("aria-label", `查看 ${item.title || "未命名"} 图集`);
+    card.append(coverWrap, body);
+    link.appendChild(card);
+    return link;
   }
 
   card.append(coverWrap, body);

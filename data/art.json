@@ -1,44 +1,11 @@
-﻿{
+{
   "arts": [
     {
-      "title": "UFO!",
-      "description": "快看！！",
-      "year": "2026",
-      "image": "./assets/Art/0.jpg",
-      "tags": "摸鱼"
-    },
-    {
-      "title": "Ghost",
-      "description": "幽灵~",
-      "year": "2026",
-      "image": "./assets/Art/1.jpg",
-      "tags": "摸鱼"
-    },
-    {
-      "title": "盯",
-      "description": "...",
-      "year": "2026",
-      "image": "./assets/Art/2.png",
-      "tags": "摸鱼"
-    },
-    {
-      "title": "雪",
-      "description": "说起来，我从来没见过雪..",
-      "year": "2026",
-      "image": "./assets/Art/3.jpg",
-      "tags": "摸鱼"
-    },
-    {
-      "title": "神秘",
-      "description": "正在帮木头人实现心愿",
-      "year": "2026",
-      "image": "./assets/Art/4.jpg",
-      "tags": "摸鱼"
-    },
-    {
       "title": "杂项",
+      "year": "2024",
+      "tags": "漫画",
+      "description": "封面使用实验区的画图绘制",
       "type": "comic",
-      "year": "2026",
       "cover": "./assets/Art/5.png",
       "pages": [
         "./assets/Art/CM1/M2.jpg",
@@ -47,10 +14,56 @@
         "./assets/Art/CM1/M5.jpg",
         "./assets/Art/CM1/M6.jpg",
         "./assets/Art/CM1/M7.jpg"
-      ],
-      "description": "封面使用实验区的画图绘制",
-      "tags": "漫画"
+      ]
+    },
+    {
+      "title": "Ghost",
+      "year": "2025",
+      "tags": "摸鱼",
+      "description": "幽灵~",
+      "image": "./assets/Art/1.jpg"
+    },
+    {
+      "title": "盯",
+      "year": "2025",
+      "tags": "摸鱼",
+      "description": "...",
+      "image": "./assets/Art/2.png"
+    },
+    {
+      "title": "雪",
+      "year": "2025",
+      "tags": "摸鱼",
+      "description": "说起来，我从来没见过雪..",
+      "image": "./assets/Art/3.jpg"
+    },
+    {
+      "title": "神秘",
+      "year": "2025",
+      "tags": "摸鱼",
+      "description": "正在帮木头人实现心愿",
+      "image": "./assets/Art/4.jpg"
+    },
+    {
+      "title": "UFO!",
+      "year": "2026",
+      "tags": "摸鱼",
+      "description": "快看！！",
+      "image": "./assets/Art/0.jpg"
+    },
+    {
+      "title": "图集Test",
+      "year": "2026",
+      "tags": "test",
+      "description": "测试",
+      "type": "gallery",
+      "cover": "./assets/Art/CM1/M1.jpg",
+      "images": [
+        "./assets/Blog/Gw1/03.png",
+        "./assets/Blog/Gw1/01.png",
+        "./assets/Blog/Gw1/04.png",
+        "./assets/Blog/Gw1/05.png"
+      ]
     }
-    
   ]
 }

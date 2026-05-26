@@ -632,6 +632,8 @@ a {
 }
 
 .item-card {
+  position: relative;
+  z-index: 0;
   background: var(--surface);
   display: grid;
   grid-template-rows: auto 1fr;
@@ -2553,4 +2555,34 @@ body.lightbox-open {
     padding-left: 0;
     font-weight: 700;
   }
+}
+
+/* ---------- Gallery ---------- */
+.gallery-grid {
+  column-width: clamp(220px, 24vw, 340px);
+  column-gap: 12px;
+  margin-top: 2rem;
+}
+.gallery-grid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+  break-inside: avoid;
+  border-radius: 4px;
+  cursor: zoom-in;
+}
+.gallery-hero {
+  margin-bottom: 1.5rem;
+}
+.gallery-desc {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+.gallery-card-link {
+  display: contents;
+  color: inherit;
+  text-decoration: none;
 }

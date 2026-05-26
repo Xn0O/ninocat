@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="googlebot" content="noindex, nofollow" />
+    <title>图集 - Nino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <script>document.documentElement.dataset.theme=sessionStorage.getItem("vb_theme")==="light"?"light":"dark"</script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="art" data-theme="dark">
+    <header class="top-nav shell">
+      <a class="brand" href="./index.html">Nino</a>
+      <nav aria-label="主导航">
+        <a data-nav="blog" href="./blog.html">博客</a>
+        <a data-nav="game" href="./game.html">游戏</a>
+        <a data-nav="art" href="./art.html">美术</a>
+        <a data-nav="about" href="./about.html">关于</a>
+        <a data-nav="lab" href="./lab.html">实验区</a>
+      </nav>
+      <button id="theme-toggle" class="btn theme-toggle" type="button">切换主题</button>
+    </header>
+
+    <main class="shell page-main">
+      <section class="gallery-hero">
+        <img data-hero-image class="hero-image" alt="" />
+        <div class="hero-copy block">
+          <a class="back-link" href="./art.html">&lt; 返回美术</a>
+          <h1 id="gallery-title">加载中...</h1>
+          <p id="gallery-meta"></p>
+          <p id="gallery-desc" class="gallery-desc"></p>
+        </div>
+      </section>
+      <div class="gallery-grid block" id="gallery-grid"></div>
+    </main>
+
+    <footer class="page-footer block" id="page-footer">
+      <p>&copy; <span id="footer-year"></span> Nino</p>
+    </footer>
+
+    <script src="./js/common.js"></script>
+    <script src="./js/gallery.js"></script>
+  </body>
+</html>
