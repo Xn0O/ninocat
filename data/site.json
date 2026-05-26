@@ -191,6 +191,7 @@
     "roleXPercent": 0,
     "roleYPercent": 0,
     "shakeMs": 240
-  }
+  },
+  "commentEnabled": true
 }
 
