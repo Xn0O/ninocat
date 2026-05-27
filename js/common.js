@@ -1403,6 +1403,18 @@
     closeBtn.setAttribute("aria-label", "关闭大图");
     closeBtn.textContent = "×";
 
+    const prevBtn = document.createElement("button");
+    prevBtn.type = "button";
+    prevBtn.className = "image-lightbox-nav image-lightbox-prev";
+    prevBtn.setAttribute("aria-label", "上一张");
+    prevBtn.innerHTML = "‹";
+
+    const nextBtn = document.createElement("button");
+    nextBtn.type = "button";
+    nextBtn.className = "image-lightbox-nav image-lightbox-next";
+    nextBtn.setAttribute("aria-label", "下一张");
+    nextBtn.innerHTML = "›";
+
     const img = document.createElement("img");
     img.className = "image-lightbox-img";
     img.alt = "";
@@ -1411,7 +1423,44 @@
     caption.className = "image-lightbox-caption";
     caption.hidden = true;
 
-    mask.append(closeBtn, img, caption);
+    var gallerySources = [];
+    var galleryIndex = 0;
+
+    function updateNav() {
+      var showNav = gallerySources.length > 1;
+      prevBtn.style.display = showNav ? "" : "none";
+      nextBtn.style.display = showNav ? "" : "none";
+      if (showNav) {
+        prevBtn.classList.toggle("disabled", galleryIndex <= 0);
+        nextBtn.classList.toggle("disabled", galleryIndex >= gallerySources.length - 1);
+      }
+    }
+
+    function showImage(index) {
+      if (index < 0 || index >= gallerySources.length) return;
+      galleryIndex = index;
+      var entry = gallerySources[index];
+      img.src = entry.src;
+      img.alt = entry.alt || "大图预览";
+      if (entry.alt) {
+        caption.textContent = entry.alt;
+        caption.hidden = false;
+      } else {
+        caption.textContent = "";
+        caption.hidden = true;
+      }
+      updateNav();
+    }
+
+    function goPrev() {
+      if (galleryIndex > 0) showImage(galleryIndex - 1);
+    }
+
+    function goNext() {
+      if (galleryIndex < gallerySources.length - 1) showImage(galleryIndex + 1);
+    }
+
+    mask.append(closeBtn, prevBtn, img, nextBtn, caption);
     document.body.appendChild(mask);
 
     const close = () => {
@@ -1422,28 +1471,37 @@
       img.alt = "";
       caption.textContent = "";
       caption.hidden = true;
+      gallerySources = [];
+      galleryIndex = 0;
     };
 
     closeBtn.addEventListener("click", close);
     mask.addEventListener("click", (event) => {
       if (event.target === mask) close();
     });
+    prevBtn.addEventListener("click", goPrev);
+    nextBtn.addEventListener("click", goNext);
+
     window.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && mask.classList.contains("open")) {
-        close();
-      }
+      if (!mask.classList.contains("open")) return;
+      if (event.key === "Escape") { close(); }
+      else if (event.key === "ArrowLeft") { goPrev(); }
+      else if (event.key === "ArrowRight") { goNext(); }
     });
 
     mask.openImage = (src, alt) => {
-      img.src = src;
-      img.alt = alt || "大图预览";
-      if (alt) {
-        caption.textContent = alt;
-        caption.hidden = false;
-      } else {
-        caption.textContent = "";
-        caption.hidden = true;
-      }
+      gallerySources = [{ src: src, alt: alt || "" }];
+      galleryIndex = 0;
+      showImage(0);
+      mask.classList.add("open");
+      mask.setAttribute("aria-hidden", "false");
+      document.body.classList.add("lightbox-open");
+    };
+
+    mask.openGallery = (sources, startIndex) => {
+      gallerySources = sources;
+      galleryIndex = startIndex || 0;
+      showImage(galleryIndex);
       mask.classList.add("open");
       mask.setAttribute("aria-hidden", "false");
       document.body.classList.add("lightbox-open");
@@ -1578,6 +1636,7 @@
     enhanceCodeBlocks,
     renderMath,
     setupImageLightbox,
+    ensureImageLightbox,
     tagsFromText,
     isHiddenMeta,
     parseMiMeta,

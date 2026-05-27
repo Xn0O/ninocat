@@ -1,4 +1,4 @@
-﻿{
+{
   "title": "Nino",
   "brandIcon": "./assets/Home_Site/ninocatlogo.png",
   "brand": {
@@ -102,7 +102,8 @@
     "blog": "./assets/Home_Site/B_0.jpg",
     "game": "./assets/Home_Site/B_1.jpg",
     "art": "./assets/Home_Site/B_2_1.jpg",
-    "about": "./assets/Home_Site/B_3.jpg"
+    "about": "./assets/Home_Site/B_3.jpg",
+    "nnspace": "./assets/hero-home.svg"
   },
   "pageHeroTexts": {
     "blog": {
@@ -124,6 +125,11 @@
       "eyebrow": "ninocat",
       "title": "关于",
       "description": "我是nino"
+    },
+    "nnspace": {
+      "eyebrow": "nnspace",
+      "title": "动态",
+      "description": "今天发生了什么？"
     }
   },
   "homeStrips": [
@@ -194,4 +200,3 @@
   },
   "commentEnabled": true
 }
-
