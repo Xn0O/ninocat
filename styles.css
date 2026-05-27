@@ -1452,6 +1452,19 @@ a {
   margin-bottom: 0;
 }
 
+.comment-pending {
+  opacity: 0.55;
+}
+.comment-pending-badge {
+  font-size: 0.7rem;
+  color: #999;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  padding: 0 5px;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
 .markdown-content table {
   border-collapse: collapse;
   width: 100%;

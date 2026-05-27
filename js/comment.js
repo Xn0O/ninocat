@@ -17,6 +17,8 @@
   }
 
   function boot() {
+    var pendingComments = [];
+
     var AVATAR_ICONS = [
       { cls: 'fa-solid fa-user' },
       { cls: 'fa-solid fa-ghost' },
@@ -160,6 +162,7 @@
     function buildCommentItem(c, parentName, byParent, allComments) {
       var el = document.createElement('div');
       el.className = 'comment-item';
+      if (c.approved === false) el.className += ' comment-pending';
 
       var replyToHtml = parentName
         ? '<div class="reply-to-label">回复 @' + escapeHtml(parentName) + '</div>'
@@ -171,6 +174,7 @@
           '<strong>' + escapeHtml(c.name || '匿名') + '</strong>' +
           replyToHtml +
           '<span class="comment-date">' + formatTime(c.created_at) + '</span>' +
+      (c.approved === false ? '<span class="comment-pending-badge">待审核</span>' : '') +
         '</div>' +
         '<div class="comment-body">' + escapeHtml(c.content) + '</div>' +
         '<button class="comment-reply-btn">回复</button>' +
@@ -213,7 +217,7 @@
         if (!content) return;
         var btn = this;
         btn.disabled = true;
-        postComment(slug, name, email, avatar, content, c.id, function (ok) {
+        postComment(slug, name, email, avatar, content, c.id, function (ok, commentData) {
           btn.disabled = false;
           if (ok) {
             replyForm.style.display = 'none';
@@ -221,9 +225,8 @@
             replyEmail.value = '';
             replyAvatar.value = '';
             replyContent.value = '';
-            loadComments(slug, function (comments) {
-              renderComments(list, comments);
-            });
+            if (commentData) pendingComments.push(commentData);
+            loadAndRender();
           }
         });
       });
@@ -231,8 +234,18 @@
       return el;
     }
 
+    function loadAndRender() {
+      loadComments(slug, function (comments) {
+        for (var i = 0; i < pendingComments.length; i++) {
+          comments.push(pendingComments[i]);
+        }
+        pendingComments = [];
+        renderComments(list, comments);
+      });
+    }
+
     function loadComments(slug, callback) {
-      fetch(SUPABASE_URL + '/rest/v1/comments?slug=eq.' + encodeURIComponent(slug) + '&order=created_at.asc', {
+      fetch(SUPABASE_URL + '/rest/v1/comments?slug=eq.' + encodeURIComponent(slug) + '&approved=eq.true&order=created_at.asc', {
         headers: headers,
       })
         .then(function (r) { return r.json(); })
@@ -259,7 +272,12 @@
         },
         body: JSON.stringify(body),
       })
-        .then(function (r) { callback(r.ok); })
+        .then(function (r) {
+          if (!r.ok) { callback(false); return; }
+          r.json().then(function (data) {
+            callback(true, data && data.comment ? data.comment : null);
+          });
+        })
         .catch(function () { callback(false); });
     }
 
@@ -290,9 +308,7 @@
     var contentInput = section.querySelector('#comment-content');
     var avatarInput = section.querySelector('.comment-avatar');
 
-    loadComments(slug, function (comments) {
-      renderComments(list, comments);
-    });
+    loadAndRender();
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -303,14 +319,13 @@
       if (!content) return;
       var btn = form.querySelector('button');
       btn.disabled = true;
-      postComment(slug, name, email, avatar, content, null, function (ok) {
+      postComment(slug, name, email, avatar, content, null, function (ok, commentData) {
         btn.disabled = false;
         if (ok) {
           contentInput.value = '';
           if (avatarInput) avatarInput.value = '';
-          loadComments(slug, function (comments) {
-            renderComments(list, comments);
-          });
+          if (commentData) pendingComments.push(commentData);
+          loadAndRender();
         }
       });
     });
