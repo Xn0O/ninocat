@@ -2454,6 +2454,12 @@ body.lightbox-open {
 }
 
 @media (max-width: 900px) {
+  .back-to-top {
+    right: 12px;
+    width: 60px;
+    height: 56px;
+  }
+
   .top-nav {
     grid-template-columns: 1fr;
     justify-items: stretch;
@@ -2681,11 +2687,17 @@ body.lightbox-open {
 
 /* --- NN Space --- */
 
-.back-to-blog {
+.space-top-bar {
   display: flex;
   align-items: center;
+  gap: 10px;
   width: min(680px, 100%);
   margin: 0 auto 10px;
+}
+.back-to-blog {
+  flex: 1;
+  display: flex;
+  align-items: center;
   padding: 14px 18px;
   background: var(--surface);
   border: 1px solid var(--surface-alt);
@@ -2699,6 +2711,46 @@ body.lightbox-open {
   color: var(--accent);
   border-color: var(--accent);
   transform: scale(1.02);
+}
+.space-theme-btn {
+  position: fixed;
+  right: 16px;
+  bottom: 24px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--nav-glass-border);
+  color: var(--nav-ink);
+  background:
+    linear-gradient(120deg, var(--nav-glass-tint) 0%, rgba(255, 255, 255, 0) 44%),
+    linear-gradient(165deg, var(--nav-glass-base) 0%, var(--nav-glass-glow) 100%);
+  backdrop-filter: blur(var(--nav-blur)) saturate(var(--nav-saturate));
+  -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(var(--nav-saturate));
+  box-shadow: 0 10px 24px rgba(80, 0, 120, 0.3);
+  border-radius: 0;
+  width: 66px;
+  height: 62px;
+  padding: 0;
+  cursor: pointer;
+  transition: border-color 180ms ease;
+}
+.space-theme-btn:hover {
+  border-color: rgba(255, 255, 255, 0.62);
+}
+.space-theme-btn::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M21.64 13a1 1 0 0 0-1.06-.33A8 8 0 0 1 11.36 3.4a1 1 0 0 0-1.39-1A10 10 0 1 0 22.6 15a1 1 0 0 0-.96-2z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M21.64 13a1 1 0 0 0-1.06-.33A8 8 0 0 1 11.36 3.4a1 1 0 0 0-1.39-1A10 10 0 1 0 22.6 15a1 1 0 0 0-.96-2z'/%3E%3C/svg%3E");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 .space-feed {

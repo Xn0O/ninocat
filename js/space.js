@@ -162,6 +162,19 @@
     sc.initTheme(config);
     sc.applySiteText(config);
 
+    // Remove back-to-top button since space page has its own theme toggle
+    var existingBackToTop = document.getElementById('back-to-top-btn');
+    if (existingBackToTop) existingBackToTop.remove();
+
+    // Theme toggle
+    var themeBtn = document.getElementById('space-theme-btn');
+    if (themeBtn && sc.getTheme) {
+      themeBtn.addEventListener('click', function () {
+        var next = sc.getTheme() === 'dark' ? 'light' : 'dark';
+        sc.setTheme(next);
+      });
+    }
+
     if (!feedEl) return;
 
     // Loading state

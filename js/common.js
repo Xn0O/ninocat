@@ -278,14 +278,7 @@
     updateVisibility();
     window.addEventListener("resize", updateBackToTopTop, { passive: true });
     window.addEventListener("scroll", updateVisibility, { passive: true });
-
-    if (typeof window.ResizeObserver === "function") {
-      const nav = document.querySelector(".top-nav");
-      if (nav) {
-        const ro = new window.ResizeObserver(() => updateBackToTopTop());
-        ro.observe(nav);
-      }
-    }
+    window.addEventListener("resize", updateBackToTopTop, { passive: true });
   }
 
   function setupAutoHideNav(config) {
