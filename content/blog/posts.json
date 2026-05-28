@@ -1,6 +1,10 @@
 {
   "posts": [
     {
+      "slug": "PP0",
+      "file": "./content/blog/PP0.md"
+    },
+    {
       "slug": "Gw1",
       "file": "./content/blog/Gw1.md"
     },
