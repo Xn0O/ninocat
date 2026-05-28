@@ -2681,6 +2681,26 @@ body.lightbox-open {
 
 /* --- NN Space --- */
 
+.back-to-blog {
+  display: flex;
+  align-items: center;
+  width: min(680px, 100%);
+  margin: 0 auto 10px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1px solid var(--surface-alt);
+  border-radius: 8px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: transform 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+.back-to-blog:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+
 .space-feed {
   width: min(680px, 100%);
   margin: 0 auto;
@@ -2814,8 +2834,16 @@ body.lightbox-open {
 }
 
 .moment-images[data-count="1"] {
-  grid-template-columns: 1fr;
-  max-width: 480px;
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
+}
+.moment-images[data-count="1"] .moment-image {
+  aspect-ratio: auto;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 480px;
 }
 
 .moment-images[data-count="2"] {

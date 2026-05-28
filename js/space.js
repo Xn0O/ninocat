@@ -160,9 +160,7 @@
     var config = await sc.loadSiteConfig();
     sc.applyThemeConfig(config);
     sc.initTheme(config);
-    sc.setupThemeToggle();
     sc.applySiteText(config);
-    sc.markActiveNav();
 
     if (!feedEl) return;
 
