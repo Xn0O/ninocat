@@ -412,7 +412,9 @@ async function init() {
 
     appendMeta(meta, encrypted ? mi : null, encrypted ? 0 : body.replace(/\s+/g, "").length);
 
-    if (heroNode && meta.cover) {
+    if (meta.hide_cover && meta.hide_cover !== "0") {
+      if (heroNode) heroNode.style.display = "none";
+    } else if (heroNode && meta.cover) {
       heroNode.src = resolveAssetUrl(meta.cover);
       heroNode.alt = `${meta.title || slug} 文章头图`;
       heroNode.draggable = false;

@@ -5,6 +5,7 @@ summary: 中文版：https://gpp.tkchu.me
 tags: Blog,GameDev
 cover: ./assets/Blog/PP0/0.jpg
 hidden: 0
+hide_cover: 1
 ---
 
 # 0. 序

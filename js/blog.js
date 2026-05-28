@@ -138,13 +138,16 @@ function renderCard(post) {
   card.setAttribute("draggable", "false");
   card.addEventListener("dragstart", (event) => event.preventDefault());
 
-  const cover = document.createElement("img");
-  cover.className = "item-cover";
-  cover.loading = "lazy";
-  cover.alt = `${post.title || post.slug} 头图`;
-  cover.src = resolveAssetUrl(post.cover || DEFAULT_COVER);
-  cover.draggable = false;
-  cover.setAttribute("draggable", "false");
+  var cover = null;
+  if (!post.hide_cover || post.hide_cover === "0") {
+    cover = document.createElement("img");
+    cover.className = "item-cover";
+    cover.loading = "lazy";
+    cover.alt = `${post.title || post.slug} 头图`;
+    cover.src = resolveAssetUrl(post.cover || DEFAULT_COVER);
+    cover.draggable = false;
+    cover.setAttribute("draggable", "false");
+  }
 
   const body = document.createElement("div");
   body.className = "item-body";
@@ -195,7 +198,10 @@ function renderCard(post) {
   });
 
   body.append(meta, title, desc, tags);
-  card.append(cover, body);
+  if (cover) {
+    card.appendChild(cover);
+  }
+  card.appendChild(body);
   return card;
 }
 
@@ -236,6 +242,7 @@ async function loadPosts() {
             : body.slice(0, 120).replace(/\s+/g, " ")),
         tags: tagsFromText(meta.tags),
         cover: meta.cover || DEFAULT_COVER,
+        hide_cover: meta.hide_cover,
         encrypted,
         encRef,
         miQuestion: mi?.question || item.miQuestion || "",
