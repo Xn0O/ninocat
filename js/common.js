@@ -842,6 +842,7 @@
       })
       .replace(/&lt;(https?:\/\/[^<>\s]+)&gt;/g, '<a href="$1" target="_blank" rel="noreferrer noopener">$1</a>')
       .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/==([^=]+)==/g, "<mark>$1</mark>")
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/\*([^*]+)\*/g, "<em>$1</em>")
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
@@ -1097,16 +1098,49 @@
   function markdownToHtml(markdownText) {
     const text = String(markdownText || "").replace(/\r\n/g, "\n");
 
-    // Pre-process foldable blocks: +>...<+ (multi-line)
+    // Pre-process foldable blocks: +>...<+ (multi-line, supports nesting)
     const foldableBlocks = [];
-    const textWithoutFoldables = text.replace(/(?:\!\[([^\]]*)\])?\+\>([\s\S]*?)\<\+/g, function (_m, summary, content) {
-      var label = (summary || '').trim() || '展开折叠内容';
-      var innerHtml = markdownToHtml(content);
-      var html = '<details class="foldable"><summary>' + label + '</summary>' + innerHtml + '</details>';
-      var idx = foldableBlocks.length;
-      foldableBlocks.push(html);
-      return ' ' + idx + ' ';
-    });
+    let foldResult = '';
+    let depth = 0;
+    let segStart = 0;
+    let foldLabel = '';
+    let contentStart = -1;
+
+    function foldFlush(end) {
+      if (end > segStart) foldResult += text.slice(segStart, end);
+    }
+
+    for (let pos = 0; pos < text.length - 1; pos++) {
+      if (text[pos] === '+' && text[pos + 1] === '>') {
+        if (depth === 0) {
+          foldFlush(pos);
+          const lm = foldResult.match(/!\[([^\]]*)\]$/);
+          foldLabel = lm ? lm[1].trim() : '展开折叠内容';
+          if (lm) foldResult = foldResult.slice(0, -lm[0].length);
+          contentStart = pos + 2;
+        }
+        depth++;
+        pos++;
+        continue;
+      }
+      if (text[pos] === '<' && text[pos + 1] === '+') {
+        if (depth > 0) {
+          depth--;
+          if (depth === 0) {
+            const inner = text.slice(contentStart, pos);
+            const innerHtml = markdownToHtml(inner);
+            const idx = foldableBlocks.length;
+            foldableBlocks.push('<details class="foldable"><summary>' + foldLabel + '</summary>' + innerHtml + '</details>');
+            foldResult += ' ' + idx + ' ';
+            segStart = pos + 2;
+          }
+        }
+        pos++;
+        continue;
+      }
+    }
+    foldFlush(text.length);
+    const textWithoutFoldables = foldResult;
 
     const lines = textWithoutFoldables.split("\n");
     const out = [];
@@ -1357,6 +1391,12 @@
       .split(/[|,;/]/)
       .map((part) => part.trim())
       .filter(Boolean);
+  }
+
+  function parseTag(str) {
+    var m = String(str || '').match(/^\[(#[\da-fA-F]{3,8})\](.*)/);
+    if (m) return { name: m[2].trim(), color: m[1] };
+    return { name: str, color: null };
   }
 
   function isHiddenMeta(value) {
@@ -1630,6 +1670,7 @@
     renderMath,
     setupImageLightbox,
     ensureImageLightbox,
+    parseTag,
     tagsFromText,
     isHiddenMeta,
     parseMiMeta,

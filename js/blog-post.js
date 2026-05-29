@@ -210,11 +210,13 @@ function appendMeta(meta, mi, charCount = 0) {
   const tags = tagsFromText(meta.tags);
   if (tags.length) {
     appendText(" · ");
-    tags.forEach((tag, index) => {
-      const link = document.createElement("a");
-      link.href = `./blog.html?tag=${encodeURIComponent(tag)}`;
+    tags.forEach(function (rawStr, index) {
+      var parsed = SiteCommon.parseTag ? SiteCommon.parseTag(rawStr) : { name: rawStr, color: null };
+      var link = document.createElement("a");
+      link.href = './blog.html?tag=' + encodeURIComponent(parsed.name);
       link.className = "post-tag-link";
-      link.textContent = tag;
+      link.textContent = parsed.name;
+      if (parsed.color) link.style.color = parsed.color;
       metaNode.appendChild(link);
       if (index < tags.length - 1) appendText(" / ");
     });
@@ -423,6 +425,17 @@ async function init() {
         heroNode.addEventListener("dragstart", (event) => event.preventDefault());
         heroNode.dataset.dragLocked = "1";
       }
+    }
+
+    // Background image
+    if (meta.bg_image) {
+      var bgUrl = resolveAssetUrl(meta.bg_image);
+      var bgMode = (meta.bg_repeat || '').trim() === 'repeat' ? 'repeat' : 'cover';
+      document.body.style.backgroundImage = 'url(' + bgUrl + ')';
+      document.body.style.backgroundSize = bgMode === 'cover' ? 'cover' : 'auto';
+      document.body.style.backgroundRepeat = bgMode === 'repeat' ? 'repeat' : 'no-repeat';
+      document.body.style.backgroundPosition = 'center';
+      document.body.style.backgroundAttachment = 'fixed';
     }
 
     if (encrypted) {

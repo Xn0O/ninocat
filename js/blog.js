@@ -9,6 +9,7 @@
   createEmptyTip,
   parseFrontMatter,
   tagsFromText,
+  parseTag,
   isHiddenMeta,
   parseMiMeta,
   resolveAssetUrl,
@@ -85,8 +86,9 @@ function syncUrlQuery() {
 }
 
 function matchesPost(post) {
-  if (state.tag !== ALL_TAG && !post.tags.includes(state.tag)) {
-    return false;
+  if (state.tag !== ALL_TAG) {
+    const matched = post.tags.some((t) => parseTag(t).name === state.tag);
+    if (!matched) return false;
   }
 
   const q = normalizeText(state.query);
@@ -106,7 +108,7 @@ function getFilteredPosts() {
 
 function uniqueTags(posts) {
   const pool = new Set();
-  posts.forEach((post) => post.tags.forEach((tag) => pool.add(tag)));
+  posts.forEach((post) => post.tags.forEach((tag) => pool.add(parseTag(tag).name)));
   return [...pool].sort((a, b) => a.localeCompare(b, "zh-Hans-CN"));
 }
 
@@ -172,13 +174,15 @@ function renderCard(post) {
     lockChip.textContent = "加密";
     tags.appendChild(lockChip);
   }
-  post.tags.forEach((tag) => {
+  post.tags.forEach((rawTag) => {
+    const parsed = parseTag(rawTag);
     const chip = document.createElement("span");
     chip.className = "blog-tag-chip";
     chip.tabIndex = 0;
     chip.setAttribute("role", "button");
-    chip.setAttribute("aria-label", `按标签筛选：${tag}`);
-    chip.textContent = tag;
+    chip.setAttribute("aria-label", `按标签筛选：${parsed.name}`);
+    chip.textContent = parsed.name;
+    if (parsed.color) chip.style.color = parsed.color;
 
     chip.addEventListener("click", (event) => {
       event.preventDefault();

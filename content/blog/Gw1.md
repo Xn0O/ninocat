@@ -2,9 +2,11 @@
 title: GhostWish.1
 date: 2026-05-25
 summary: LD58游戏的后续开发日志
-tags: Blog,GameDev,Unity
+tags:Blog,GameDev,Unity,[#735de0]GhostWish
 cover: ./assets/Blog/Gw1/00.png
 hidden: 0
+bg_image: ./assets/BG/bg.jpg
+bg_repeat: 
 ---
 ->![00](./assets/Blog/Gw1/05.png)<-
 ->[Ghostwish - itch.io](https://nnoi.itch.io/ghostwish)<-
