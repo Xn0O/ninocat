@@ -670,10 +670,7 @@
   }
 
   function applyHeaderImage(config) {
-    const heroImage = document.querySelector("[data-hero-image]");
-    if (!heroImage) return;
-
-    const page = document.body.dataset.page || "default";
+    const pages = document.body.dataset.page || "default";
     const fallback = { src: "./assets/hero-home.svg", fit: "cover", position: "center", ratio: "21 / 8" };
 
     const parseHeaderEntry = (entry) => {
@@ -705,43 +702,64 @@
       return "21 / 8";
     };
 
-    const pageEntry = parseHeaderEntry(config?.headerImages?.[page]);
-    const defaultEntry = parseHeaderEntry(config?.headerImages?.default);
-    const merged = {
-      ...fallback,
-      ...(defaultEntry || {}),
-      ...(pageEntry || {}),
-    };
-
-    heroImage.src = resolveAssetUrl(merged.src || fallback.src, { config });
-    heroImage.style.setProperty("--hero-fit", sanitizeFit(merged.fit));
-    heroImage.style.setProperty("--hero-position", sanitizePosition(merged.position));
-    heroImage.style.setProperty("--hero-ratio", sanitizeRatio(merged.ratio));
+    // Support SPA: apply to all hero images with matching page
+    document.querySelectorAll("[data-hero-image]").forEach(function (heroImage) {
+      var parentSection = heroImage.closest("[data-page]");
+      var pageKey = parentSection ? parentSection.getAttribute("data-page") : pages;
+      var pageEntry = parseHeaderEntry(config?.headerImages?.[pageKey]);
+      var defaultEntry = parseHeaderEntry(config?.headerImages?.default);
+      var merged = Object.assign({}, fallback, defaultEntry || {}, pageEntry || {});
+      heroImage.src = resolveAssetUrl(merged.src || fallback.src, { config });
+      heroImage.style.setProperty("--hero-fit", sanitizeFit(merged.fit));
+      heroImage.style.setProperty("--hero-position", sanitizePosition(merged.position));
+      heroImage.style.setProperty("--hero-ratio", sanitizeRatio(merged.ratio));
+    });
   }
 
   function applyPageHeroText(config) {
-    const page = document.body?.dataset?.page;
-    if (!page) return;
-
     const flatTexts = config?.pageHeroTexts && typeof config.pageHeroTexts === "object" ? config.pageHeroTexts : {};
     const nestedTexts =
       config?.pages?.heroTexts && typeof config.pages.heroTexts === "object" ? config.pages.heroTexts : {};
     const texts = Object.keys(flatTexts).length ? flatTexts : nestedTexts;
-    const pageText = texts?.[page];
-    if (!pageText || typeof pageText !== "object") return;
 
-    const setHeroText = (slot, value) => {
-      if (typeof value !== "string") return;
-      const text = value.trim();
-      if (!text) return;
-      document.querySelectorAll(`[data-page-hero="${slot}"]`).forEach((el) => {
-        el.textContent = text;
+    if (document.getElementById("spa-main")) {
+      // SPA mode: apply text to each section's hero
+      document.querySelectorAll("[data-page]").forEach(function (section) {
+        var pageKey = section.getAttribute("data-page");
+        var pt = texts[pageKey];
+        if (!pt || typeof pt !== "object") return;
+        var sectionHero = section.querySelectorAll("[data-page-hero]");
+        if (!sectionHero.length) return;
+        var setHero = function (slot, value) {
+          if (typeof value !== "string") return;
+          var t = value.trim();
+          if (!t) return;
+          section.querySelectorAll('[data-page-hero="' + slot + '"]').forEach(function (el) {
+            el.textContent = t;
+          });
+        };
+        setHero("eyebrow", pt.eyebrow);
+        setHero("title", pt.title);
+        setHero("description", pt.description ?? pt.desc);
       });
-    };
-
-    setHeroText("eyebrow", pageText.eyebrow);
-    setHeroText("title", pageText.title);
-    setHeroText("description", pageText.description ?? pageText.desc);
+    } else {
+      // Legacy mode: single page
+      var page = document.body?.dataset?.page;
+      if (!page) return;
+      var pageText = texts[page];
+      if (!pageText || typeof pageText !== "object") return;
+      var setHero = function (slot, value) {
+        if (typeof value !== "string") return;
+        var t = value.trim();
+        if (!t) return;
+        document.querySelectorAll('[data-page-hero="' + slot + '"]').forEach(function (el) {
+          el.textContent = t;
+        });
+      };
+      setHero("eyebrow", pageText.eyebrow);
+      setHero("title", pageText.title);
+      setHero("description", pageText.description ?? pageText.desc);
+    }
   }
 
   function applySiteText(config) {

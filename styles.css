@@ -405,6 +405,48 @@ a {
   animation: toy-role-shake var(--toy-shake-ms, 220ms) linear infinite;
 }
 
+/* ---------- SPA ---------- */
+
+#spa-main {
+  display: block;
+}
+
+/* ---------- Page morph transition ---------- */
+
+/* ---------- Page sweep transition ---------- */
+
+.page-sweep {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  z-index: -9999;
+  pointer-events: none;
+  background: #735de0;
+}
+.page-sweep.stripes::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  background: repeating-linear-gradient(
+    90deg,
+    #735de0 0px,
+    #735de0 2px,
+    transparent 2px,
+    transparent 18px
+  );
+  animation: stripeFade 0.2s ease forwards;
+}
+@keyframes stripeFade {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @keyframes toy-role-shake {
   0% {
     transform: translate3d(
