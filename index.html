@@ -54,9 +54,71 @@
     />
 
     <div id="page-sweep" class="page-sweep"></div>
+    <canvas id="grid-trail" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none"></canvas>
 
     <script src="./js/common.js?v=2"></script>
     <script src="./js/home.js"></script>
     <script src="./js/page-transition.js"></script>
+    <script>
+      (function () {
+        var c = document.getElementById('grid-trail');
+        if (!c) return;
+        var ctx = c.getContext('2d');
+        var cellSize = 10;
+        var cols = 0, rows = 0, cells = [];
+
+        function resize() {
+          c.width = window.innerWidth;
+          c.height = window.innerHeight;
+          cols = Math.ceil(c.width / cellSize);
+          rows = Math.ceil(c.height / cellSize);
+          cells = new Array(cols * rows).fill(0);
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        function draw() {
+          ctx.clearRect(0, 0, c.width, c.height);
+          ctx.strokeStyle = 'rgba(168,85,247,0.15)';
+          ctx.lineWidth = 0.5;
+          for (var x = 0; x <= c.width; x += cellSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, c.height); ctx.stroke(); }
+          for (var y = 0; y <= c.height; y += cellSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(c.width, y); ctx.stroke(); }
+          for (var i = 0; i < cells.length; i++) {
+            if (cells[i] > 0.01) {
+              var v = cells[i];
+              var r = Math.round(v * 130 + (1 - v) * 180);
+              var g = Math.round(v * 60 + (1 - v) * 160);
+              var b = Math.round(v * 180 + (1 - v) * 50);
+              ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + Math.min(0.85, v * 0.6 + 0.25) + ')';
+              ctx.fillRect((i % cols) * cellSize, Math.floor(i / cols) * cellSize, cellSize, cellSize);
+              cells[i] *= 0.96;
+            } else cells[i] = 0;
+          }
+          requestAnimationFrame(draw);
+        }
+        draw();
+
+        var lastX = -1, lastY = -1;
+        document.addEventListener('mousemove', function (e) {
+          var speed = lastX >= 0 ? Math.sqrt(Math.pow(e.clientX - lastX, 2) + Math.pow(e.clientY - lastY, 2)) : 0;
+          lastX = e.clientX; lastY = e.clientY;
+          if (speed < 6) return;
+          var col = Math.floor(e.clientX / cellSize);
+          var row = Math.floor(e.clientY / cellSize);
+          var intensity = Math.min(1, speed / 50 + 0.3);
+          for (var dx = -2; dx <= 2; dx++) {
+            for (var dy = -2; dy <= 2; dy++) {
+              var cx2 = col + dx, ry2 = row + dy;
+              if (cx2 >= 0 && cx2 < cols && ry2 >= 0 && ry2 < rows) {
+                var dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist <= 2.2) {
+                  cells[ry2 * cols + cx2] = Math.min(1, cells[ry2 * cols + cx2] + intensity * (1 - dist / 3));
+                }
+              }
+            }
+          }
+        });
+      })();
+    </script>
   </body>
 </html>
