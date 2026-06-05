@@ -53,10 +53,97 @@
       draggable="false"
     />
 
-    <div id="page-sweep" class="page-sweep"></div>
+    <canvas id="grid-trail" style="position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none"></canvas>
 
     <script src="./js/common.js?v=2"></script>
     <script src="./js/home.js"></script>
+    <script>
+      // Grid trail effect
+      (function () {
+        var c = document.getElementById('grid-trail');
+        if (!c) return;
+        var ctx = c.getContext('2d');
+        var cellSize = 10;
+        var cols = 0, rows = 0;
+        var cells = [];
+
+        function resize() {
+          c.width = window.innerWidth;
+          c.height = window.innerHeight;
+          cols = Math.ceil(c.width / cellSize);
+          rows = Math.ceil(c.height / cellSize);
+          cells = new Array(cols * rows).fill(0);
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        function draw() {
+          var cw = cellSize, ch = cellSize;
+          ctx.clearRect(0, 0, c.width, c.height);
+
+          // Grid lines
+          ctx.strokeStyle = 'rgba(168,85,247,0.15)';
+          ctx.lineWidth = 0.5;
+          for (var x = 0; x <= c.width; x += cw) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, c.height); ctx.stroke(); }
+          for (var y = 0; y <= c.height; y += ch) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(c.width, y); ctx.stroke(); }
+
+          // Fill trail cells with color gradient
+          for (var i = 0; i < cells.length; i++) {
+            if (cells[i] > 0.01) {
+              var v = cells[i];
+              // Blue core → pink-purple edges
+              // Klein Blue core → purple tail → subtle yellow-green edge
+              var r, g, b;
+              if (v > 0.6) {
+                var t = (v - 0.6) / 0.4;
+                r = Math.round(t * 30 + (1 - t) * 140);
+                g = Math.round(t * 50 + (1 - t) * 40);
+                b = Math.round(t * 200 + (1 - t) * 180);
+              } else if (v > 0.25) {
+                var t = (v - 0.25) / 0.35;
+                r = Math.round(t * 140 + (1 - t) * 170);
+                g = Math.round(t * 40 + (1 - t) * 60);
+                b = Math.round(t * 180 + (1 - t) * 100);
+              } else {
+                var t = v / 0.25;
+                r = Math.round(t * 170 + (1 - t) * 140);
+                g = Math.round(t * 60 + (1 - t) * 130);
+                b = Math.round(t * 100 + (1 - t) * 60);
+              }
+              ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + Math.min(0.85, v * 0.6 + 0.25) + ')';
+              ctx.fillRect((i % cols) * cw, Math.floor(i / cols) * ch, cw, ch);
+              cells[i] *= 0.92;
+            } else cells[i] = 0;
+          }
+          requestAnimationFrame(draw);
+        }
+        draw();
+
+        var lastX = -1, lastY = -1;
+        document.addEventListener('mousemove', function (e) {
+          var speed = lastX >= 0 ? Math.sqrt(Math.pow(e.clientX - lastX, 2) + Math.pow(e.clientY - lastY, 2)) : 0;
+          lastX = e.clientX; lastY = e.clientY;
+          if (speed < 6) return;
+
+          var col = Math.floor(e.clientX / cellSize);
+          var row = Math.floor(e.clientY / cellSize);
+          var intensity = Math.min(1, speed / 50 + 0.3);
+
+          // Fill cells in a small radius
+          for (var dx = -2; dx <= 2; dx++) {
+            for (var dy = -2; dy <= 2; dy++) {
+              var cx2 = col + dx, ry2 = row + dy;
+              if (cx2 >= 0 && cx2 < cols && ry2 >= 0 && ry2 < rows) {
+                var dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist <= 2.2) {
+                  cells[ry2 * cols + cx2] = Math.min(1, cells[ry2 * cols + cx2] + intensity * (1 - dist / 3));
+                }
+              }
+            }
+          }
+        });
+      })();
+    </script>
     <script src="./js/page-transition.js"></script>
   </body>
 </html>

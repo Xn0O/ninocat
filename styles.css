@@ -413,39 +413,8 @@ a {
 
 /* ---------- Page morph transition ---------- */
 
-/* ---------- Page sweep transition ---------- */
-
-.page-sweep {
-  position: fixed;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  z-index: -9999;
-  pointer-events: none;
-  background: #735de0;
-}
-.page-sweep.stripes::before {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 100vw;
-  background: repeating-linear-gradient(
-    90deg,
-    #735de0 0px,
-    #735de0 2px,
-    transparent 2px,
-    transparent 18px
-  );
-  animation: stripeFade 0.2s ease forwards;
-}
-@keyframes stripeFade {
-  0% { opacity: 0; }
-  30% { opacity: 1; }
-  100% { opacity: 0; }
-}
+/* ---------- Page transition ---------- */
+/* Pixel grid is created dynamically by page-transition.js */
 
 @keyframes toy-role-shake {
   0% {
@@ -478,6 +447,7 @@ a {
   display: grid;
   gap: 0;
   width: 100%;
+  max-width: 860px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -506,7 +476,7 @@ a {
 }
 
 .home-strip + .home-strip {
-  margin-top: clamp(-62px, -4.6vw, -30px);
+  margin-top: clamp(-20px, -2vw, -8px);
 }
 
 .home-strip:hover,
