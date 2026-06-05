@@ -69,10 +69,10 @@ body[data-theme="light"] {
   --accent-ink: var(--light-accent-ink);
   --emphasis-bg: rgba(0, 0, 0, 0.08);
   --emphasis-bg-strong: rgba(0, 0, 0, 0.12);
-  --code-block-bg: #f7f2ea;
-  --code-block-border: #e6ddd0;
+  --code-block-bg: #f8f9ff;
+  --code-block-border: #e4e0f0;
   --code-block-fg: #1a1a1a;
-  --code-block-label: #9a907e;
+  --code-block-label: #9a91b8;
   --code-tok-comment: #928a7e;
   --code-tok-kw: #b5121c;
   --code-tok-str: #156b3c;
@@ -343,6 +343,8 @@ a {
   order: 1;
 }
 
+#home-logo { max-width: min(90vw, 480px); height: auto; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+
 .home-intro [data-site="eyebrow"] {
   order: 2;
   margin-top: clamp(2px, 0.7vw, 8px);
@@ -476,7 +478,7 @@ a {
 }
 
 .home-strip + .home-strip {
-  margin-top: clamp(-20px, -2vw, -8px);
+  margin-top: clamp(-80px, -8vw, -40px);
 }
 
 .home-strip:hover,
@@ -1068,7 +1070,7 @@ a {
   padding: 12px;
   background: var(--code-block-bg);
   border: 1px solid var(--code-block-border);
-  border-radius: 6px;
+  border-radius: 10px;
   overflow-wrap: normal;
   word-break: normal;
 }
@@ -1114,7 +1116,6 @@ a {
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   color: var(--code-block-label);
-  border-bottom: 1px solid var(--code-block-border);
 }
 
 .markdown-content .code-copy-btn {
@@ -1129,8 +1130,9 @@ a {
   font-size: 0.74rem;
   font-weight: 700;
   line-height: 1;
-  padding: 4px 9px;
+  padding: 5px 8px;
   cursor: pointer;
+  border-radius: 6px;
 }
 
 .markdown-content .code-copy-btn:hover {

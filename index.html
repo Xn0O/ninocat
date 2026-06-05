@@ -32,7 +32,8 @@
       <section class="home-intro block">
         <p class="eyebrow" data-site="eyebrow">黑白 / 涂鸦 / 实验</p>
         <div class="home-title-line">
-          <h1 data-site="title">Nino</h1>
+          <h1 data-site="title" style="display:none">Nino</h1>
+          <img id="home-logo" src="./assets/Home_Site/LOG_white.png" alt="Nino" draggable="false" />
         </div>
         <p data-site="subtitle">博客、游戏、美术与关于四个分区的创作站。</p>
       </section>
@@ -59,5 +60,16 @@
     <script src="./js/common.js?v=2"></script>
     <script src="./js/home.js"></script>
     <script src="./js/page-transition.js"></script>
+    <script>
+      var logo = document.getElementById('home-logo');
+      if (logo) {
+        function updateLogo() {
+          var theme = document.body.getAttribute('data-theme');
+          logo.src = './assets/Home_Site/LOG_' + (theme === 'light' ? 'white' : 'black') + '.png';
+        }
+        updateLogo();
+        new MutationObserver(updateLogo).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+      }
+    </script>
   </body>
 </html>
