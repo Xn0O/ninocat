@@ -458,7 +458,6 @@ a {
   --strip-pad: clamp(12px, 2.2vw, 22px);
   --strip-slant: 22%;
   min-height: clamp(260px, 34vw, 460px);
-  overflow: hidden;
   display: grid;
   align-items: end;
   text-decoration: none;
@@ -480,10 +479,36 @@ a {
   margin-top: clamp(-80px, -8vw, -40px);
 }
 
-.home-strip:hover,
-.home-strip:focus-visible {
+
+
+
+.strip-wrap, .card-wrap {
+  position: relative;
+  display: block;
+  transition: transform 180ms ease;
+  transform-origin: center;
+}
+.strip-wrap:hover, .card-wrap:hover {
   transform: scale(1.08);
   z-index: 3;
+}
+.strip-wrap::after, .card-wrap::after {
+  content: '';
+  position: absolute;
+  top: -5px; left: -5px;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  background: #5b3bff;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+  z-index: -1;
+}
+.strip-wrap { --strip-slant: 22%; }
+.strip-wrap::after { clip-path: polygon(0 var(--strip-slant), 100% 0, 100% calc(100% - var(--strip-slant)), 0 100%); }
+.strip-wrap:hover::after, .card-wrap:hover::after {
+  opacity: 1 !important;
 }
 
 .home-strip-bg {
@@ -669,7 +694,6 @@ a {
 
 .item-card:hover,
 .item-card:focus-within {
-  transform: scale(1.08);
   z-index: 2;
 }
 

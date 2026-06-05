@@ -193,3 +193,18 @@
           }
         });
       })();
+
+// ---- Card hover border wrapper ----
+(function () {
+  function wrapCards() {
+    document.querySelectorAll('.item-card:not(.wrapped), .ac:not(.wrapped), .game-card:not(.wrapped)').forEach(function (card) {
+      var w = document.createElement('div');
+      w.className = 'card-wrap';
+      card.parentNode.insertBefore(w, card);
+      w.appendChild(card);
+      card.classList.add('wrapped');
+    });
+  }
+  wrapCards();
+  setInterval(wrapCards, 800);
+})();

@@ -61,6 +61,23 @@
     <script src="./js/home.js"></script>
     <script src="./js/page-transition.js"></script>
     <script>
+      // Wrap each home strip for hover border
+      function wrapStrips() {
+        document.querySelectorAll('.home-strip:not(.wrapped)').forEach(function (s) {
+          var w = document.createElement('div');
+          w.className = 'strip-wrap';
+          s.parentNode.insertBefore(w, s);
+          w.appendChild(s);
+          s.classList.add('wrapped');
+        });
+      }
+      wrapStrips();
+      setInterval(wrapStrips, 500);
+      var stripList = document.getElementById('home-strip-list');
+      if (stripList) {
+        new MutationObserver(wrapStrips).observe(stripList, { childList: true, subtree: true });
+      }
+
       var logo = document.getElementById('home-logo');
       if (logo) {
         function updateLogo() {
