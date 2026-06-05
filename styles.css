@@ -2516,8 +2516,10 @@ body.lightbox-open {
     max-width: calc(100% - 84px);
     margin: 0 auto;
     justify-content: center;
-    gap: 8px;
+    gap: 2px;
+    flex-wrap: nowrap;
   }
+  .top-nav nav a { font-size: 0.78rem; padding: 4px 6px; white-space: nowrap; }
 
   .top-nav .theme-toggle {
     position: absolute;
