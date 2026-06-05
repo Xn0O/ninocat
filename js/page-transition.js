@@ -64,13 +64,11 @@
           setTimeout(function () {
             pixels[p.idx].style.background = color;
             pixels[p.idx].style.opacity = '1';
-            pixels[p.idx].style.transition = 'opacity 0.2s ease';
           }, delay);
         } else {
           setTimeout(function () {
-            pixels[p.idx].style.transition = 'opacity 0.04s ease';
             pixels[p.idx].style.opacity = '0';
-          }, baseDelay + 80 + t * expandDur * 0.6 + Math.random() * 4);
+          }, baseDelay + t * expandDur * 0.5 + 20 + Math.random() * 4);
         }
       });
     })(ri);
