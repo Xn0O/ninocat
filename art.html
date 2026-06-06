@@ -1,57 +1,372 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-    <meta name="googlebot" content="noindex, nofollow" />
-    <title>美术 - Nino</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <script>document.documentElement.dataset.theme=sessionStorage.getItem("vb_theme")==="light"?"light":"dark"</script>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body data-page="art" data-theme="dark">
-    <header class="top-nav shell">
-      <a class="brand" href="./index.html">Nino</a>
-      <nav aria-label="主导航">
-        <a data-nav="blog" href="./blog.html">博客</a>
-        <a data-nav="game" href="./game.html">游戏</a>
-        <a data-nav="art" href="./art.html">美术</a>
-        <a data-nav="about" href="./about.html">关于</a>
-        <a data-nav="lab" href="./lab.html">实验区</a>
-      </nav>
-      <button id="theme-toggle" class="btn theme-toggle" type="button">切换主题</button>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>美术 - Nino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script>document.documentElement.dataset.theme=sessionStorage.getItem("vb_theme")==="light"?"light":"dark"</script>
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    body { overflow-x: clip; background: var(--bg); }
+    :root { --line: rgba(255,255,255,0.12); }
+    :root[data-theme="light"], [data-theme="light"] { --line: rgba(0,0,0,0.12); }
+    .polaroid-wall {
+      position: relative; width: 100%; min-height: 500px;
+      padding: 30px; overflow: visible; margin: 12px auto 24px;
+      background-image:
+        repeating-linear-gradient(90deg, transparent, transparent 29px, rgba(255,255,255,0.15) 29px, rgba(255,255,255,0.15) 30px),
+        repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(255,255,255,0.15) 29px, rgba(255,255,255,0.15) 30px);
+    }
+    .polaroid {
+      position: absolute;
+      background: #f0ebe0;
+      padding: 8px 8px 35px 8px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.25), 2px 4px 12px rgba(0,0,0,0.25);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transform-origin: center;
+    }
+    .polaroid:hover {
+      transform: scale(1.08) !important;
+      box-shadow: 0 0 0 2px #5b3bff, 2px 6px 20px rgba(0,0,0,0.35);
+      z-index: 10;
+    }
+    .polaroid .polaroid-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 300px;
+      object-fit: cover;
+    }
+    .polaroid-dialog {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.7); display: none;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .polaroid-dialog.open { display: flex; }
+    .polaroid-dialog .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 24px; max-width: 500px; width: 90%; text-align: center;
+    }
+    .polaroid-dialog .card img { max-width: 100%; max-height: 50vh; object-fit: contain; margin-bottom: 12px; border-radius: 4px; }
+    .polaroid-dialog .card h2 { margin: 0 0 4px; font-size: 1.1rem; }
+    .polaroid-dialog .card .meta { color: var(--muted); font-size: 0.82rem; margin-bottom: 8px; }
+    .polaroid-dialog .card .desc { font-size: 0.9rem; line-height: 1.6; }
+    .polaroid-dialog .close-btn {
+      position: absolute; top: 16px; right: 20px;
+      background: none; border: 0; color: #fff; font-size: 1.5rem; cursor: pointer;
+    }
+    .polaroid-tip {
+      position: fixed; z-index: 9998; pointer-events: none;
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 6px; padding: 8px 12px; max-width: 220px;
+      font-size: 0.78rem; line-height: 1.5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      opacity: 0; transition: opacity 0.15s ease;
+    }
+    .polaroid-tip.show { opacity: 1; }
+    .polaroid-tip .tip-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 2px; }
+    .polaroid-tip .tip-meta { color: var(--muted); font-size: 0.72rem; }
+    .polaroid-tip .tip-desc { color: var(--muted); margin-top: 4px; font-size: 0.72rem; }
+    @media (max-width:600px) {
+      .polaroid .polaroid-img { max-height: 220px; }
+      .polaroid { padding: 5px 5px 28px 5px; }
+      .polaroid-wall { padding: 14px; }
+      .hero-image { aspect-ratio: 16/9; }
+    }
+  </style>
+</head>
+<body data-page="art" data-theme="dark">
+  <header class="top-nav shell">
+    <a class="brand" href="./index.html">Nino</a>
+    <nav aria-label="主导航">
+      <a data-nav="blog" href="./blog.html">博客</a>
+      <a data-nav="game" href="./game.html">游戏</a>
+      <a data-nav="art" href="./art.html">美术</a>
+      <a data-nav="about" href="./about.html">关于</a>
+      <a data-nav="lab" href="./lab.html">实验区</a>
+    </nav>
+    <button id="theme-toggle" class="btn theme-toggle" type="button">切换主题</button>
+  </header>
 
-    <main class="shell page-main">
-      <section class="page-hero">
-        <img data-hero-image class="hero-image" alt="美术头图" />
-        <div class="hero-copy block">
-          <p class="eyebrow" data-page-hero="eyebrow">美术</p>
-          <h1 data-page-hero="title">美术作品</h1>
-          <p data-page-hero="description">作品卡片由 `data/art.json` 管理。</p>
-        </div>
-      </section>
+  <main class="shell page-main">
+    <section class="page-hero">
+      <img data-hero-image class="hero-image" alt="美术头图" />
+      <div class="hero-copy block">
+        <p class="eyebrow" data-page-hero="eyebrow">美术</p>
+        <h1 data-page-hero="title">美术作品</h1>
+        <p data-page-hero="description">拍立得照片墙</p>
+      </div>
+    </section>
+  </main>
 
-      <section class="card-grid" id="art-grid"></section>
-    </main>
+  <div class="polaroid-wall" id="polaroid-wall"></div>
+  <div class="polaroid-nav" id="polaroid-nav" style="display:flex;justify-content:center;gap:10px;padding:12px 0">
+    <button class="btn" id="page-prev">上一页</button>
+    <span id="page-info" style="color:var(--muted);font-size:0.85rem;padding:8px 0"></span>
+    <button class="btn" id="page-next">下一页</button>
+  </div>
 
-    <footer class="site-footer shell">
-      <p data-site="footer-line1">Copyright © 2026 Nino</p>
-      <p data-site="footer-line2">All rights reserved.</p>
-    </footer>
+  <footer class="site-footer shell">
+    <p data-site="footer-line1">Copyright &copy; 2026 Nino</p>
+    <p data-site="footer-line2">All rights reserved.</p>
+  </footer>
 
-    <script src="./js/common.js?v=2"></script>
-    <script src="./js/art.js"></script>
-    <div id="page-sweep" class="page-sweep"></div>
+  <div class="polaroid-dialog" id="polaroid-dialog">
+    <button class="close-btn" id="dialog-close">&times;</button>
+    <div class="card" id="dialog-content"></div>
+  </div>
+  <div class="comic-viewer" id="comic-viewer" aria-hidden="true">
+    <button class="comic-viewer-close" id="cv-close" aria-label="关闭">×</button>
+    <button class="comic-viewer-nav prev" id="cv-prev" aria-label="上一页">‹</button>
+    <img class="comic-viewer-img" id="cv-img" alt="" />
+    <button class="comic-viewer-nav next" id="cv-next" aria-label="下一页">›</button>
+    <p class="comic-viewer-caption" id="cv-caption" hidden></p>
+  </div>
+  <div class="polaroid-tip" id="polaroid-tip"></div>
+  <div id="page-sweep" class="page-sweep"></div>
+  <div id="px-grid"></div>
+
+  <script src="./js/common.js?v=2"></script>
+  <script>
+    // --- Site config (theme, hero, footer, nav) ---
+    setTimeout(function () {
+      (async function () {
+        try {
+          var c = await (window.SiteCommon && window.SiteCommon.loadSiteConfig());
+          if (c) {
+            window.SiteCommon.applyThemeConfig(c);
+            window.SiteCommon.initTheme(c);
+            window.SiteCommon.setupThemeToggle();
+            window.SiteCommon.applyHeaderImage(c);
+            window.SiteCommon.applyPageHeroText(c);
+            window.SiteCommon.applySiteText(c);
+            window.SiteCommon.markActiveNav();
+          }
+        } catch(e) { console.warn(e); }
+      })();
+    }, 10);
+  </script>
+  <script>
+    // --- Polaroid wall ---
+    (function () {
+      var wall = document.getElementById('polaroid-wall');
+      if (!wall) { console.error('no wall'); return; }
+
+      var dialog = document.getElementById('polaroid-dialog');
+      var dialogContent = document.getElementById('dialog-content');
+      var pageInfo = document.getElementById('page-info');
+      var tip = document.getElementById('polaroid-tip');
+      var PS = 5, allItems = [], cp = 1, tipTimer = null;
+
+      if (document.getElementById('dialog-close')) {
+        document.getElementById('dialog-close').addEventListener('click', function () { dialog.classList.remove('open'); });
+      }
+      if (dialog) {
+        dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.classList.remove('open'); });
+      }
+      if (document.getElementById('page-prev')) {
+        document.getElementById('page-prev').addEventListener('click', function () { if (cp > 1) { cp--; renderWall(); } });
+      }
+      if (document.getElementById('page-next')) {
+        document.getElementById('page-next').addEventListener('click', function () { if (cp < Math.ceil(allItems.length / pageSize())) { cp++; renderWall(); } });
+      }
+
+      function pageSize() { return PS; }
+
+      function showDialog(src, title, year, tags, desc) {
+        if (!dialogContent) return;
+        dialogContent.innerHTML = (src ? '<img src="' + src + '" alt="" />' : '') + (title ? '<h2>' + title + '</h2>' : '') +
+          '<div class="meta">' + (year || '') + (tags ? ' &middot; ' + tags : '') + '</div>' + (desc ? '<div class="desc">' + desc + '</div>' : '');
+        dialog.classList.add('open');
+      }
+
+      // --- Comic viewer ---
+      var cvState = { pages: [], index: 0, title: '' };
+      var cvEl = document.getElementById('comic-viewer');
+      var cvImg = document.getElementById('cv-img');
+      var cvCaption = document.getElementById('cv-caption');
+
+      function cvRender() {
+        var total = cvState.pages.length;
+        if (!total || !cvImg) return;
+        cvImg.src = cvState.pages[cvState.index] || '';
+        cvImg.alt = cvState.title ? cvState.title + ' p.' + (cvState.index + 1) : 'p.' + (cvState.index + 1);
+        if (cvCaption) {
+          cvCaption.textContent = (cvState.title ? cvState.title + ' · ' : '') + (cvState.index + 1) + ' / ' + total;
+          cvCaption.hidden = false;
+        }
+        var p = document.getElementById('cv-prev'); if (p) p.disabled = total <= 1;
+        var n = document.getElementById('cv-next'); if (n) n.disabled = total <= 1;
+      }
+
+      function cvOpen(pages, startIndex, title) {
+        var source = Array.isArray(pages) ? pages.filter(Boolean) : [];
+        if (!source.length || !cvEl) return;
+        cvState.pages = source;
+        cvState.index = Number.isFinite(startIndex) ? Math.max(0, Math.min(source.length - 1, startIndex)) : 0;
+        cvState.title = String(title || '').trim();
+        cvRender();
+        cvEl.classList.add('open');
+        cvEl.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('lightbox-open');
+      }
+
+      function cvClose() {
+        if (!cvEl) return;
+        cvEl.classList.remove('open');
+        cvEl.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('lightbox-open');
+        if (cvImg) cvImg.removeAttribute('src');
+        if (cvCaption) { cvCaption.hidden = true; cvCaption.textContent = ''; }
+        cvState.pages = []; cvState.index = 0; cvState.title = '';
+      }
+
+      function cvStep(delta) {
+        var total = cvState.pages.length;
+        if (!total) return;
+        cvState.index = (cvState.index + delta + total) % total;
+        cvRender();
+      }
+
+      var cvCloseBtn = document.getElementById('cv-close'); if (cvCloseBtn) cvCloseBtn.addEventListener('click', cvClose);
+      var cvPrevBtn = document.getElementById('cv-prev'); if (cvPrevBtn) cvPrevBtn.addEventListener('click', function () { cvStep(-1); });
+      var cvNextBtn = document.getElementById('cv-next'); if (cvNextBtn) cvNextBtn.addEventListener('click', function () { cvStep(1); });
+      if (cvEl) {
+        cvEl.addEventListener('click', function (e) { if (e.target === cvEl) cvClose(); });
+      }
+      window.addEventListener('keydown', function (e) {
+        if (!cvEl || !cvEl.classList.contains('open')) return;
+        if (e.key === 'Escape') cvClose();
+        if (e.key === 'ArrowLeft') cvStep(-1);
+        if (e.key === 'ArrowRight') cvStep(1);
+      });
+
+      // --- Tooltip ---
+      function showTip(item, x, y) {
+        if (!tip) return;
+        tip.innerHTML = (item.title ? '<div class="tip-title">' + item.title + '</div>' : '') +
+          '<div class="tip-meta">' + (item.year || '') + (item.tags ? ' &middot; ' + item.tags : '') + '</div>' +
+          (item.description ? '<div class="tip-desc">' + item.description + '</div>' : '');
+        tip.style.left = Math.min(x + 16, window.innerWidth - 240) + 'px';
+        tip.style.top = Math.min(y + 16, window.innerHeight - 120) + 'px';
+        tip.classList.add('show');
+      }
+      function hideTip() { if (tip) tip.classList.remove('show'); }
+
+      function makePolaroid(src, x, y, rot, onClick, parent, item) {
+        parent = parent || wall;
+        var p = document.createElement('div');
+        p.className = 'polaroid';
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        p.style.transform = 'rotate(' + rot + 'deg)';
+        var img = document.createElement('img');
+        img.className = 'polaroid-img';
+        img.src = src;
+        img.draggable = false;
+        img.alt = (item && item.title) || '';
+        p.appendChild(img);
+        p.addEventListener('click', onClick);
+        if (item) {
+          p.addEventListener('mouseenter', function (e) {
+            clearTimeout(tipTimer);
+            tipTimer = setTimeout(function () { showTip(item, e.clientX, e.clientY); }, 300);
+          });
+          p.addEventListener('mousemove', function (e) {
+            if (!tip || !tip.classList.contains('show')) return;
+            tip.style.left = Math.min(e.clientX + 16, window.innerWidth - 240) + 'px';
+            tip.style.top = Math.min(e.clientY + 16, window.innerHeight - 120) + 'px';
+          });
+          p.addEventListener('mouseleave', function () {
+            clearTimeout(tipTimer);
+            hideTip();
+          });
+        }
+        parent.appendChild(p);
+        return p;
+      }
+
+      function renderWall() {
+        wall.textContent = '';
+        var ps = pageSize();
+        var start = (cp - 1) * ps;
+        var pageItems = allItems.slice(start, start + ps);
+        var rects = [];
+        var cw = window.innerWidth;
+        var mobile = cw < 600;
+        var pw = mobile ? 120 : 176;
+        var ph = mobile ? 148 : 216;
+        var areaX = mobile ? 10 : cw * 0.06;
+        var areaY = 10;
+        var areaW = mobile ? cw - 20 : cw * 0.88;
+        var areaH = mobile ? Math.min(1000, window.innerHeight * 0.75) : Math.min(500, window.innerHeight * 0.45);
+
+        function rand(mn, mx) { return mn + Math.random() * (mx - mn); }
+
+        function tryPlace(md) {
+          md = md || 8;
+          for (var a = 0; a < 150; a++) {
+            var x = areaX + rand(0, Math.max(10, areaW - pw));
+            var y = areaY + rand(0, Math.max(10, areaH - ph));
+            var ok = true;
+            for (var i = 0; i < rects.length; i++) {
+              if (x < rects[i].x + rects[i].w + md && x + pw + md > rects[i].x &&
+                  y < rects[i].y + rects[i].h + md && y + ph + md > rects[i].y) {
+                ok = false; break;
+              }
+            }
+            if (ok) return { x: x, y: y };
+          }
+          var fallbackCols = Math.max(1, Math.floor(areaW / (pw + 12)));
+          return {
+            x: areaX + (rects.length % fallbackCols) * (pw + 12),
+            y: areaY + Math.floor(rects.length / fallbackCols) * (ph + 12)
+          };
+        }
+
+        pageItems.forEach(function (item) {
+          var src = item.cover || item.image || '';
+          if (!src) return;
+          var pos = tryPlace(8);
+          rects.push({ x: pos.x, y: pos.y, w: pw, h: ph });
+          makePolaroid(src, pos.x, pos.y, (Math.random() - 0.5) * 40, function () {
+            var itemPages = Array.isArray(item.pages) ? item.pages : [];
+            if (itemPages.length > 0) {
+              cvOpen(itemPages, 0, item.title);
+            } else if (String(item.type || '').trim().toLowerCase() === 'gallery') {
+              window.location.href = './gallery.html?slug=' + encodeURIComponent(
+                (item.title || '').trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9一-鿿\-]/g, ''));
+            } else {
+              showDialog(src, item.title, item.year, item.tags, item.description);
+            }
+          }, wall, item);
+        });
+
+        var maxY = rects.reduce(function (m, r) { return Math.max(m, r.y + r.h); }, 0);
+        wall.style.height = Math.max(maxY + 80, window.innerHeight * 0.6) + 'px';
+        if (pageInfo) {
+          pageInfo.textContent = (start + 1) + '-' + Math.min(start + ps, allItems.length) + ' / ' + allItems.length;
+        }
+        var prevBtn = document.getElementById('page-prev');
+        var nextBtn = document.getElementById('page-next');
+        if (prevBtn) prevBtn.disabled = cp <= 1;
+        if (nextBtn) nextBtn.disabled = cp >= Math.ceil(allItems.length / ps);
+      }
+
+      fetch('./data/art.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (d) {
+        allItems = Array.isArray(d.arts) ? d.arts.slice().reverse() : [];
+        renderWall();
+      }).catch(function (e) { console.error('art.json fetch failed:', e); });
+    })();
+  </script>
   <script src="./js/page-transition.js"></script>
 </body>
 </html>
-
-
-
