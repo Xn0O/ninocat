@@ -139,9 +139,17 @@
                 g = Math.round(t * 230 + (1 - t) * 160);
                 b = Math.round(t * 53 + (1 - t) * 30);
               }
-              ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + Math.min(0.85, v * 0.6 + 0.25) + ')';
+              var falloff = v > 0.35 ? 1 : Math.max(0, v / 0.35);
+              var alpha = Math.min(0.9, 0.3 + falloff * 0.6);
+              ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
               ctx.fillRect((i % cols) * cellSize, Math.floor(i / cols) * cellSize, cellSize, cellSize);
-              cells[i] *= 0.96;
+              // Bright border, drops sharply when v < 0.35
+              if (v > 0.35) {
+                ctx.strokeStyle = 'rgba(' + Math.min(255, r + 120) + ',' + Math.min(255, g + 120) + ',' + Math.min(255, b + 120) + ',' + (0.5 + falloff * 0.4) + ')';
+                ctx.lineWidth = 1;
+                ctx.strokeRect((i % cols) * cellSize + 0.5, Math.floor(i / cols) * cellSize + 0.5, cellSize - 1, cellSize - 1);
+              }
+              cells[i] *= 0.93;
             } else cells[i] = 0;
           }
           requestAnimationFrame(draw);
@@ -155,7 +163,7 @@
           var ring = 0;
           var ripple = setInterval(function () {
             ring += 1;
-            var innerR = (ring - 1) * 1.5, outerR = ring * 1.5;
+            var innerR = (ring - 1) * 3, outerR = ring * 3;
             for (var dy = -Math.ceil(outerR); dy <= Math.ceil(outerR); dy++) {
               for (var dx = -Math.ceil(outerR); dx <= Math.ceil(outerR); dx++) {
                 var c2 = rc + dx, r2 = rr + dy;
@@ -168,8 +176,8 @@
                 }
               }
             }
-            if (ring > maxR2 / 1.5) clearInterval(ripple);
-          }, 30);
+            if (ring > maxR2 / 3) clearInterval(ripple);
+          }, 15);
         });
 
         var lastX = -1, lastY = -1;
