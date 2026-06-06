@@ -476,12 +476,15 @@ a {
 }
 
 .home-strip + .home-strip {
-  margin-top: clamp(-80px, -8vw, -40px);
+  margin-top: 0;
 }
 
 
 
 
+.strip-wrap + .strip-wrap {
+  margin-top: clamp(-85px, -7vw, -40px);
+}
 .strip-wrap, .card-wrap {
   position: relative;
   display: block;
