@@ -100,7 +100,7 @@
         var c = document.getElementById('grid-trail');
         if (!c) return;
         var ctx = c.getContext('2d');
-        var cellSize = 10;
+        var cellSize = 16;
         var cols = 0, rows = 0, cells = [];
 
         function resize() {
@@ -115,10 +115,28 @@
 
         function draw() {
           ctx.clearRect(0, 0, c.width, c.height);
-          ctx.strokeStyle = 'rgba(168,85,247,0.15)';
+          // Grid lines (brighter in center, fade to edges)
           ctx.lineWidth = 0.5;
-          for (var x = 0; x <= c.width; x += cellSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, c.height); ctx.stroke(); }
-          for (var y = 0; y <= c.height; y += cellSize) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(c.width, y); ctx.stroke(); }
+          var cx = c.width / 2, cy = c.height / 2;
+          var fadeRange = 2.0;
+          function gridAlpha(dist, center) { return Math.max(0, 1 - (dist / center) * fadeRange); }
+          function gridColor(a) {
+            var isDark = document.body.getAttribute('data-theme') !== 'light';
+            return isDark ? 'rgba(245,245,255,' + a + ')' : 'rgba(168,85,247,' + a + ')';
+          }
+          var visibleW = c.width / fadeRange, visibleH = c.height / fadeRange;
+          var startX = Math.max(0, Math.floor((cx - visibleW / 2) / cellSize) * cellSize);
+          var endX = Math.min(c.width, Math.ceil((cx + visibleW / 2) / cellSize) * cellSize);
+          var startY = Math.max(0, Math.floor((cy - visibleH / 2) / cellSize) * cellSize);
+          var endY = Math.min(c.height, Math.ceil((cy + visibleH / 2) / cellSize) * cellSize);
+          for (var x = startX; x <= endX; x += cellSize) {
+            ctx.strokeStyle = gridColor(gridAlpha(Math.abs(x - cx), cx) * 0.7);
+            ctx.beginPath(); ctx.moveTo(x, startY); ctx.lineTo(x, endY); ctx.stroke();
+          }
+          for (var y = startY; y <= endY; y += cellSize) {
+            ctx.strokeStyle = gridColor(gridAlpha(Math.abs(y - cy), cy) * 0.7);
+            ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
+          }
           for (var i = 0; i < cells.length; i++) {
             if (cells[i] > 0.01) {
               var v = cells[i];
@@ -134,22 +152,18 @@
                 g = Math.round(t * 85 + (1 - t) * 230);
                 b = Math.round(t * 247 + (1 - t) * 53);
               } else {
-                var t = v / 0.15;
-                r = Math.round(t * 163 + (1 - t) * 80);
-                g = Math.round(t * 230 + (1 - t) * 160);
-                b = Math.round(t * 53 + (1 - t) * 30);
+                var t = v / 0.08;
+                r = Math.round(t * 200 + (1 - t) * 100);
+                g = Math.round(t * 240 + (1 - t) * 180);
+                b = Math.round(t * 80 + (1 - t) * 40);
               }
               var falloff = v > 0.35 ? 1 : Math.max(0, v / 0.35);
               var alpha = Math.min(0.9, 0.3 + falloff * 0.6);
-              ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+              // Yellow-green at trailing edge: always 80% opacity
+              var finalAlpha = v < 0.12 ? 0.8 : alpha;
+              ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + finalAlpha + ')';
               ctx.fillRect((i % cols) * cellSize, Math.floor(i / cols) * cellSize, cellSize, cellSize);
-              // Bright border, drops sharply when v < 0.35
-              if (v > 0.35) {
-                ctx.strokeStyle = 'rgba(' + Math.min(255, r + 120) + ',' + Math.min(255, g + 120) + ',' + Math.min(255, b + 120) + ',' + (0.5 + falloff * 0.4) + ')';
-                ctx.lineWidth = 1;
-                ctx.strokeRect((i % cols) * cellSize + 0.5, Math.floor(i / cols) * cellSize + 0.5, cellSize - 1, cellSize - 1);
-              }
-              cells[i] *= 0.93;
+              cells[i] *= 0.82;
             } else cells[i] = 0;
           }
           requestAnimationFrame(draw);
