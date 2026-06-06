@@ -51,7 +51,7 @@
   },
   "eyebrow": "ninocat",
   "subtitle": "nino猫可以拖动",
-  "defaultTheme": "dark",
+  "defaultTheme": "light",
   "themes": {
     "light": {
       "bg": "#f7f7f7",

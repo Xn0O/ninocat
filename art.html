@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <script>document.documentElement.dataset.theme=sessionStorage.getItem("vb_theme")==="light"?"light":"dark"</script>
+  <script>document.documentElement.dataset.theme=sessionStorage.getItem("vb_theme")==="dark"?"dark":"light"</script>
   <link rel="stylesheet" href="./styles.css" />
   <style>
     body { overflow-x: clip; background: var(--bg); }
@@ -19,8 +19,8 @@
       position: relative; width: 100%; min-height: 500px;
       padding: 30px; overflow: visible; margin: 12px auto 24px;
       background-image:
-        repeating-linear-gradient(90deg, transparent, transparent 29px, rgba(255,255,255,0.15) 29px, rgba(255,255,255,0.15) 30px),
-        repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(255,255,255,0.15) 29px, rgba(255,255,255,0.15) 30px);
+        repeating-linear-gradient(90deg, transparent, transparent 29px, rgba(180,80,255,0.25) 29px, rgba(180,80,255,0.25) 30px),
+        repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(180,80,255,0.25) 29px, rgba(180,80,255,0.25) 30px);
     }
     .polaroid {
       position: absolute;
@@ -83,7 +83,7 @@
     }
   </style>
 </head>
-<body data-page="art" data-theme="dark">
+<body data-page="art" data-theme="light">
   <header class="top-nav shell">
     <a class="brand" href="./index.html">Nino</a>
     <nav aria-label="主导航">
