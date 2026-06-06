@@ -22,6 +22,7 @@
         repeating-linear-gradient(90deg, transparent, transparent 29px, rgba(180,80,255,0.25) 29px, rgba(180,80,255,0.25) 30px),
         repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(180,80,255,0.25) 29px, rgba(180,80,255,0.25) 30px);
     }
+    .wall-sticker { position: absolute; pointer-events: none; z-index: -1; }
     .polaroid {
       position: absolute;
       background: #f0ebe0;
@@ -291,8 +292,76 @@
           });
         }
         parent.appendChild(p);
+        makeDraggable(p);
         return p;
       }
+
+      // --- Drag ---
+      var dragState = null;
+      var dragWasMoved = false;
+
+      function makeDraggable(p) {
+        p.addEventListener('mousedown', function (e) {
+          if (e.button !== 0) return;
+          dragWasMoved = false;
+          e.preventDefault();
+          var rect = p.getBoundingClientRect();
+          dragState = {
+            el: p,
+            offsetX: e.clientX - rect.left,
+            offsetY: e.clientY - rect.top,
+            moved: false,
+          };
+          p.style.zIndex = 20;
+          p.style.boxShadow = '0 0 0 2px #5b3bff, 4px 12px 32px rgba(0,0,0,0.4)';
+          if (tip) hideTip();
+        });
+
+        p.addEventListener('touchstart', function (e) {
+          var t = e.touches[0];
+          if (!t) return;
+          var rect = p.getBoundingClientRect();
+          dragState = {
+            el: p,
+            offsetX: t.clientX - rect.left,
+            offsetY: t.clientY - rect.top,
+            moved: false,
+          };
+          p.style.zIndex = 20;
+          if (tip) hideTip();
+        }, { passive: true });
+      }
+
+      document.addEventListener('mousemove', function (e) {
+        if (!dragState) return;
+        dragWasMoved = true;
+        dragState.el.style.left = (e.clientX - dragState.offsetX) + 'px';
+        dragState.el.style.top = (e.clientY - dragState.offsetY) + 'px';
+      });
+
+      document.addEventListener('touchmove', function (e) {
+        if (!dragState) return;
+        dragWasMoved = true;
+        var t = e.touches[0];
+        if (!t) return;
+        dragState.el.style.left = (t.clientX - dragState.offsetX) + 'px';
+        dragState.el.style.top = (t.clientY - dragState.offsetY) + 'px';
+      }, { passive: true });
+
+      document.addEventListener('mouseup', function () {
+        if (!dragState) return;
+        dragState.el.style.zIndex = '';
+        dragState.el.style.boxShadow = '';
+        dragState = null;
+        setTimeout(function () { dragWasMoved = false; }, 10);
+      });
+
+      document.addEventListener('touchend', function () {
+        if (!dragState) return;
+        dragState.el.style.zIndex = '';
+        dragState = null;
+        setTimeout(function () { dragWasMoved = false; }, 10);
+      });
 
       function renderWall() {
         wall.textContent = '';
@@ -338,6 +407,7 @@
           var pos = tryPlace(8);
           rects.push({ x: pos.x, y: pos.y, w: pw, h: ph });
           makePolaroid(src, pos.x, pos.y, (Math.random() - 0.5) * 40, function () {
+            if (dragWasMoved) return;
             var itemPages = Array.isArray(item.pages) ? item.pages : [];
             if (itemPages.length > 0) {
               cvOpen(itemPages, 0, item.title);
@@ -352,6 +422,28 @@
 
         var maxY = rects.reduce(function (m, r) { return Math.max(m, r.y + r.h); }, 0);
         wall.style.height = Math.max(maxY + 80, window.innerHeight * 0.6) + 'px';
+
+        // Stickers - ✦ stars at corners
+        var corners = [
+          { l: '3%', t: '3%', rot: '-12deg' },
+          { l: '3%', t: '88%', rot: '8deg' },
+          { r: '3%', t: '3%', rot: '15deg' },
+          { r: '3%', t: '88%', rot: '-6deg' },
+          { l: '46%', t: '46%', rot: '20deg', s: '5rem' },
+        ];
+        corners.forEach(function (c) {
+          var el = document.createElement('div');
+          el.className = 'wall-sticker';
+          el.textContent = '✦';
+          el.style.fontSize = c.s || (4 + Math.random() * 3) + 'rem';
+          el.style.color = '#7017ff';
+          if (c.l) el.style.left = c.l;
+          if (c.r) el.style.right = c.r;
+          if (c.t) el.style.top = c.t;
+          if (c.b) el.style.bottom = c.b;
+          el.style.transform = 'rotate(' + (c.rot || '0deg') + ')';
+          wall.appendChild(el);
+        });
         if (pageInfo) {
           pageInfo.textContent = (start + 1) + '-' + Math.min(start + ps, allItems.length) + ' / ' + allItems.length;
         }
