@@ -79,10 +79,10 @@ body[data-theme="light"] {
   --accent-ink: var(--light-accent-ink);
   --emphasis-bg: rgba(0, 0, 0, 0.08);
   --emphasis-bg-strong: rgba(0, 0, 0, 0.12);
-  --code-block-bg: #f7f2ea;
-  --code-block-border: #e6ddd0;
+  --code-block-bg: #f8f9ff;
+  --code-block-border: #e4e0f0;
   --code-block-fg: #1a1a1a;
-  --code-block-label: #9a907e;
+  --code-block-label: #9a91b8;
   --code-tok-comment: #928a7e;
   --code-tok-kw: #b5121c;
   --code-tok-str: #156b3c;
@@ -353,6 +353,8 @@ a {
   order: 1;
 }
 
+#home-logo { max-width: min(90vw, 480px); height: auto; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+
 .home-intro [data-site="eyebrow"] {
   order: 2;
   margin-top: clamp(2px, 0.7vw, 8px);
@@ -415,6 +417,17 @@ a {
   animation: toy-role-shake var(--toy-shake-ms, 220ms) linear infinite;
 }
 
+/* ---------- SPA ---------- */
+
+#spa-main {
+  display: block;
+}
+
+/* ---------- Page morph transition ---------- */
+
+/* ---------- Page transition ---------- */
+/* Pixel grid is created dynamically by page-transition.js */
+
 @keyframes toy-role-shake {
   0% {
     transform: translate3d(
@@ -455,7 +468,6 @@ a {
   --strip-pad: clamp(12px, 2.2vw, 22px);
   --strip-slant: 22%;
   min-height: clamp(260px, 34vw, 460px);
-  overflow: hidden;
   display: grid;
   align-items: end;
   text-decoration: none;
@@ -474,13 +486,42 @@ a {
 }
 
 .home-strip + .home-strip {
-  margin-top: clamp(-62px, -4.6vw, -30px);
+  margin-top: 0;
 }
 
-.home-strip:hover,
-.home-strip:focus-visible {
+
+
+
+.strip-wrap + .strip-wrap {
+  margin-top: clamp(-85px, -7vw, -40px);
+}
+.strip-wrap, .card-wrap {
+  position: relative;
+  display: block;
+  transition: transform 180ms ease;
+  transform-origin: center;
+}
+.strip-wrap:hover, .card-wrap:hover {
   transform: scale(1.08);
   z-index: 3;
+}
+.strip-wrap::after, .card-wrap::after {
+  content: '';
+  position: absolute;
+  top: -5px; left: -5px;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  background: #5b3bff;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+  z-index: -1;
+}
+.strip-wrap { --strip-slant: 22%; }
+.strip-wrap::after { clip-path: polygon(0 var(--strip-slant), 100% 0, 100% calc(100% - var(--strip-slant)), 0 100%); }
+.strip-wrap:hover::after, .card-wrap:hover::after {
+  opacity: 1 !important;
 }
 
 .home-strip-bg {
@@ -666,7 +707,6 @@ a {
 
 .item-card:hover,
 .item-card:focus-within {
-  transform: scale(1.08);
   z-index: 2;
 }
 
@@ -1066,7 +1106,7 @@ a {
   padding: 12px;
   background: var(--code-block-bg);
   border: 1px solid var(--code-block-border);
-  border-radius: 6px;
+  border-radius: 10px;
   overflow-wrap: normal;
   word-break: normal;
 }
@@ -1112,7 +1152,6 @@ a {
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   color: var(--code-block-label);
-  border-bottom: 1px solid var(--code-block-border);
 }
 
 .markdown-content .code-copy-btn {
@@ -1127,8 +1166,9 @@ a {
   font-size: 0.74rem;
   font-weight: 700;
   line-height: 1;
-  padding: 4px 9px;
+  padding: 5px 8px;
   cursor: pointer;
+  border-radius: 6px;
 }
 
 .markdown-content .code-copy-btn:hover {
@@ -2513,8 +2553,10 @@ body.lightbox-open {
     max-width: calc(100% - 84px);
     margin: 0 auto;
     justify-content: center;
-    gap: 8px;
+    gap: 2px;
+    flex-wrap: nowrap;
   }
+  .top-nav nav a { font-size: 0.78rem; padding: 4px 6px; white-space: nowrap; }
 
   .top-nav .theme-toggle {
     position: absolute;
@@ -2955,6 +2997,38 @@ body.lightbox-open {
     padding: 14px 16px;
   }
 }
+.page-sweep {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  z-index: -9999;
+  pointer-events: none;
+  background: #735de0;
+}
+.page-sweep.stripes::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  background: repeating-linear-gradient(
+    90deg,
+    #735de0 0px,
+    #735de0 2px,
+    transparent 2px,
+    transparent 18px
+  );
+  animation: stripeFade 0.2s ease forwards;
+}
+@keyframes stripeFade {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 
 </style>
     <style>

@@ -2,3 +2,5 @@
 /tools/publish.config.local.json
 /tools/secrets/
 *.local.json
+assets/.DS_Store
+.DS_Store
