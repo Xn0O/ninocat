@@ -317,6 +317,7 @@
         p.addEventListener('touchstart', function (e) {
           var t = e.touches[0];
           if (!t) return;
+          e.preventDefault();
           var rect = p.getBoundingClientRect();
           dragState = {
             el: p,
@@ -326,7 +327,7 @@
           };
           p.style.zIndex = 20;
           if (tip) hideTip();
-        }, { passive: true });
+        }, { passive: false });
       }
 
       document.addEventListener('mousemove', function (e) {
@@ -338,12 +339,13 @@
 
       document.addEventListener('touchmove', function (e) {
         if (!dragState) return;
+        e.preventDefault();
         dragWasMoved = true;
         var t = e.touches[0];
         if (!t) return;
         dragState.el.style.left = (t.clientX - dragState.offsetX) + 'px';
         dragState.el.style.top = (t.clientY - dragState.offsetY) + 'px';
-      }, { passive: true });
+      }, { passive: false });
 
       document.addEventListener('mouseup', function () {
         if (!dragState) return;
