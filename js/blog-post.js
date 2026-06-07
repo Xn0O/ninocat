@@ -360,6 +360,7 @@ async function renderEncryptedBody(mi, encRef) {
       renderMath(contentNode);
       buildPostToc();
       setupImageLightbox(document.querySelector("main") || document);
+      renderTiffImages();
       // Append char count after successful decryption
       const chars = markdown.replace(/\s+/g, "");
       if (chars.length) {
@@ -446,6 +447,7 @@ async function init() {
       renderMath(contentNode);
       buildPostToc();
       setupImageLightbox(document.querySelector("main") || document);
+      renderTiffImages();
     }
 
     document.title = `${meta.title || slug} - 博客`;
@@ -455,6 +457,50 @@ async function init() {
     contentNode.replaceChildren();
     contentNode.appendChild(createEmptyTip("请检查 posts.json、Markdown 或加密文件路径。"));
   }
+}
+
+// --- TIFF image rendering ---
+function renderTiffImages() {
+  document.querySelectorAll('.markdown-content img[src*=".tif"], .markdown-content img[src*=".tiff"]').forEach(function (img) {
+    var src = img.src || '';
+    if (!src) return;
+    var loader = document.createElement('span');
+    loader.textContent = '⏳ TIFF 加载中...';
+    loader.style.cssText = 'display:block;padding:12px;text-align:center;color:#888;';
+    img.parentNode.insertBefore(loader, img);
+    img.style.display = 'none';
+
+    fetch(src).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.arrayBuffer();
+    }).then(function (buf) {
+      // Load tiff.js if needed
+      if (typeof Tiff === 'undefined') {
+        return new Promise(function (resolve, reject) {
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/tiff.js@1.0.0/tiff.min.js';
+          s.onload = function () { resolve(buf); };
+          s.onerror = function () { reject(new Error('tiff.js 加载失败')); };
+          document.head.appendChild(s);
+        });
+      }
+      return buf;
+    }).then(function (buf) {
+      try {
+        var tiff = new Tiff({ buffer: buf });
+        var canvas = tiff.toCanvas();
+        img.src = canvas.toDataURL('image/png');
+        img.style.display = '';
+        if (loader.parentNode) loader.parentNode.removeChild(loader);
+        tiff.close();
+      } catch (e) {
+        loader.textContent = '❌ TIFF 渲染失败';
+        console.error(e);
+      }
+    }).catch(function (e) {
+      loader.textContent = '❌ TIFF 加载失败: ' + e.message;
+    });
+  });
 }
 
 init();
