@@ -317,7 +317,6 @@
         p.addEventListener('touchstart', function (e) {
           var t = e.touches[0];
           if (!t) return;
-          e.preventDefault();
           var rect = p.getBoundingClientRect();
           dragState = {
             el: p,
@@ -327,7 +326,7 @@
           };
           p.style.zIndex = 20;
           if (tip) hideTip();
-        }, { passive: false });
+        }, { passive: true });
       }
 
       document.addEventListener('mousemove', function (e) {
