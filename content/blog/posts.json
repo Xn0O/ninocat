@@ -1,6 +1,10 @@
 {
   "posts": [
     {
+      "slug": "G101_2",
+      "file": "./content/blog/G101_2.md"
+    },
+    {
       "slug": "G101_1",
       "file": "./content/blog/G101_1.md"
     },
