@@ -616,16 +616,16 @@ a {
   border-radius: 8px;
 }
 
-/* Blog page: overlay hero text on image like cards */
-body[data-page="blog"] .page-hero {
+/* Blog page: overlay hero text on image */
+body[data-page="blog"]:not(:has(.back-link)) .page-hero {
   position: relative;
   display: block;
 }
-body[data-page="blog"] .page-hero .hero-image {
+body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-image {
   aspect-ratio: 21 / 7;
   border-radius: 8px;
 }
-body[data-page="blog"] .page-hero .hero-copy {
+body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy {
   position: absolute;
   bottom: 16px; left: 16px; right: 16px;
   display: flex;
@@ -635,9 +635,9 @@ body[data-page="blog"] .page-hero .hero-copy {
   background: none;
   padding: 0;
 }
-body[data-page="blog"] .page-hero .hero-copy .eyebrow,
-body[data-page="blog"] .page-hero .hero-copy h1,
-body[data-page="blog"] .page-hero .hero-copy p {
+body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy .eyebrow,
+body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy h1,
+body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy p {
   display: inline;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
@@ -647,11 +647,11 @@ body[data-page="blog"] .page-hero .hero-copy p {
   color: #fff;
   margin: 0;
 }
-body[data-page="blog"] .page-hero .hero-copy h1 {
+body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy h1 {
   font-size: clamp(1.5rem, 4vw, 2.2rem);
   line-height: 1.2;
 }
-body[data-page="blog"] .page-hero .hero-copy p {
+body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy p {
   color: #fff;
   font-size: 0.9rem;
 }
@@ -2505,7 +2505,24 @@ body.lightbox-open {
   gap: 3px;
   pointer-events: none;
   max-width: calc(100% - 24px);
-  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .blog-list .item-card.has-cover .item-overlay {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px 6px;
+    bottom: 8px; left: 8px; right: 8px;
+    max-width: calc(100% - 16px);
+  }
+  .blog-list .item-card.has-cover .item-overlay .item-desc {
+    display: none;
+  }
+  .blog-list .item-card.has-cover .item-overlay .item-meta,
+  .blog-list .item-card.has-cover .item-overlay .item-title {
+    font-size: 0.8rem;
+    padding: 1px 4px;
+  }
 }
 .blog-list .item-card.has-cover .item-overlay .item-meta,
 .blog-list .item-card.has-cover .item-overlay .item-title,
@@ -2518,6 +2535,8 @@ body.lightbox-open {
   background: rgba(0,0,0,0.55);
   color: #fff;
   width: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .blog-list .item-card.has-cover .item-overlay .item-meta { font-size: 0.78rem; margin: 0; }
 .blog-list .item-card.has-cover .item-overlay .item-title { font-size: 1.15rem; margin: 0; font-weight: 600; }
