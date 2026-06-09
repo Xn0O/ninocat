@@ -203,9 +203,28 @@ function renderCard(post) {
 
   body.append(meta, title, desc, tags);
   if (cover) {
+    card.classList.add("has-cover");
+    const overlay = document.createElement("div");
+    overlay.className = "item-overlay";
+    overlay.append(meta, title, desc, tags);
     card.appendChild(cover);
+    card.appendChild(overlay);
+    // Auto-detect image brightness and set text color
+    cover.addEventListener("load", function () {
+      try {
+        var c = document.createElement("canvas");
+        c.width = 1; c.height = 1;
+        var ctx = c.getContext("2d");
+        ctx.drawImage(cover, 0, 0, 1, 1);
+        var d = ctx.getImageData(0, 0, 1, 1).data;
+        var brightness = (d[0] * 299 + d[1] * 587 + d[2] * 114) / 1000;
+        overlay.classList.toggle("light", brightness > 160);
+      } catch(e) {}
+    });
+    if (cover.complete) cover.dispatchEvent(new Event("load"));
+  } else {
+    card.appendChild(body);
   }
-  card.appendChild(body);
   return card;
 }
 
@@ -330,7 +349,19 @@ function renderCurrentPage() {
 
   const start = (state.page - 1) * PAGE_SIZE;
   const visible = state.posts.slice(start, start + PAGE_SIZE);
-  visible.forEach((post) => grid.appendChild(renderCard(post)));
+  visible.forEach((post) => {
+    const wrap = document.createElement("div");
+    wrap.className = "blog-card-wrap";
+    var card = renderCard(post);
+    var dot = document.createElement("div");
+    dot.className = "blog-timeline-dot";
+    card.appendChild(dot);
+    wrap.appendChild(card);
+    const divider = document.createElement("div");
+    divider.className = "index-post-divider";
+    wrap.appendChild(divider);
+    grid.appendChild(wrap);
+  });
   renderPagination();
 }
 
