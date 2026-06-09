@@ -2578,10 +2578,6 @@ body.lightbox-open {
 .blog-list .item-card.has-cover .item-overlay .item-tags {
   margin-top: 2px;
 }
-.blog-list .item-card.has-cover .item-overlay .item-tags .blog-tag-chip {
-  color: rgba(255,255,255,0.7);
-  background: rgba(255,255,255,0.12);
-}
 
 .blog-pagination {
   width: min(960px, 100%);

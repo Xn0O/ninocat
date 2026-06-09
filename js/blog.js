@@ -149,6 +149,7 @@ function renderCard(post) {
     cover.src = resolveAssetUrl(post.cover || DEFAULT_COVER);
     cover.draggable = false;
     cover.setAttribute("draggable", "false");
+    cover.crossOrigin = "anonymous";
   }
 
   const body = document.createElement("div");
