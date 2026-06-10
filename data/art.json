@@ -64,6 +64,13 @@
         "./assets/Blog/Gw1/04.png",
         "./assets/Blog/Gw1/05.png"
       ]
+    },
+    {
+      "title": "go",
+      "year": "2026",
+      "tags": "摸鱼",
+      "description": "！",
+      "image": "./assets/Art/6.jpg"
     }
   ]
 }
