@@ -27,6 +27,14 @@
     {
       "slug": "P1",
       "file": "./content/blog/P1.md"
+    },
+    {
+      "slug": "G101_3",
+      "file": "./content/blog/G101_3.md"
+    },
+    {
+      "slug": "G101_4",
+      "file": "./content/blog/G101_4.md"
     }
   ]
 }

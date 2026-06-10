@@ -198,5 +198,5 @@
     "roleYPercent": 0,
     "shakeMs": 240
   },
-  "commentEnabled": true
+  "commentEnabled": false
 }

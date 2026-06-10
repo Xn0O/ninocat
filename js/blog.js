@@ -284,7 +284,12 @@ async function loadPosts() {
       return null;
     })
     .filter(Boolean);
-  visible.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  visible.sort((a, b) => {
+    const dateCmp = String(b.date).localeCompare(String(a.date));
+    if (dateCmp !== 0) return dateCmp;
+    // 同一天时按 slug 倒序（G101_4 排在 G101_3 前面）
+    return String(b.slug).localeCompare(String(a.slug));
+  });
   return visible;
 }
 
