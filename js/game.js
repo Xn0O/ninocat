@@ -16,17 +16,9 @@ const gameGrid = document.getElementById("game-grid");
 const filterRoot = document.getElementById("game-filter");
 const randomBtn = document.getElementById("random-play");
 
-const player = document.getElementById("game-player");
-const playerTitle = document.getElementById("player-title");
-const playerClose = document.getElementById("player-close");
-const frame = document.getElementById("game-frame");
-const embedHint = document.getElementById("embed-hint");
-const embedOpenLink = document.getElementById("embed-open-link");
-
 const state = {
   games: [],
   filter: "全部",
-  hintTimer: null,
 };
 
 function isAbsoluteUrl(url) {
@@ -60,55 +52,21 @@ function normalizeGame(raw, index) {
 }
 
 function clearHintTimer() {
-  if (state.hintTimer) {
-    clearTimeout(state.hintTimer);
-    state.hintTimer = null;
-  }
+  /* 预留 */
 }
 
 function setEmbedHint(visible, message, fallbackUrl) {
-  if (!embedHint || !embedOpenLink) return;
-  embedHint.hidden = !visible;
-  embedOpenLink.hidden = !visible;
-  if (visible) {
-    embedHint.textContent = message;
-    embedOpenLink.href = fallbackUrl || "#";
-  }
+  /* 预留 */
 }
 
 function closePlayer() {
-  clearHintTimer();
-  if (player) player.hidden = true;
-  document.body.classList.remove("game-player-open");
-  frame.src = "about:blank";
-  setEmbedHint(false, "", "");
+  /* 预留 */
 }
 
 function openInSite(game) {
-  if (!game.playUrl) {
-    if (game.openUrl) {
-      window.location.href = game.openUrl;
-    }
-    return;
-  }
-
-  if (game.launchMode === "newtab") {
-    window.location.href = game.openUrl;
-    return;
-  }
-
-  playerTitle.textContent = `${game.title} · 本站游玩`;
-  frame.src = game.playUrl;
-  if (player) player.hidden = false;
-  document.body.classList.add("game-player-open");
-  setEmbedHint(false, "", "");
-
-  // 远程站点可能通过 X-Frame-Options/CSP 阻止 iframe 嵌入。
-  if (game.launchMode === "auto") {
-    clearHintTimer();
-    state.hintTimer = setTimeout(() => {
-      setEmbedHint(true, "该页面可能阻止跨站 iframe 嵌入，请改为打开完整页面。", game.openUrl);
-    }, 2600);
+  const url = game.openUrl || game.playUrl;
+  if (url) {
+    window.open(url, "_blank");
   }
 }
 
@@ -175,16 +133,6 @@ function cardForGame(game) {
   const actions = document.createElement("div");
   actions.className = "item-actions";
 
-  const previewBtn = document.createElement("button");
-  previewBtn.type = "button";
-  previewBtn.className = "btn";
-  previewBtn.textContent = game.launchMode === "newtab" || !game.playUrl ? "打开网页" : "本站游玩";
-  if (game.playUrl || game.openUrl) {
-    previewBtn.addEventListener("click", () => openInSite(game));
-  } else {
-    previewBtn.disabled = true;
-  }
-
   const openPage = document.createElement("a");
   openPage.className = "btn";
   openPage.textContent = "打开完整页面";
@@ -197,7 +145,7 @@ function cardForGame(game) {
     openPage.setAttribute("aria-disabled", "true");
   }
 
-  actions.append(previewBtn, openPage);
+  actions.append(openPage);
   body.append(meta, title, desc, tags, actions);
   card.append(media, body);
   return card;

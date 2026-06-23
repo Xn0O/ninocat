@@ -267,9 +267,13 @@ a {
   cursor: pointer;
 }
 
-.btn:disabled {
-  opacity: 0.4;
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.35;
+  background: var(--border, #30363d) !important;
+  color: var(--muted, #8b949e) !important;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .theme-toggle {
@@ -1884,7 +1888,7 @@ body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy p {
 
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   position: relative;
   z-index: 1;

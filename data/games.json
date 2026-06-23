@@ -10,21 +10,60 @@
       "coverHover": "./assets/GamePic/Aio_1.png",
       "embedUrl": "./games/aio_Web/index.html",
       "launchMode": "auto",
-      "tags": "Unity|本地",
+      "tags": "Unity|本地|萌芽gamejam",
       "order": 1
+    },
+    {
+      "id": "ghost-web",
+      "title": "GhostWish",
+      "description": "帮幽灵完成心愿",
+      "status": "可玩",
+      "category": "平台跳跃",
+      "cover": "./assets/GamePic/Ghost_0.png",
+      "coverHover": "./assets/GamePic/Ghost_1.png",
+      "embedUrl": "https://nnoi.itch.io/ghostwish",
+      "launchMode": "auto",
+      "tags": "Unity|itch.io|LudumDare58",
+      "order": 2
+    },
+    {
+      "id": "hya-web",
+      "title": "Hyaee",
+      "description": "神秘游戏",
+      "status": "不可玩",
+      "category": "文字冒险",
+      "cover": "./assets/GamePic/hya_0.jpg",
+      "coverHover": "./assets/GamePic/hya_1.jpg",
+      "embedUrl": "",
+      "launchMode": "auto",
+      "tags": "Unity",
+      "order": 3
+    },
+    {
+      "id": "ttt-web",
+      "title": "TTT",
+      "description": "木头人想要变成人类",
+      "status": "不可玩",
+      "category": "文字冒险",
+      "cover": "./assets/GamePic/TTT_0.jpg",
+      "coverHover": "./assets/GamePic/TTT_1.jpg",
+      "embedUrl": "",
+      "launchMode": "auto",
+      "tags": "Unity",
+      "order": 4
     },
     {
       "id": "thecat-web",
       "title": "地狱猫",
       "description": "废弃的游戏",
       "status": "可玩",
-      "category": "文字",
+      "category": "文字冒险",
       "cover": "./assets/GamePic/thecat_0.jpg",
       "coverHover": "./assets/GamePic/thecat_1.jpg",
       "embedUrl": "./games/Thecat_Web/index.html",
       "launchMode": "auto",
       "tags": "Unity|本地",
-      "order": 2
+      "order": 10
     }
   ]
 }
