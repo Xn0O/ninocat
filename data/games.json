@@ -11,6 +11,7 @@
       "embedUrl": "./games/aio_Web/index.html",
       "launchMode": "auto",
       "tags": "Unity|本地|萌芽gamejam",
+      "devType": "solo",
       "order": 1
     },
     {
@@ -24,6 +25,7 @@
       "embedUrl": "https://nnoi.itch.io/ghostwish",
       "launchMode": "auto",
       "tags": "Unity|itch.io|LudumDare58",
+      "devType": "solo",
       "order": 2
     },
     {
@@ -37,6 +39,7 @@
       "embedUrl": "",
       "launchMode": "auto",
       "tags": "Unity",
+      "devType": "solo",
       "order": 3
     },
     {
@@ -50,6 +53,7 @@
       "embedUrl": "",
       "launchMode": "auto",
       "tags": "Unity",
+      "devType": "solo",
       "order": 4
     },
     {
@@ -63,7 +67,36 @@
       "embedUrl": "./games/Thecat_Web/index.html",
       "launchMode": "auto",
       "tags": "Unity|本地",
+      "devType": "solo",
       "order": 10
+    },
+    {
+      "id": "ttt-web",
+      "title": "TTT",
+      "description": "",
+      "status": "不可玩",
+      "category": "文字冒险",
+      "cover": "./assets/GamePic/",
+      "coverHover": "./assets/GamePic/",
+      "embedUrl": "",
+      "launchMode": "auto",
+      "tags": "Unity",
+      "devType": "collab",
+      "order": 5
+    },
+    {
+      "id": "ttt-web",
+      "title": "TTT",
+      "description": "",
+      "status": "不可玩",
+      "category": "文字冒险",
+      "cover": "./assets/GamePic/",
+      "coverHover": "./assets/GamePic/",
+      "embedUrl": "",
+      "launchMode": "auto",
+      "tags": "Unity",
+      "devType": "collab",
+      "order": 6
     }
   ]
 }

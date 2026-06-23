@@ -41,6 +41,7 @@ function normalizeGame(raw, index) {
     status: raw.status || "原型",
     category: raw.category || "未分类",
     tags: tagsFromText(raw.tags),
+    devType: raw.devType || "solo",
     cover: raw.cover || "./assets/hero-game.svg",
     coverHover: raw.coverHover || raw.cover || "./assets/hero-game.svg",
     playUrl,
@@ -182,7 +183,20 @@ function renderGames() {
     return;
   }
 
-  visible.forEach((game) => gameGrid.appendChild(cardForGame(game)));
+  const solo = visible.filter((g) => g.devType !== "collab");
+  const collab = visible.filter((g) => g.devType === "collab");
+
+  function addSection(title, games) {
+    if (!games.length) return;
+    const header = document.createElement("div");
+    header.className = "game-section-header";
+    header.textContent = title;
+    gameGrid.appendChild(header);
+    games.forEach((game) => gameGrid.appendChild(cardForGame(game)));
+  }
+
+  addSection("独立开发", solo);
+  addSection("合作开发", collab);
 }
 
 function bindPlayer() {

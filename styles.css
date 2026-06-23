@@ -1894,6 +1894,16 @@ body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy p {
   z-index: 1;
 }
 
+.game-section-header {
+  grid-column: 1 / -1;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--muted, #8b949e);
+  padding: 20px 0 4px 0;
+  border-bottom: 1px solid var(--border, #30363d);
+  margin-bottom: 4px;
+}
+
 .game-card {
   background: var(--surface);
   display: grid;
