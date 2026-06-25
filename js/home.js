@@ -41,14 +41,6 @@ const DEFAULT_STRIPS = [
     image: "./assets/hero-about.svg",
     speed: 0.1,
   },
-  {
-    key: "lab",
-    href: "./lab.html",
-    title: "实验区",
-    desc: "互动小玩意",
-    image: "./assets/hero-home.svg",
-    speed: 0.12,
-  },
 ];
 
 function detectStripMedia(rawSrc, forcedKind = "") {

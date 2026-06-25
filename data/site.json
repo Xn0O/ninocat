@@ -173,16 +173,6 @@
       "image": "./assets/Home_Site/B_3.jpg",
       "hoverVideo": "./assets/Home_Site/B_3.mp4",
       "speed": 0.3
-    },
-    {
-      "key": "lab",
-      "href": "./lab.html",
-      "title": "实验区",
-      "desc": "互动小玩意",
-      "fit": "cover",
-      "image": "./assets/Home_Site/backgr.jpg",
-      "hoverVideo": "./assets/Home_Site/B_4.mp4",
-      "speed": 0.45
     }
   ],
   "homeToy": {

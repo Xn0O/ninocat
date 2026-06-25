@@ -14,8 +14,6 @@
 const GAMES_PATH = "./data/games.json";
 const gameGrid = document.getElementById("game-grid");
 const filterRoot = document.getElementById("game-filter");
-const randomBtn = document.getElementById("random-play");
-
 const state = {
   games: [],
   filter: "全部",
@@ -208,15 +206,6 @@ function bindPlayer() {
   });
 }
 
-function bindRandom() {
-  randomBtn.addEventListener("click", () => {
-    const list = state.games.filter((g) => g.playUrl || g.openUrl);
-    if (!list.length) return;
-    const pick = list[Math.floor(Math.random() * list.length)];
-    openInSite(pick);
-  });
-}
-
 async function loadGames() {
   const res = await fetch(GAMES_PATH, { cache: "no-store" });
   if (!res.ok) throw new Error("无法加载 data/games.json");
@@ -248,7 +237,6 @@ async function init() {
   }
 
   bindPlayer();
-  bindRandom();
 }
 
 init();
