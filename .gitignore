@@ -4,3 +4,4 @@
 *.local.json
 assets/.DS_Store
 .DS_Store
+.nino-preview.html
