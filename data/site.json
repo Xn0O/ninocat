@@ -1,0 +1,192 @@
+{
+  "title": "Nino",
+  "brandIcon": "./assets/Home_Site/ninocatlogo.png",
+  "brand": {
+    "icon": "./assets/Home_Site/ninocatlogo.png",
+    "textSize": "1.1rem",
+    "logoSize": "22px",
+    "gap": "8px"
+  },
+  "navItems": [
+    {
+      "key": "blog",
+      "label": "博客",
+      "href": "./blog.html"
+    },
+    {
+      "key": "game",
+      "label": "游戏",
+      "href": "./game.html"
+    },
+    {
+      "key": "art",
+      "label": "美术",
+      "href": "./art.html"
+    },
+    {
+      "key": "about",
+      "label": "关于",
+      "href": "./about.html"
+    },
+    {
+      "key": "lab",
+      "label": "实验区",
+      "href": "./lab.html"
+    }
+  ],
+  "navGlassQuick": {
+    "color": "#ffffff",
+    "opacity": 0.1,
+    "blur": "16px",
+    "saturate": "100%"
+  },
+  "navPillActiveInk": "#1900ff",
+  "labPainter": {
+    "windowWidth": "360px"
+  },
+  "assetCdn": {
+    "enabled": true,
+    "base": "https://cdn.osyb.cn/gh/xn0o/ninocat",
+    "useOnLocal": false
+  },
+  "eyebrow": "ninocat",
+  "subtitle": "nino猫可以拖动",
+  "defaultTheme": "light",
+  "themes": {
+    "light": {
+      "bg": "#f7f7f7",
+      "surface": "#ffffff",
+      "surfaceAlt": "#e8e8e8",
+      "text": "#0f0f0f",
+      "muted": "#303030",
+      "accent": "#101010"
+    },
+    "dark": {
+      "bg": "#090909",
+      "surface": "#141414",
+      "surfaceAlt": "#262626",
+      "text": "#f2f2f2",
+      "muted": "#bcbcbc",
+      "accent": "#f2f2f2"
+    }
+  },
+  "selection": {
+    "light": {
+      "bg": "rgba(100, 0, 255, 1)",
+      "text": "#ffffff"
+    },
+    "dark": {
+      "bg": "rgba(255, 255, 255, 1)",
+      "text": "#000000"
+    }
+  },
+  "homeStripText": {
+    "light": {
+      "title": "#f5f8ff",
+      "desc": "#e7ecff",
+      "index": "#f5f8ff"
+    },
+    "dark": {
+      "title": "#f5f8ff",
+      "desc": "#e7ecff",
+      "index": "#f5f8ff"
+    }
+  },
+  "footer": {
+    "line1": "Copyright © 2026 Nino",
+    "line2": "(✿◡‿◡)"
+  },
+  "headerImages": {
+    "default": "./assets/hero-home.svg",
+    "home": "./assets/hero-home.svg",
+    "blog": "./assets/Home_Site/B_0.jpg",
+    "game": "./assets/Home_Site/B_1.jpg",
+    "art": "./assets/Home_Site/B_2_1.jpg",
+    "about": "./assets/Home_Site/B_3.jpg",
+    "nnspace": "./assets/hero-home.svg"
+  },
+  "pageHeroTexts": {
+    "blog": {
+      "eyebrow": "blog",
+      "title": "博客文章",
+      "description": "梦游产物"
+    },
+    "game": {
+      "eyebrow": "game",
+      "title": "游戏卡片",
+      "description": "钝意开发中"
+    },
+    "art": {
+      "eyebrow": "art",
+      "title": "美术",
+      "description": "存放处"
+    },
+    "about": {
+      "eyebrow": "ninocat",
+      "title": "关于",
+      "description": "我是nino"
+    },
+    "nnspace": {
+      "eyebrow": "nnspace",
+      "title": "动态",
+      "description": "今天发生了什么？"
+    }
+  },
+  "homeStrips": [
+    {
+      "key": "blog",
+      "href": "./blog.html",
+      "title": "博客",
+      "desc": "梦游产物",
+      "fit": "cover",
+      "image": "./assets/Home_Site/B_0.jpg",
+      "hoverImage": "",
+      "hoverVideo": "./assets/Home_Site/B_0.mp4",
+      "speed": 0.8
+    },
+    {
+      "key": "game",
+      "href": "./game.html",
+      "title": "游戏",
+      "desc": "钝意开发中",
+      "fit": "cover",
+      "image": "./assets/Home_Site/B_1.jpg",
+      "hoverVideo": "./assets/Home_Site/B_1.mp4",
+      "speed": 0.7
+    },
+    {
+      "key": "art",
+      "href": "./art.html",
+      "title": "美术",
+      "desc": "存放处",
+      "fit": "cover",
+      "image": "./assets/Home_Site/B_2.jpg",
+      "hoverVideo": "./assets/Home_Site/B_2.mp4",
+      "speed": 0.5
+    },
+    {
+      "key": "about",
+      "href": "./about.html",
+      "title": "关于",
+      "desc": "关于",
+      "fit": "cover",
+      "image": "./assets/Home_Site/B_3.jpg",
+      "hoverVideo": "./assets/Home_Site/B_3.mp4",
+      "speed": 0.3
+    }
+  ],
+  "homeToy": {
+    "stand": "./assets/Home_Toy/M_0.png",
+    "transition": "./assets/Home_Toy/M_1.png",
+    "raise": "./assets/Home_Toy/M_2.png",
+    "bgA": "./assets/Home_Toy/BG_0.jpg",
+    "bgB": "./assets/Home_Toy/BG_0.jpg",
+    "frameMs": 90,
+    "roleScale": 1.5,
+    "titleGap": "0px",
+    "roleXPercent": 0,
+    "roleYPercent": 0,
+    "shakeMs": 240
+  },
+  "commentEnabled": false
+}

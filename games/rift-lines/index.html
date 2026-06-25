@@ -1,0 +1,177 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>裂隙连线 演示</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+        color: #25185f;
+        background: linear-gradient(155deg, #ffffff, #ede7ff);
+      }
+      .shell {
+        width: min(920px, calc(100% - 24px));
+        margin: 20px auto;
+        display: grid;
+        gap: 10px;
+      }
+      .panel {
+        border: 1px solid rgba(95, 73, 255, 0.24);
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.88);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+      button,
+      a {
+        border: 1px solid rgba(95, 73, 255, 0.32);
+        background: #ffffff;
+        color: #533ee0;
+        border-radius: 999px;
+        padding: 8px 12px;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      canvas {
+        width: 100%;
+        height: auto;
+        border: 1px solid rgba(95, 73, 255, 0.24);
+        border-radius: 14px;
+        background: linear-gradient(180deg, #ffffff, #f1ebff);
+        touch-action: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="panel">
+        <strong>裂隙连线</strong>
+        <span id="status">按数字顺序点击节点：1→2→3→...→8</span>
+        <div class="actions">
+          <button id="reset" type="button">重置</button>
+          <a href="../../index.html">返回首页</a>
+        </div>
+      </div>
+      <canvas id="board" width="880" height="520"></canvas>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("board");
+      const ctx = canvas.getContext("2d");
+      const statusNode = document.getElementById("status");
+      const resetBtn = document.getElementById("reset");
+
+      const points = [
+        { x: 120, y: 120 },
+        { x: 300, y: 90 },
+        { x: 520, y: 150 },
+        { x: 740, y: 110 },
+        { x: 680, y: 310 },
+        { x: 460, y: 390 },
+        { x: 260, y: 350 },
+        { x: 130, y: 270 },
+      ];
+
+      let path = [];
+      let solved = false;
+
+      function reset() {
+        path = [];
+        solved = false;
+        statusNode.textContent = "按数字顺序点击节点：1→2→3→...→8";
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#fbfaff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (path.length > 1) {
+          ctx.strokeStyle = "#5f49ff";
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          const first = points[path[0]];
+          ctx.moveTo(first.x, first.y);
+          for (let i = 1; i < path.length; i += 1) {
+            const p = points[path[i]];
+            ctx.lineTo(p.x, p.y);
+          }
+          ctx.stroke();
+        }
+
+        points.forEach((p, index) => {
+          const visited = path.includes(index);
+          ctx.fillStyle = visited ? "#5f49ff" : "#ffffff";
+          ctx.strokeStyle = "#5f49ff";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 24, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = visited ? "#ffffff" : "#4638a3";
+          ctx.font = "700 18px sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(String(index + 1), p.x, p.y + 1);
+        });
+
+        if (solved) {
+          ctx.fillStyle = "rgba(29, 18, 69, 0.82)";
+          ctx.font = "700 38px sans-serif";
+          ctx.fillText("连线成功", 440, 470);
+        }
+      }
+
+      function hitPoint(x, y) {
+        for (let i = 0; i < points.length; i += 1) {
+          const p = points[i];
+          const d = Math.hypot(x - p.x, y - p.y);
+          if (d <= 24) return i;
+        }
+        return -1;
+      }
+
+      canvas.addEventListener("pointerdown", (event) => {
+        if (solved) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * canvas.width;
+        const y = ((event.clientY - rect.top) / rect.height) * canvas.height;
+        const index = hitPoint(x, y);
+        if (index < 0) return;
+
+        const expected = path.length;
+        if (index === expected) {
+          path.push(index);
+          if (path.length === points.length) {
+            solved = true;
+            statusNode.textContent = "完成了，闭环连线成功。";
+          } else {
+            statusNode.textContent = `已连接 ${path.length} / ${points.length}`;
+          }
+        } else {
+          path = [];
+          statusNode.textContent = "顺序错误，已重置，请从 1 开始。";
+        }
+      });
+
+      resetBtn.addEventListener("click", reset);
+
+      function loop() {
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      loop();
+    </script>
+  </body>
+</html>

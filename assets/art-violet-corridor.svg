@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a124d" />
+      <stop offset="100%" stop-color="#0d0a2b" />
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)" />
+  <g stroke="#8c74ff" stroke-opacity="0.45" fill="none">
+    <path d="M230 80 L640 80 L1040 80 L920 620 L640 620 L360 620 Z" stroke-width="6" />
+    <path d="M340 130 L640 130 L940 130 L850 560 L640 560 L430 560 Z" stroke-width="4" />
+    <path d="M430 190 L640 190 L850 190 L780 500 L640 500 L500 500 Z" stroke-width="3" />
+  </g>
+  <text x="88" y="650" fill="#c7bcff" font-size="58" font-family="Arial, sans-serif">VIOLET CORRIDOR</text>
+</svg>

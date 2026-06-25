@@ -1,0 +1,9 @@
+{
+  "privateRepo": "E:/Blog_VB/ninocat_private",
+  "privateSourceDir": "content/blog",
+  "publicBlogDir": "content/blog",
+  "publicEncryptedDir": "content/blog_encrypted",
+  "postsIndexFile": "content/blog/posts.json",
+  "secretsFile": "tools/secrets/mi-passwords.local.json",
+  "defaultIterations": 310000
+}

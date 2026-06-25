@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="a" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="60%" stop-color="#e9e3ff" />
+      <stop offset="100%" stop-color="#cdc2ff" />
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#a)" />
+  <rect x="140" y="500" width="1000" height="24" rx="12" fill="#5f49ff" opacity="0.5" />
+  <circle cx="250" cy="450" r="42" fill="#5f49ff" />
+  <circle cx="450" cy="380" r="20" fill="#7a66ff" />
+  <circle cx="710" cy="320" r="18" fill="#7a66ff" />
+  <circle cx="930" cy="270" r="16" fill="#7a66ff" />
+  <text x="140" y="170" fill="#2b1f6c" font-size="88" font-family="Arial, sans-serif" font-weight="700">NEBULA DASH</text>
+  <text x="145" y="230" fill="#5f49ff" font-size="34" font-family="Arial, sans-serif">Playable Browser Demo</text>
+</svg>

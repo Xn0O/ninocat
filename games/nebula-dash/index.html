@@ -1,0 +1,189 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>星云冲刺 演示</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+        color: #25185f;
+        background: linear-gradient(150deg, #ffffff, #ede7ff);
+      }
+      .shell {
+        width: min(940px, calc(100% - 24px));
+        margin: 18px auto;
+        display: grid;
+        gap: 10px;
+      }
+      .hud {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(95, 73, 255, 0.26);
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.86);
+      }
+      canvas {
+        width: 100%;
+        height: auto;
+        border: 1px solid rgba(95, 73, 255, 0.26);
+        border-radius: 14px;
+        background: linear-gradient(180deg, #ffffff 0%, #ece5ff 100%);
+        touch-action: none;
+      }
+      button,
+      a {
+        border: 1px solid rgba(95, 73, 255, 0.32);
+        background: #ffffff;
+        color: #533ee0;
+        border-radius: 999px;
+        padding: 8px 12px;
+        text-decoration: none;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="hud">
+        <strong>星云冲刺</strong>
+        <span>分数：<b id="score">0</b></span>
+        <span>按空格或点击进行跳跃</span>
+        <a href="../../index.html">返回首页</a>
+      </div>
+      <canvas id="game" width="900" height="360"></canvas>
+      <button id="restart" type="button">重新开始</button>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+      const scoreNode = document.getElementById("score");
+      const restartBtn = document.getElementById("restart");
+
+      const state = {
+        running: true,
+        score: 0,
+        speed: 4,
+        gravity: 0.45,
+        jumpPower: 9.2,
+        hero: { x: 110, y: 280, w: 34, h: 34, vy: 0, onGround: true },
+        obstacles: [],
+        tick: 0,
+      };
+
+      function reset() {
+        state.running = true;
+        state.score = 0;
+        state.speed = 4;
+        state.hero.y = 280;
+        state.hero.vy = 0;
+        state.hero.onGround = true;
+        state.obstacles = [];
+        state.tick = 0;
+        scoreNode.textContent = "0";
+      }
+
+      function jump() {
+        if (!state.running) return;
+        if (!state.hero.onGround) return;
+        state.hero.vy = -state.jumpPower;
+        state.hero.onGround = false;
+      }
+
+      function spawnObstacle() {
+        const h = 28 + Math.random() * 40;
+        state.obstacles.push({
+          x: canvas.width + 20,
+          y: 314 - h,
+          w: 20 + Math.random() * 22,
+          h,
+          passed: false,
+        });
+      }
+
+      function intersects(a, b) {
+        return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
+      }
+
+      function update() {
+        if (!state.running) return;
+
+        state.tick += 1;
+        if (state.tick % 85 === 0) {
+          spawnObstacle();
+          if (state.speed < 8) state.speed += 0.08;
+        }
+
+        state.hero.vy += state.gravity;
+        state.hero.y += state.hero.vy;
+
+        if (state.hero.y >= 280) {
+          state.hero.y = 280;
+          state.hero.vy = 0;
+          state.hero.onGround = true;
+        }
+
+        state.obstacles.forEach((obs) => {
+          obs.x -= state.speed;
+          if (!obs.passed && obs.x + obs.w < state.hero.x) {
+            obs.passed = true;
+            state.score += 1;
+            scoreNode.textContent = String(state.score);
+          }
+          if (intersects(state.hero, obs)) {
+            state.running = false;
+          }
+        });
+
+        state.obstacles = state.obstacles.filter((obs) => obs.x + obs.w > -20);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#f7f4ff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#d9d1ff";
+        ctx.fillRect(0, 314, canvas.width, 46);
+
+        ctx.fillStyle = "#5b45f6";
+        ctx.fillRect(state.hero.x, state.hero.y, state.hero.w, state.hero.h);
+
+        ctx.fillStyle = "#7a66ff";
+        state.obstacles.forEach((obs) => {
+          ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+        });
+
+        if (!state.running) {
+          ctx.fillStyle = "rgba(29, 18, 69, 0.82)";
+          ctx.font = "700 42px sans-serif";
+          ctx.fillText("游戏结束", 330, 160);
+          ctx.font = "500 22px sans-serif";
+          ctx.fillText("点击重新开始，再冲一次", 300, 206);
+        }
+      }
+
+      function loop() {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener("keydown", (event) => {
+        if (event.code === "Space") {
+          event.preventDefault();
+          jump();
+        }
+      });
+      canvas.addEventListener("pointerdown", jump);
+      restartBtn.addEventListener("click", reset);
+
+      loop();
+    </script>
+  </body>
+</html>

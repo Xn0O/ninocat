@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="r1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10152e" />
+      <stop offset="100%" stop-color="#2e275d" />
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#r1)" />
+  <g stroke="#b2a3ff" stroke-width="7" fill="none" opacity="0.75">
+    <path d="M120 560 L340 360 L520 450 L730 250 L940 380 L1140 210" />
+    <path d="M160 640 L390 470 L560 580 L760 430 L980 540 L1160 380" />
+  </g>
+  <g fill="#c6baff">
+    <circle cx="340" cy="360" r="18" />
+    <circle cx="730" cy="250" r="18" />
+    <circle cx="940" cy="380" r="18" />
+  </g>
+  <text x="120" y="138" fill="#f2eeff" font-size="78" font-family="Arial, sans-serif" font-weight="700">RIFT LINES</text>
+  <text x="124" y="195" fill="#cfc6ff" font-size="30" font-family="Arial, sans-serif">Hover Preview / Puzzle State</text>
+</svg>

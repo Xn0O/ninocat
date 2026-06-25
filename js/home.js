@@ -1,0 +1,451 @@
+﻿const {
+  loadSiteConfig,
+  applyThemeConfig,
+  initTheme,
+  setupThemeToggle,
+  applySiteText,
+  markActiveNav,
+  resolveAssetUrl,
+} = window.SiteCommon;
+
+const DEFAULT_STRIPS = [
+  {
+    key: "blog",
+    href: "./blog.html",
+    title: "博客",
+    desc: "梦游产物",
+    image: "./assets/backgr.jpg",
+    speed: 0.12,
+  },
+  {
+    key: "game",
+    href: "./game.html",
+    title: "游戏",
+    desc: "钝意开发中！",
+    image: "./assets/hero-game.svg",
+    speed: 0.16,
+  },
+  {
+    key: "art",
+    href: "./art.html",
+    title: "美术",
+    desc: "存放处",
+    image: "./assets/hero-art.svg",
+    speed: 0.14,
+  },
+  {
+    key: "about",
+    href: "./about.html",
+    title: "关于",
+    desc: "nino",
+    image: "./assets/hero-about.svg",
+    speed: 0.1,
+  },
+];
+
+function detectStripMedia(rawSrc, forcedKind = "") {
+  const src = String(rawSrc || "").trim();
+  if (!src) return { kind: "image", src: "" };
+  if (forcedKind === "video") return { kind: "video", src };
+  if (forcedKind === "image") return { kind: "image", src };
+  const clean = src.split("#")[0].split("?")[0].toLowerCase();
+  if (/\.(mp4|webm|ogg|m4v|mov)$/i.test(clean)) {
+    return { kind: "video", src };
+  }
+  return { kind: "image", src };
+}
+
+function createStripMediaLayer(media, fit, position, layerClass) {
+  if (!media || !media.src) return null;
+  const resolvedMediaSrc = resolveAssetUrl(media.src);
+
+  if (media.kind === "video") {
+    const video = document.createElement("video");
+    video.className = `home-strip-media home-strip-media-video ${layerClass}`;
+    video.src = resolvedMediaSrc;
+    video.autoplay = true;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+    video.setAttribute("aria-hidden", "true");
+    video.setAttribute("disablepictureinpicture", "true");
+    video.style.objectFit = fit;
+    video.style.objectPosition = position;
+    const tryPlay = () => {
+      const task = video.play();
+      if (task && typeof task.catch === "function") {
+        task.catch(() => {});
+      }
+    };
+    video.addEventListener("loadeddata", tryPlay, { once: true });
+    tryPlay();
+    return video;
+  }
+
+  const image = document.createElement("div");
+  image.className = `home-strip-media ${layerClass}`;
+  image.style.backgroundImage = `url("${resolvedMediaSrc}")`;
+  image.style.backgroundSize = fit;
+  image.style.backgroundPosition = position;
+  image.style.backgroundRepeat = "no-repeat";
+  return image;
+}
+
+function normalizeStrips(config) {
+  const incoming = Array.isArray(config?.homeStrips) ? config.homeStrips : [];
+  const source = incoming.length ? incoming : DEFAULT_STRIPS;
+
+  return source.map((item, index) => {
+    const fallback = DEFAULT_STRIPS[index] || {
+      key: `section-${index + 1}`,
+      href: "#",
+      title: "未命名分区",
+      desc: "",
+      image: "./assets/hero-home.svg",
+      speed: 0.12,
+    };
+    const parsedSpeed = Number(item?.speed);
+    const speed = Number.isFinite(parsedSpeed) ? parsedSpeed : fallback.speed;
+    const explicitVideo = typeof item?.video === "string" ? item.video.trim() : "";
+    const rawMediaSrc = explicitVideo || item?.image || fallback.image;
+    const media = explicitVideo
+      ? detectStripMedia(rawMediaSrc, "video")
+      : detectStripMedia(rawMediaSrc);
+
+    const explicitHoverVideo = typeof item?.hoverVideo === "string" ? item.hoverVideo.trim() : "";
+    const explicitHoverImage = typeof item?.hoverImage === "string" ? item.hoverImage.trim() : "";
+    const rawHoverSrc = explicitHoverVideo || explicitHoverImage;
+    const hoverMedia = explicitHoverVideo
+      ? detectStripMedia(rawHoverSrc, "video")
+      : detectStripMedia(rawHoverSrc);
+
+    return {
+      key: item?.key || fallback.key,
+      href: item?.href || fallback.href,
+      title: item?.title || fallback.title,
+      desc: item?.desc || fallback.desc,
+      image: media.src || fallback.image,
+      mediaKind: media.kind,
+      hoverImage: hoverMedia.src,
+      hoverMediaKind: hoverMedia.kind,
+      hasHoverMedia: Boolean(hoverMedia.src),
+      speed: Math.max(0, Math.min(1, speed)),
+      fit: item?.fit === "contain" ? "contain" : "cover",
+      position: typeof item?.position === "string" && item.position.trim() ? item.position.trim() : "center",
+    };
+  });
+}
+
+function renderStrips(strips) {
+  const list = document.getElementById("home-strip-list");
+  if (!list) return [];
+
+  list.replaceChildren();
+
+  const nodes = strips.map((item, index) => {
+    const card = document.createElement("a");
+    card.className = "home-strip";
+    card.href = item.href;
+    card.draggable = false;
+    card.setAttribute("draggable", "false");
+    card.addEventListener("dragstart", (event) => event.preventDefault());
+
+    const bg = document.createElement("div");
+    bg.className = "home-strip-bg";
+    const baseLayer = createStripMediaLayer(
+      { kind: item.mediaKind, src: item.image },
+      item.fit,
+      item.position,
+      "home-strip-media-base"
+    );
+    if (baseLayer) bg.appendChild(baseLayer);
+    if (item.hasHoverMedia) {
+      const hoverLayer = createStripMediaLayer(
+        { kind: item.hoverMediaKind, src: item.hoverImage },
+        item.fit,
+        item.position,
+        "home-strip-media-hover"
+      );
+      if (hoverLayer) {
+        bg.appendChild(hoverLayer);
+        card.classList.add("has-hover-media");
+      }
+    }
+    bg.dataset.speed = String(item.speed);
+    bg.style.setProperty("--strip-fit", item.fit);
+    bg.style.setProperty("--strip-position", item.position);
+
+    const shade = document.createElement("div");
+    shade.className = "home-strip-shade";
+
+    const content = document.createElement("div");
+    content.className = "home-strip-content";
+
+    const no = document.createElement("span");
+    no.className = "home-strip-no";
+    no.textContent = `0${index + 1}`;
+
+    const title = document.createElement("h2");
+    title.textContent = item.title;
+
+    const desc = document.createElement("p");
+    desc.textContent = item.desc;
+
+    content.append(no, title, desc);
+    card.append(bg, shade, content);
+    list.appendChild(card);
+
+    return { card, bg };
+  });
+
+  return nodes;
+}
+
+function setupScrollParallax(pairs) {
+  if (!pairs.length) return;
+  const STRIP_BG_SCALE = 1.2;
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const motionFactor = prefersReducedMotion ? 0.75 : 1;
+
+  const update = () => {
+    const viewportHeight = window.innerHeight;
+
+    pairs.forEach(({ card, bg }) => {
+      const rect = card.getBoundingClientRect();
+      const speed = Math.max(0, Math.min(1, Number(bg.dataset.speed || 0.12)));
+      // progress: 0 = card just below viewport, 1 = card just above viewport
+      const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
+      const centered = (progress - 0.5) * 2;
+      // Card-based parallax: intentionally stronger so motion is clearly visible.
+      const maxShift = Math.min(180, rect.height * 0.85) * motionFactor;
+      const moveY = centered * speed * maxShift;
+      bg.style.transform = `translate3d(0, ${moveY}px, 0) scale(${STRIP_BG_SCALE})`;
+    });
+  };
+
+  let ticking = false;
+  const schedule = () => {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(() => {
+      update();
+      ticking = false;
+    });
+  };
+
+  update();
+  window.addEventListener("scroll", schedule, { passive: true });
+  window.addEventListener("resize", schedule);
+}
+
+function setupHomeTitleRole(config) {
+  const role = document.getElementById("home-title-role");
+  if (!role) return;
+  const roleHit =
+    role.parentElement && role.parentElement.classList.contains("home-title-role-hit")
+      ? role.parentElement
+      : (() => {
+          const hit = document.createElement("span");
+          hit.className = "home-title-role-hit";
+          hit.setAttribute("role", "button");
+          hit.setAttribute("aria-label", role.alt || "主页小人互动");
+          hit.tabIndex = 0;
+          role.parentNode?.insertBefore(hit, role);
+          hit.appendChild(role);
+          return hit;
+        })();
+
+  const toy = config?.homeToy || {};
+  const stand = toy.stand || "./assets/toy-stand.svg";
+  const transition = toy.transition || stand;
+  const raise = toy.raise || transition;
+  const frameMs = Math.max(80, Number(toy.frameMs) || 180);
+  const shakeMs = Math.max(80, Number(toy.shakeMs) || 220);
+  const roleScale = Number(toy.roleScale);
+  const resolvedRoleScale = Number.isFinite(roleScale) && roleScale > 0 ? roleScale : 1;
+  const roleXPercent = Number(toy.roleXPercent);
+  const roleYPercent = Number(toy.roleYPercent);
+  const resolvedRoleX = Number.isFinite(roleXPercent) ? roleXPercent : 0;
+  const resolvedRoleY = Number.isFinite(roleYPercent) ? roleYPercent : 0;
+
+  role.src = resolveAssetUrl(stand);
+  role.style.setProperty("--toy-shake-ms", `${shakeMs}ms`);
+  role.style.setProperty("--home-role-scale", String(resolvedRoleScale));
+  role.style.setProperty("--home-role-offset-x", `${resolvedRoleX}%`);
+  role.style.setProperty("--home-role-offset-y", `${resolvedRoleY}%`);
+
+  role.draggable = false;
+  role.setAttribute("draggable", "false");
+
+  /* ── drag state ── */
+  let holding = false;
+  let isDragging = false;
+  let pressTimer = 0;
+  let releaseTimer = 0;
+  let capturedPointerId = null;
+  let dragStartLeft = 12;
+  let dragStartBottom = 12;
+  let dragStartPointerX = 0;
+  let dragStartPointerY = 0;
+
+  const getPos = () => {
+    const L = parseFloat(roleHit.style.getPropertyValue("--home-toy-left")) || 12;
+    const B = parseFloat(roleHit.style.getPropertyValue("--home-toy-bottom")) || 12;
+    return { left: L, bottom: B };
+  };
+
+  const savePos = (L, B) => {
+    try {
+      localStorage.setItem("home_pet_left", String(L));
+      localStorage.setItem("home_pet_bottom", String(B));
+    } catch (_) {}
+  };
+
+  const clampPos = () => {
+    const L = parseFloat(roleHit.style.getPropertyValue("--home-toy-left")) || 12;
+    const B = parseFloat(roleHit.style.getPropertyValue("--home-toy-bottom")) || 12;
+    const w = roleHit.offsetWidth || 120;
+    const h = roleHit.offsetHeight || 120;
+    const maxL = Math.max(0, window.innerWidth - w - 12);
+    const maxB = Math.max(0, window.innerHeight - h - 12);
+    const clampedL = Math.min(L, maxL);
+    const clampedB = Math.min(B, maxB);
+    if (clampedL !== L) roleHit.style.setProperty("--home-toy-left", `${clampedL}px`);
+    if (clampedB !== B) roleHit.style.setProperty("--home-toy-bottom", `${clampedB}px`);
+  };
+
+  /* restore saved position */
+  (function restoreSavedPos() {
+    try {
+      const L = localStorage.getItem("home_pet_left");
+      const B = localStorage.getItem("home_pet_bottom");
+      if (L !== null) roleHit.style.setProperty("--home-toy-left", `${L}px`);
+      if (B !== null) roleHit.style.setProperty("--home-toy-bottom", `${B}px`);
+    } catch (_) {}
+  })();
+  /* clamp after first paint so offsetWidth is available */
+  window.requestAnimationFrame(() => window.requestAnimationFrame(clampPos));
+
+  const clearTimers = () => {
+    if (pressTimer) {
+      window.clearTimeout(pressTimer);
+      pressTimer = 0;
+    }
+    if (releaseTimer) {
+      window.clearTimeout(releaseTimer);
+      releaseTimer = 0;
+    }
+  };
+
+  const setState = (state) => {
+    if (state === "raise") {
+      role.src = raise;
+      role.classList.add("raised");
+      return;
+    }
+    role.classList.remove("raised");
+    role.src = resolveAssetUrl(state === "transition" ? transition : stand);
+  };
+
+  const startHold = (event) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    event.preventDefault();
+
+    const pos = getPos();
+    dragStartLeft = pos.left;
+    dragStartBottom = pos.bottom;
+    dragStartPointerX = event.clientX;
+    dragStartPointerY = event.clientY;
+    isDragging = false;
+
+    holding = true;
+    clearTimers();
+    setState("transition");
+
+    if (event.pointerId !== undefined && roleHit.setPointerCapture) {
+      try {
+        roleHit.setPointerCapture(event.pointerId);
+        capturedPointerId = event.pointerId;
+      } catch (_) {
+        capturedPointerId = null;
+      }
+    }
+
+    pressTimer = window.setTimeout(() => {
+      if (holding) {
+        setState("raise");
+      }
+    }, frameMs);
+  };
+
+  const onPointerMove = (event) => {
+    if (!holding) return;
+    isDragging = true;
+    const dx = event.clientX - dragStartPointerX;
+    const dy = event.clientY - dragStartPointerY;
+    const newLeft = Math.max(0, dragStartLeft + dx);
+    const newBottom = Math.max(0, dragStartBottom - dy);
+    roleHit.style.setProperty("--home-toy-left", `${newLeft}px`);
+    roleHit.style.setProperty("--home-toy-bottom", `${newBottom}px`);
+  };
+
+  const endHold = () => {
+    if (!holding) return;
+    holding = false;
+    clearTimers();
+
+    if (isDragging) {
+      const pos = getPos();
+      savePos(pos.left, pos.bottom);
+    }
+
+    setState("transition");
+    releaseTimer = window.setTimeout(() => {
+      if (!holding) {
+        setState("stand");
+      }
+    }, frameMs);
+
+    if (capturedPointerId !== null && roleHit.releasePointerCapture) {
+      try {
+        roleHit.releasePointerCapture(capturedPointerId);
+      } catch (_) {}
+    }
+    capturedPointerId = null;
+  };
+
+  roleHit.addEventListener("pointerdown", startHold);
+  roleHit.addEventListener("pointermove", onPointerMove);
+  roleHit.addEventListener("pointerup", endHold);
+  roleHit.addEventListener("pointercancel", endHold);
+  roleHit.addEventListener("lostpointercapture", endHold);
+  window.addEventListener("pointerup", endHold);
+  window.addEventListener("resize", clampPos);
+  roleHit.addEventListener("dragstart", (event) => event.preventDefault());
+  roleHit.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  });
+}
+
+async function init() {
+  const config = await loadSiteConfig();
+  applyThemeConfig(config);
+  initTheme(config);
+  setupThemeToggle();
+  applySiteText(config);
+  markActiveNav();
+
+  const strips = normalizeStrips(config);
+  const pairs = renderStrips(strips);
+  setupScrollParallax(pairs);
+  setupHomeTitleRole(config);
+
+  if (config.title) {
+    document.title = config.title;
+  }
+}
+
+init();
