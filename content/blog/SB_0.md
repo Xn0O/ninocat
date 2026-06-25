@@ -3,7 +3,7 @@ title: 一些游戏设定草稿
 date: 2026-06-25
 summary: 大概是2年前的设定
 tags: Blog,GameDev
-cover: ./assets/Blog/SB_0/SB_000.jpg
+cover: ./assets/Blog/SB_0/SB_000.JPG
 hidden: 0
 hide_cover: 0
 ---
