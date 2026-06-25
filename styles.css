@@ -1965,6 +1965,18 @@ body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy p {
   gap: 8px;
 }
 
+.game-body-overlay {
+  display: grid;
+  gap: 4px;
+}
+
+/* 桌面端隐藏封面上的 overlay（meta+title 在 body 里显示） */
+@media (min-width: 601px) {
+  .game-body-overlay {
+    display: none;
+  }
+}
+
 .game-meta {
   margin: 0;
   color: var(--muted);
@@ -2536,6 +2548,51 @@ body.lightbox-open {
   .blog-list .item-card.has-cover .item-overlay .item-title {
     font-size: 0.8rem;
     padding: 1px 4px;
+  }
+
+  /* 游戏卡片：手机端meta+标题叠在封面上，其余在封面下方 */
+  .game-card {
+    grid-template-rows: auto;
+  }
+  .game-body-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 24px 10px 10px;
+    gap: 2px;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  }
+  .game-body-overlay .game-meta,
+  .game-body-overlay .game-title {
+    color: #fff;
+  }
+  .game-body-overlay .game-meta {
+    font-size: 0.7rem;
+  }
+  .game-body-overlay .game-title {
+    font-size: 0.95rem;
+  }
+  .game-body {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  .game-meta-desktop,
+  .game-title-desktop {
+    display: none;
+  }
+  .game-desc {
+    font-size: 0.8rem;
+  }
+  .game-tags span {
+    font-size: 0.7rem;
+    padding: 1px 6px;
+  }
+  .item-actions .btn {
+    font-size: 0.75rem;
+    padding: 6px 10px;
   }
 }
 .blog-list .item-card.has-cover .item-overlay .item-meta,

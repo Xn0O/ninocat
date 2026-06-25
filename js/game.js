@@ -104,10 +104,8 @@ function cardForGame(game) {
   coverHover.draggable = false;
   coverHover.setAttribute("draggable", "false");
 
-  media.append(coverPrimary, coverHover);
-
-  const body = document.createElement("div");
-  body.className = "game-body";
+  const bodyOverlay = document.createElement("div");
+  bodyOverlay.className = "game-body-overlay";
 
   const meta = document.createElement("p");
   meta.className = "game-meta";
@@ -116,6 +114,9 @@ function cardForGame(game) {
   const title = document.createElement("h3");
   title.className = "game-title";
   title.textContent = game.title;
+
+  bodyOverlay.append(meta, title);
+  media.append(coverPrimary, coverHover, bodyOverlay);
 
   const desc = document.createElement("p");
   desc.className = "game-desc";
@@ -128,6 +129,17 @@ function cardForGame(game) {
     chip.textContent = tag;
     tags.appendChild(chip);
   });
+
+  const body = document.createElement("div");
+  body.className = "game-body";
+
+  // 桌面端 meta+title（手机端隐藏）
+  const bodyMeta = document.createElement("p");
+  bodyMeta.className = "game-meta game-meta-desktop";
+  bodyMeta.textContent = `${game.status} · ${game.category}${game.external ? " · 外部链接" : ""}`;
+  const bodyTitle = document.createElement("h3");
+  bodyTitle.className = "game-title game-title-desktop";
+  bodyTitle.textContent = game.title;
 
   const actions = document.createElement("div");
   actions.className = "item-actions";
@@ -145,7 +157,7 @@ function cardForGame(game) {
   }
 
   actions.append(openPage);
-  body.append(meta, title, desc, tags, actions);
+  body.append(bodyMeta, bodyTitle, desc, tags, actions);
   card.append(media, body);
   return card;
 }
