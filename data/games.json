@@ -71,6 +71,20 @@
       "order": 10
     },
     {
+      "id": "candle-web",
+      "title": "烛途",
+      "description": "程序",
+      "status": "可玩",
+      "category": "解谜",
+      "cover": "./assets/GamePic/candle_0.png",
+      "coverHover": "./assets/GamePic/candle_1.png",
+      "embedUrl": "https://cgj2026.ninocat.site/",
+      "launchMode": "auto",
+      "tags": "Unity|CiGAGamejam",
+      "devType": "collab",
+      "order": 4
+    },
+    {
       "id": "jl-web",
       "title": "剧烈接触",
       "description": "副程：负责道具的开发",
