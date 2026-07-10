@@ -45,7 +45,7 @@
     "windowWidth": "360px"
   },
   "assetCdn": {
-    "enabled": true,
+    "enabled": false,
     "base": "https://cdn.osyb.cn/gh/xn0o/ninocat",
     "useOnLocal": false
   },
