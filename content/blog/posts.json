@@ -1,6 +1,10 @@
 {
   "posts": [
     {
+      "slug": "CGJ",
+      "file": "./content/blog/CGJ.md"
+    },
+    {
       "slug": "SB_0",
       "file": "./content/blog/SB_0.md"
     },
