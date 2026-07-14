@@ -78,3 +78,4 @@ hide_cover: 0
 
 总之，我玩得很开心。
 大概就是这样，感谢您的阅读。
+->![](./assets/Blog/CGJ/end.png)<-
