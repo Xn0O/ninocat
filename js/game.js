@@ -76,26 +76,39 @@ function cardForGame(game) {
   card.setAttribute("draggable", "false");
   card.addEventListener("dragstart", (event) => event.preventDefault());
 
-  // 3D tilt on mouse hover
-  const TILT_MAX = 8;
-  function getTiltTarget() {
-    // page-transition.js wraps .game-card in .card-wrap; ::after purple glow lives there
-    return card.parentElement?.classList.contains("card-wrap") ? card.parentElement : card;
-  }
+  // 3D tilt on mouse hover (throttled via rAF for performance)
+  const TILT_MAX = 15;
+  let rectCache = null;
+  let rafId = null;
+  card.addEventListener("mouseenter", () => {
+    const wrap = card.parentElement?.classList.contains("card-wrap") ? card.parentElement : card;
+    rectCache = wrap.getBoundingClientRect();
+  });
   card.addEventListener("mousemove", (e) => {
-    const wrap = getTiltTarget();
-    const rect = wrap.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    const rotateY = ((x - cx) / cx) * TILT_MAX;
-    const rotateX = -((y - cy) / cy) * TILT_MAX;
-    wrap.style.transform = `perspective(800px) scale(1.08) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    if (rafId) return;
+    if (!rectCache) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      const wrap = card.parentElement?.classList.contains("card-wrap") ? card.parentElement : card;
+      const rect = rectCache;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const rotateY = ((x - cx) / cx) * TILT_MAX;
+      const rotateX = -((y - cy) / cy) * TILT_MAX;
+      wrap.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
   });
   card.addEventListener("mouseleave", () => {
-    const wrap = getTiltTarget();
-    wrap.style.transform = "";
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    rectCache = null;
+    card.style.transform = "";
+    const wrap = card.parentElement?.classList.contains("card-wrap") ? card.parentElement : null;
+    if (wrap) wrap.style.transform = "";
   });
 
   const media = document.createElement("button");
