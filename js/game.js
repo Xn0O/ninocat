@@ -76,6 +76,28 @@ function cardForGame(game) {
   card.setAttribute("draggable", "false");
   card.addEventListener("dragstart", (event) => event.preventDefault());
 
+  // 3D tilt on mouse hover
+  const TILT_MAX = 8;
+  function getTiltTarget() {
+    // page-transition.js wraps .game-card in .card-wrap; ::after purple glow lives there
+    return card.parentElement?.classList.contains("card-wrap") ? card.parentElement : card;
+  }
+  card.addEventListener("mousemove", (e) => {
+    const wrap = getTiltTarget();
+    const rect = wrap.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotateY = ((x - cx) / cx) * TILT_MAX;
+    const rotateX = -((y - cy) / cy) * TILT_MAX;
+    wrap.style.transform = `perspective(800px) scale(1.08) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+  card.addEventListener("mouseleave", () => {
+    const wrap = getTiltTarget();
+    wrap.style.transform = "";
+  });
+
   const media = document.createElement("button");
   media.type = "button";
   media.className = "game-media";
@@ -157,7 +179,7 @@ function cardForGame(game) {
   }
 
   actions.append(openPage);
-  body.append(bodyMeta, bodyTitle, desc, tags, actions);
+  body.append(bodyTitle, bodyMeta, desc, tags, actions);
   card.append(media, body);
   return card;
 }

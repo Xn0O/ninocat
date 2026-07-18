@@ -124,6 +124,30 @@ body[data-theme="dark"] {
   --home-strip-index: var(--dark-home-strip-index);
 }
 
+/* 游戏页 — 浅色模式 */
+body[data-page="game"][data-theme="light"] {
+  --bg: #F2F2F2;
+  --surface: #FCF9F4;
+  --emphasis-bg: rgba(0, 0, 0, 0.04);
+  --border: rgba(0, 0, 0, 0.10);
+  --muted: #7A7670;
+  --accent: #0055FF;
+  --accent-ink: #FFFFFF;
+}
+
+
+body[data-page="game"][data-theme="light"] .game-card:hover,
+body[data-page="game"][data-theme="light"] .game-card:focus-within {
+  box-shadow: none;
+}
+
+body[data-page="game"][data-theme="light"] .game-card .game-title-desktop {
+  background: linear-gradient(to right, #0055FF 70%, #FFFFFF 100%);
+  color: #FFFFFF;
+  padding: 8px 12px;
+  margin: 0 -12px;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
@@ -1892,6 +1916,7 @@ body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy p {
   gap: 12px;
   position: relative;
   z-index: 1;
+  perspective: 800px;
 }
 
 .game-section-header {
@@ -1909,8 +1934,10 @@ body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy p {
   display: grid;
   grid-template-rows: auto 1fr;
   border-radius: 8px;
+  border: 1px solid var(--border);
   transform: scale(0.92);
   transition: transform 220ms ease;
+  transform-style: preserve-3d;
 }
 
 .game-card:hover,
