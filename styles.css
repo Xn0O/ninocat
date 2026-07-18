@@ -136,13 +136,21 @@ body[data-page="game"][data-theme="light"] {
 }
 
 
-body[data-page="game"][data-theme="light"] .game-card:hover,
-body[data-page="game"][data-theme="light"] .game-card:focus-within {
-  box-shadow: none;
+body[data-page="game"][data-theme="light"] .game-card:hover {
+  box-shadow: 0 20px 45px rgba(0, 85, 255, 0.7);
 }
 
 body[data-page="game"][data-theme="light"] .game-card .game-title-desktop {
-  background: linear-gradient(to right, #0055FF 70%, #FFFFFF 100%);
+  background-color: #FFFFFF;
+  background-image:
+    linear-gradient(to right, #0055FF 60%, transparent 70%),
+    repeating-radial-gradient(
+      circle at 60% 100%,
+      transparent 0,
+      transparent 12px,
+      #0055FF 12px,
+      #0055FF 22px
+    );
   color: #FFFFFF;
   padding: 8px 12px;
   margin: 0 -12px;
