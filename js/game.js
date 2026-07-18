@@ -76,11 +76,17 @@ function cardForGame(game) {
   card.setAttribute("draggable", "false");
   card.addEventListener("dragstart", (event) => event.preventDefault());
 
-  // 3D tilt on mouse hover (throttled via rAF for performance)
+  // 3D tilt on mouse hover (throttled via rAF + guard timer to prevent edge oscillation)
   const TILT_MAX = 15;
   let rectCache = null;
   let rafId = null;
+  let leaveTimer = null;
   card.addEventListener("mouseenter", () => {
+    if (leaveTimer) {
+      clearTimeout(leaveTimer);
+      leaveTimer = null;
+      return; // keep existing rectCache, just resume
+    }
     const wrap = card.parentElement?.classList.contains("card-wrap") ? card.parentElement : card;
     rectCache = wrap.getBoundingClientRect();
   });
@@ -105,10 +111,18 @@ function cardForGame(game) {
       cancelAnimationFrame(rafId);
       rafId = null;
     }
-    rectCache = null;
-    card.style.transform = "";
-    const wrap = card.parentElement?.classList.contains("card-wrap") ? card.parentElement : null;
-    if (wrap) wrap.style.transform = "";
+    if (leaveTimer) clearTimeout(leaveTimer);
+    leaveTimer = setTimeout(() => {
+      rectCache = null;
+      card.style.transition = "transform 0.2s ease-out";
+      card.style.transform = "";
+      const wrap = card.parentElement?.classList.contains("card-wrap") ? card.parentElement : null;
+      if (wrap) {
+        wrap.style.transition = "transform 0.2s ease-out";
+        wrap.style.transform = "";
+      }
+      leaveTimer = null;
+    }, 150);
   });
 
   const media = document.createElement("button");

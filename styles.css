@@ -156,6 +156,17 @@ body[data-page="game"][data-theme="light"] .game-card .game-title-desktop {
   margin: 0 -12px;
 }
 
+/* 游戏页禁用 CSS hover 变换，由 JS 倾斜效果接管 */
+body[data-page="game"] .game-card:hover,
+body[data-page="game"] .game-card:focus-within {
+  transform: scale(0.92);
+  z-index: 2;
+}
+body[data-page="game"] .card-wrap:hover {
+  transform: none;
+  z-index: 3;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
