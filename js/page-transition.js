@@ -95,8 +95,10 @@
 })();
 
 
-// ---- Grid trail ----
+// ---- Grid trail (about/lab 页面不启用) ----
 (function () {
+        var page = document.body.getAttribute('data-page');
+        if (page === 'about' || page === 'lab') return;
         var c = document.getElementById('grid-trail');
         if (!c) return;
         var ctx = c.getContext('2d');
