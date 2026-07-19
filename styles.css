@@ -167,6 +167,13 @@ body[data-page="game"] .card-wrap:hover {
   z-index: 3;
 }
 
+/* 游戏页浅色模式 — hero 块斜切样式 
+body[data-page="game"][data-theme="light"] .page-hero .hero-copy.block {
+  background-color: #ffffff;
+  background-image: linear-gradient(135deg, #0044DD 55%, transparent 75%);
+  color: #fff;
+}
+*/
 body {
   background: var(--bg);
   color: var(--text);
@@ -548,7 +555,7 @@ a {
   top: -5px; left: -5px;
   width: calc(100% + 10px);
   height: calc(100% + 10px);
-  background: #5b3bff;
+  background: #173eff;
   border-radius: 8px;
   opacity: 0;
   transition: opacity 220ms ease;
@@ -1928,10 +1935,10 @@ body[data-page="blog"]:not(:has(.back-link)) .page-hero .hero-copy p {
 .post-tag-link:hover {
   text-decoration: underline;
 }
-
+/*游戏卡片排列*/
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   position: relative;
   z-index: 1;
@@ -2627,6 +2634,32 @@ body.lightbox-open {
   }
   .game-meta-desktop,
   .game-title-desktop {
+    display: none;
+  }
+
+  /* 手机端浅色模式 — 恢复 tittle 背景色块 */
+  body[data-page="game"][data-theme="light"] .game-title-desktop {
+    display: block;
+    background-color: #FFFFFF;
+    background-image:
+      linear-gradient(to right, #0055FF 60%, transparent 70%),
+      repeating-radial-gradient(
+        circle at 60% 100%,
+        transparent 0,
+        transparent 12px,
+        #0055FF 12px,
+        #0055FF 22px
+      );
+    color: #FFFFFF;
+    padding: 8px 12px;
+    margin: 0 -12px;
+  }
+  body[data-page="game"][data-theme="light"] .game-meta-desktop {
+    display: block;
+  }
+  /* 手机浅色模式封面 overlay 文字去掉（桌面标题已显示） */
+  body[data-page="game"][data-theme="light"] .game-body-overlay .game-meta,
+  body[data-page="game"][data-theme="light"] .game-body-overlay .game-title {
     display: none;
   }
   .game-desc {
